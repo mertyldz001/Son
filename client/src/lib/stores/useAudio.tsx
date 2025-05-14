@@ -33,7 +33,7 @@ export const useAudio = create<AudioState>((set, get) => ({
   clickSound: null,
   collectSound: null,
   buildSound: null,
-  isMuted: true, // Start muted by default
+  isMuted: false, // Varsayılan olarak ses açık
   
   setBackgroundMusic: (music) => set({ backgroundMusic: music }),
   setHitSound: (sound) => set({ hitSound: sound }),

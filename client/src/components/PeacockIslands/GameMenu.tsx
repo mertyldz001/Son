@@ -232,9 +232,9 @@ const GameMenu = () => {
                 }}
               >
                 <div className="rotate-[-45deg] flex flex-col items-center justify-center">
-                  <span className="text-white text-xl font-bold tracking-wider">TKA</span>
+                  <span className="text-white text-xl font-bold tracking-wider">FI</span>
                   <div className="w-full h-px bg-white/30 mt-1 mb-1"></div>
-                  <span className="text-white/70 text-[9px] tracking-widest">TAVUS KUŞU</span>
+                  <span className="text-white/70 text-[9px] tracking-widest">FEATHER ISLAND</span>
                 </div>
               </motion.div>
               
