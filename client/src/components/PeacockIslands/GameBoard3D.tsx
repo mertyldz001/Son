@@ -13,71 +13,115 @@ const createHexPosition = (q: number, r: number, size: number = 1) => {
 };
 
 // Hex şeklinde geometri oluştur
-const HexTile = ({ position, color, isHighlighted, isPlayerSide }: any) => {
+const HexTile = ({ position, color, isHighlighted, isPlayerSide, isOccupied = false }: any) => {
   const meshRef = useRef<THREE.Mesh>(null);
+  const lineRef = useRef<THREE.LineSegments>(null);
   const [hovered, setHovered] = useState(false);
   
   // Hover efektini yönet
   useFrame((_, delta) => {
-    if (!meshRef.current) return;
+    if (!meshRef.current || !lineRef.current) return;
     
     // Hover durumuna göre yükseklik ayarla
-    const targetY = hovered || isHighlighted ? 0.1 : 0;
+    const targetY = hovered || isHighlighted ? 0.05 : 0;
     meshRef.current.position.y += (targetY - meshRef.current.position.y) * 5 * delta;
+    lineRef.current.position.y = meshRef.current.position.y + 0.02; // Çizgileri yukarıda tut
     
     // Renk değişimini yönet
     const material = meshRef.current.material as THREE.MeshStandardMaterial;
+    const lineMaterial = lineRef.current.material as THREE.LineBasicMaterial;
+    
+    // Altıgen rengi
     const targetColor = new THREE.Color(
       isHighlighted ? '#4488ff' : 
       hovered ? '#44aa44' : 
-      color
+      isOccupied ? color : // Eğer dolu ise belirgin renk
+      new THREE.Color(color).lerp(new THREE.Color('#ffffff'), 0.7) // Boş ise soldurulmuş renk
     );
     material.color.lerp(targetColor, 10 * delta);
+    
+    // Kenar çizgisi görünürlüğü
+    const targetOpacity = hovered || isHighlighted || isOccupied ? 1.0 : 0.3;
+    lineMaterial.opacity += (targetOpacity - lineMaterial.opacity) * 10 * delta;
+    
+    // Şeffaflık ayarı - TFT'deki gibi boş kareler hafif görünür olacak
+    const targetAlpha = hovered || isHighlighted || isOccupied ? 0.9 : 0.15;
+    material.opacity += (targetAlpha - material.opacity) * 10 * delta;
   });
 
   // Hex geometrisi oluştur
   const hexShape = new THREE.Shape();
   const size = 0.95; // Kenar aralarında boşluk bırakmak için biraz küçült
+  const points = [];
   
   for (let i = 0; i < 6; i++) {
     const angle = (Math.PI / 3) * i;
     const x = size * Math.cos(angle);
     const y = size * Math.sin(angle);
+    points.push(new THREE.Vector2(x, y));
+    
     if (i === 0) {
       hexShape.moveTo(x, y);
     } else {
       hexShape.lineTo(x, y);
     }
   }
+  // Şekli kapatmak için ilk noktaya dön
+  hexShape.closePath();
+  
+  // Kenar çizgisi için geometri
+  const edgeGeometry = new THREE.EdgesGeometry(
+    new THREE.ExtrudeGeometry(hexShape, { 
+      depth: 0.1,
+      bevelEnabled: false
+    })
+  );
   
   return (
-    <mesh 
-      ref={meshRef}
-      position={position}
-      rotation={[-Math.PI / 2, 0, 0]}
-      receiveShadow
-      castShadow
-      onPointerOver={() => setHovered(true)}
-      onPointerOut={() => setHovered(false)}
-    >
-      <extrudeGeometry 
-        args={[
-          hexShape, 
-          { 
-            depth: 0.1,
-            bevelEnabled: true,
-            bevelSegments: 2,
-            bevelSize: 0.02,
-            bevelThickness: 0.02
-          }
-        ]} 
-      />
-      <meshStandardMaterial 
-        color={color} 
-        roughness={0.7}
-        metalness={0.2}
-      />
-    </mesh>
+    <group position={position}>
+      {/* Altıgen dolgusu */}
+      <mesh 
+        ref={meshRef}
+        rotation={[-Math.PI / 2, 0, 0]}
+        receiveShadow
+        onPointerOver={() => setHovered(true)}
+        onPointerOut={() => setHovered(false)}
+      >
+        <extrudeGeometry 
+          args={[
+            hexShape, 
+            { 
+              depth: 0.1,
+              bevelEnabled: true,
+              bevelSegments: 2,
+              bevelSize: 0.02,
+              bevelThickness: 0.02
+            }
+          ]} 
+        />
+        <meshStandardMaterial 
+          color={color} 
+          roughness={0.7}
+          metalness={0.2}
+          transparent={true}
+          opacity={isOccupied ? 0.9 : 0.15}
+        />
+      </mesh>
+      
+      {/* Altıgen kenar çizgileri */}
+      <lineSegments 
+        ref={lineRef} 
+        rotation={[-Math.PI / 2, 0, 0]}
+      >
+        <primitive object={edgeGeometry} />
+        <lineBasicMaterial 
+          color={isPlayerSide ? "#99ffaa" : "#ffaa99"} 
+          transparent={true} 
+          opacity={isOccupied ? 1.0 : 0.3}
+          linewidth={2}
+        />
+      </lineSegments>
+    </group>
   );
 };
 
@@ -416,16 +460,32 @@ const Battlefield = () => {
           <meshStandardMaterial color="#88aa99" roughness={0.8} />
         </mesh>
         
-        {/* Hex harita */}
-        {hexPositions.map((hex, i) => (
-          <HexTile 
-            key={i}
-            position={hex.position}
-            color={hex.isPlayerSide ? "#77aa88" : "#aa7788"}
-            isHighlighted={false}
-            isPlayerSide={hex.isPlayerSide}
-          />
-        ))}
+        {/* Hex harita - Dolu veya boş durumlarına göre render et */}
+        {hexPositions.map((hex, i) => {
+          // Bu hex'e birim yerleştirilmiş mi?
+          const playerUnitHere = playerUnits.find(unit => 
+            unit.position[0] === hex.position[0] && 
+            unit.position[2] === hex.position[2]
+          );
+          
+          const enemyUnitHere = enemyUnits.find(unit => 
+            unit.position[0] === hex.position[0] && 
+            unit.position[2] === hex.position[2]
+          );
+          
+          const isOccupied = Boolean(playerUnitHere || enemyUnitHere);
+          
+          return (
+            <HexTile 
+              key={i}
+              position={hex.position}
+              color={hex.isPlayerSide ? "#77aa88" : "#aa7788"}
+              isHighlighted={false}
+              isPlayerSide={hex.isPlayerSide}
+              isOccupied={isOccupied}
+            />
+          );
+        })}
         
         {/* Oyuncu askerleri */}
         {playerUnits.map((unit, i) => (
@@ -434,6 +494,7 @@ const Battlefield = () => {
             position={unit.position}
             color="#4488ff"
             power={unit.power}
+            health={unit.health}
             size={0.4}
           />
         ))}
@@ -450,6 +511,8 @@ const Battlefield = () => {
               "#ff0000"
             }
             power={unit.power}
+            health={unit.health}
+            type={unit.type}
             size={
               unit.type === "chick" ? 0.3 :
               unit.type === "juvenile" ? 0.4 :
@@ -563,7 +626,7 @@ const GameBoard3D = () => {
   const isBattlePhase = currentPhase === "battle";
   
   // Fazlara göre farklı kamera ve arka plan renkleri
-  const cameraPosition = isBattlePhase ? [0, 12, 0] : [6, 8, 10];
+  const cameraPosition: [number, number, number] = isBattlePhase ? [0, 12, 0] : [6, 8, 10];
   const backgroundColor = isBattlePhase ? "#345564" : "#4a6880";
   
   return (
@@ -571,7 +634,7 @@ const GameBoard3D = () => {
       <Canvas
         shadows
         camera={{
-          position: cameraPosition,
+          position: [cameraPosition[0], cameraPosition[1], cameraPosition[2]],
           fov: 50,
           near: 0.1,
           far: 1000
