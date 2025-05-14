@@ -260,7 +260,7 @@ const PreparationPhase = () => {
                     <h5 className="text-sm font-medium text-gray-300 mb-2">Tüy Renkleri:</h5>
                     <div className="grid grid-cols-3 gap-2 mb-3">
                       <button
-                        className={`p-3 rounded-lg flex flex-col items-center justify-center h-24 ${
+                        className={`p-3 rounded-lg flex flex-col items-center justify-between ${
                           featherColorSelected === "green" 
                             ? "bg-green-950 border-2 border-green-500 shadow-lg shadow-green-900/40" 
                             : "bg-green-950/40 border border-green-800 hover:bg-green-900/30"
@@ -270,20 +270,29 @@ const PreparationPhase = () => {
                           setFeatherColorSelected("green");
                         }}
                       >
-                        <div className="feather-icon flex items-center justify-center w-10 h-10 rounded-full bg-green-800/60 mb-2">
-                          <span className="material-icons text-green-400 text-xl">eco</span>
+                        {/* 3D Tüy Modeli */}
+                        <div className="h-20 w-full">
+                          <FeatherViewer 
+                            color="green" 
+                            scale={0.6} 
+                            rotate={featherColorSelected === "green"}
+                          />
                         </div>
-                        <span className="text-green-400 font-bold">Yeşil</span>
-                        <div className="bonus-badge mt-1 px-2 py-0.5 bg-green-900/60 rounded-full text-xs text-green-300">
-                          +20 Can
+                        
+                        <div className="mt-auto w-full text-center">
+                          <span className="text-green-400 font-bold">Yeşil</span>
+                          <div className="bonus-badge mt-1 px-2 py-0.5 bg-green-900/60 rounded-full text-xs text-green-300">
+                            +20 Can
+                          </div>
                         </div>
-                        <div className="count-badge absolute top-2 right-2 bg-green-700/80 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                        
+                        <div className="count-badge absolute top-2 right-2 bg-green-700/80 text-white text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center border border-green-500/50">
                           {player.island.featherInventory.green}
                         </div>
                       </button>
                       
                       <button
-                        className={`p-3 rounded-lg flex flex-col items-center justify-center h-24 ${
+                        className={`p-3 rounded-lg flex flex-col items-center justify-between ${
                           featherColorSelected === "blue" 
                             ? "bg-blue-950 border-2 border-blue-500 shadow-lg shadow-blue-900/40" 
                             : "bg-blue-950/40 border border-blue-800 hover:bg-blue-900/30"
@@ -293,20 +302,29 @@ const PreparationPhase = () => {
                           setFeatherColorSelected("blue");
                         }}
                       >
-                        <div className="feather-icon flex items-center justify-center w-10 h-10 rounded-full bg-blue-800/60 mb-2">
-                          <span className="material-icons text-blue-400 text-xl">air</span>
+                        {/* 3D Tüy Modeli */}
+                        <div className="h-20 w-full">
+                          <FeatherViewer 
+                            color="blue" 
+                            scale={0.6} 
+                            rotate={featherColorSelected === "blue"}
+                          />
                         </div>
-                        <span className="text-blue-400 font-bold">Mavi</span>
-                        <div className="bonus-badge mt-1 px-2 py-0.5 bg-blue-900/60 rounded-full text-xs text-blue-300">
-                          +20% Hız
+                        
+                        <div className="mt-auto w-full text-center">
+                          <span className="text-blue-400 font-bold">Mavi</span>
+                          <div className="bonus-badge mt-1 px-2 py-0.5 bg-blue-900/60 rounded-full text-xs text-blue-300">
+                            +20% Hız
+                          </div>
                         </div>
-                        <div className="count-badge absolute top-2 right-2 bg-blue-700/80 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                        
+                        <div className="count-badge absolute top-2 right-2 bg-blue-700/80 text-white text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center border border-blue-500/50">
                           {player.island.featherInventory.blue}
                         </div>
                       </button>
                       
                       <button
-                        className={`p-3 rounded-lg flex flex-col items-center justify-center h-24 ${
+                        className={`p-3 rounded-lg flex flex-col items-center justify-between ${
                           featherColorSelected === "orange" 
                             ? "bg-orange-950 border-2 border-orange-500 shadow-lg shadow-orange-900/40" 
                             : "bg-orange-950/40 border border-orange-800 hover:bg-orange-900/30"
@@ -316,14 +334,23 @@ const PreparationPhase = () => {
                           setFeatherColorSelected("orange");
                         }}
                       >
-                        <div className="feather-icon flex items-center justify-center w-10 h-10 rounded-full bg-orange-800/60 mb-2">
-                          <span className="material-icons text-orange-400 text-xl">bolt</span>
+                        {/* 3D Tüy Modeli */}
+                        <div className="h-20 w-full">
+                          <FeatherViewer 
+                            color="orange" 
+                            scale={0.6} 
+                            rotate={featherColorSelected === "orange"}
+                          />
                         </div>
-                        <span className="text-orange-400 font-bold">Turuncu</span>
-                        <div className="bonus-badge mt-1 px-2 py-0.5 bg-orange-900/60 rounded-full text-xs text-orange-300">
-                          +20 Saldırı
+                        
+                        <div className="mt-auto w-full text-center">
+                          <span className="text-orange-400 font-bold">Turuncu</span>
+                          <div className="bonus-badge mt-1 px-2 py-0.5 bg-orange-900/60 rounded-full text-xs text-orange-300">
+                            +20 Saldırı
+                          </div>
                         </div>
-                        <div className="count-badge absolute top-2 right-2 bg-orange-700/80 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                        
+                        <div className="count-badge absolute top-2 right-2 bg-orange-700/80 text-white text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center border border-orange-500/50">
                           {player.island.featherInventory.orange}
                         </div>
                       </button>
@@ -381,32 +408,64 @@ const PreparationPhase = () => {
                         </div>
                         
                         {player.island.featherInventory[featherColorSelected] >= 3 && (
-                          <div className="combine-preview bg-gray-900/60 p-3 rounded-lg flex items-center text-sm">
-                            <div className="flex-1 flex items-center gap-2">
-                              <div className="flex items-center">
-                                <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
-                                  featherColorSelected === "green" ? "bg-green-800/70" :
-                                  featherColorSelected === "blue" ? "bg-blue-800/70" :
-                                  "bg-orange-800/70"
-                                }`}>
-                                  <span className="material-icons text-xs">eco</span>
+                          <div className="combine-preview bg-gray-900/70 p-3 rounded-lg overflow-hidden">
+                            <h6 className="text-sm font-medium text-gray-300 mb-2 text-center">Tüyleri Birleştir</h6>
+                            
+                            <div className="grid grid-cols-5 gap-2">
+                              {/* Sol: Tüyler */}
+                              <div className="col-span-2 flex flex-col items-center">
+                                <div className="h-16 w-full">
+                                  <FeatherViewer 
+                                    color={featherColorSelected} 
+                                    scale={0.4} 
+                                    rotate={false}
+                                  />
                                 </div>
-                                <span className="mx-1">×</span>
-                                <span className="font-bold">3</span>
+                                <div className="flex items-center mt-2">
+                                  <span className="flex items-center justify-center px-2 py-1 rounded-lg bg-gray-800/80">
+                                    <span className="font-bold text-white">x3</span>
+                                    <span className="text-xs ml-1 text-gray-300">tüy</span>
+                                  </span>
+                                </div>
                               </div>
-                              <span className="mx-2">→</span>
-                              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                                featherColorSelected === "green" ? "bg-green-800/70" :
-                                featherColorSelected === "blue" ? "bg-blue-800/70" :
-                                "bg-orange-800/70"
-                              }`}>
-                                <span className="material-icons text-sm">egg</span>
+                              
+                              {/* Orta: Ok */}
+                              <div className="flex items-center justify-center">
+                                <div className="arrow w-8 h-8 bg-gray-800/80 rounded-full flex items-center justify-center">
+                                  <span className="material-icons transform scale-125 text-gray-300">
+                                    arrow_forward
+                                  </span>
+                                </div>
                               </div>
-                            </div>
-                            <div className="text-xs text-gray-300">
-                              {featherColorSelected === "green" ? "+20 Can" :
-                               featherColorSelected === "blue" ? "+20% Hız" :
-                               "+20 Saldırı"} bonusu
+                              
+                              {/* Sağ: Yumurta */}
+                              <div className="col-span-2 flex flex-col items-center">
+                                <div className="h-16 w-full">
+                                  <EggViewer 
+                                    color={featherColorSelected} 
+                                    scale={0.7} 
+                                    rotate={true}
+                                  />
+                                </div>
+                                <div className="flex items-center mt-2">
+                                  <span className={`flex items-center justify-center px-2 py-1 rounded-lg ${
+                                    featherColorSelected === "green" ? "bg-green-900/70" :
+                                    featherColorSelected === "blue" ? "bg-blue-900/70" :
+                                    "bg-orange-900/70"
+                                  }`}>
+                                    <span className="material-icons text-xs mr-1">
+                                      {featherColorSelected === "green" ? "favorite" :
+                                        featherColorSelected === "blue" ? "speed" :
+                                        "bolt"}
+                                    </span>
+                                    <span className="text-xs">
+                                      {featherColorSelected === "green" ? "+20 Can" :
+                                       featherColorSelected === "blue" ? "+20% Hız" :
+                                       "+20 Saldırı"}
+                                    </span>
+                                  </span>
+                                </div>
+                              </div>
                             </div>
                           </div>
                         )}
@@ -456,14 +515,14 @@ const PreparationPhase = () => {
                       {player.island.hatchery.map((slot) => (
                         <div 
                           key={slot.id}
-                          className={`p-3 rounded-lg border flex flex-col items-center justify-center h-28 ${
+                          className={`p-3 rounded-lg border flex flex-col items-center justify-center ${
                             selectedHatcherySlot?.id === slot.id ? "bg-purple-950 border-purple-500" : 
                             slot.egg ? (
                               slot.egg.color === "green" ? "bg-green-950/80 border-green-700" :
                               slot.egg.color === "blue" ? "bg-blue-950/80 border-blue-700" :
                               "bg-orange-950/80 border-orange-700"
                             ) : "bg-gray-850/40 border-gray-700"
-                          } ${slot.isActive ? "opacity-70" : "cursor-pointer hover:shadow-inner"}`}
+                          } ${slot.isActive ? "opacity-80" : "cursor-pointer hover:shadow-inner"}`}
                           onClick={() => {
                             if (!slot.isActive && slot.egg) {
                               playClick();
@@ -473,50 +532,62 @@ const PreparationPhase = () => {
                         >
                           {slot.egg ? (
                             <>
-                              <div className="egg-icon w-12 h-12 mb-1 rounded-full flex items-center justify-center"
-                                style={{
-                                  background: `radial-gradient(circle, ${
-                                    slot.egg.color === "green" ? "#4caf50" :
-                                    slot.egg.color === "blue" ? "#2196f3" :
-                                    "#ff9800"
-                                  }, transparent)`
-                                }}
-                              >
-                                <span className="material-icons text-2xl">
-                                  {slot.egg.color === "green" ? "favorite" :
-                                    slot.egg.color === "blue" ? "speed" :
-                                    "bolt"}
-                                </span>
+                              {/* 3D Yumurta Modeli */}
+                              <div className="h-28 w-full mb-2">
+                                <EggViewer 
+                                  color={slot.egg.color}
+                                  isActive={slot.isActive}
+                                  scale={1.2}
+                                  rotate={true}
+                                />
                               </div>
                               
-                              <span className={`font-medium ${
-                                slot.egg.color === "green" ? "text-green-400" :
-                                slot.egg.color === "blue" ? "text-blue-400" :
-                                "text-orange-400"
-                              }`}>
-                                {getFeatherColorName(slot.egg.color)} 
-                              </span>
-                              
-                              <div className="flex items-center text-xs mt-1">
-                                <span className={`px-2 py-0.5 rounded-full ${
-                                  slot.isActive 
-                                    ? "bg-green-900/60 text-green-300" 
-                                    : "bg-gray-800/60 text-gray-300"
+                              <div className="mt-auto w-full">
+                                <div className="flex justify-between items-center mb-1">
+                                  <span className={`font-medium ${
+                                    slot.egg.color === "green" ? "text-green-400" :
+                                    slot.egg.color === "blue" ? "text-blue-400" :
+                                    "text-orange-400"
+                                  }`}>
+                                    {getFeatherColorName(slot.egg.color)} 
+                                  </span>
+                                  
+                                  <div className="flex items-center ml-1">
+                                    <span className={`px-2 py-0.5 rounded-full text-xs ${
+                                      slot.isActive 
+                                        ? "bg-green-900/60 text-green-300" 
+                                        : "bg-gray-800/60 text-gray-300"
+                                    }`}>
+                                      {slot.isActive ? "Aktif" : "Pasif"}
+                                    </span>
+                                  </div>
+                                </div>
+                                
+                                <div className={`bonus-badge p-1 rounded text-xs text-center ${
+                                  slot.egg.color === "green" ? "bg-green-900/40 text-green-300" :
+                                  slot.egg.color === "blue" ? "bg-blue-900/40 text-blue-300" :
+                                  "bg-orange-900/40 text-orange-300"
                                 }`}>
-                                  {slot.isActive ? "Aktif" : "Pasif"}
-                                </span>
+                                  <span className="material-icons text-xs mr-1 align-text-top">
+                                    {slot.egg.bonusType === "health" ? "favorite" :
+                                      slot.egg.bonusType === "attackSpeed" ? "speed" :
+                                      "bolt"}
+                                  </span>
+                                  +{slot.egg.bonusValue} {getBonusTypeName(slot.egg.bonusType)}
+                                </div>
                               </div>
-                              
-                              <span className="text-xs text-gray-300 mt-1">
-                                +{slot.egg.bonusValue} {getBonusTypeName(slot.egg.bonusType)}
-                              </span>
                             </>
                           ) : (
                             <>
-                              <div className="empty-egg w-12 h-12 rounded-full border-2 border-dashed border-gray-600 flex items-center justify-center mb-2">
-                                <span className="material-icons text-gray-500">egg</span>
+                              <div className="empty-egg-container h-28 w-full flex items-center justify-center mb-2">
+                                <div className="empty-egg w-16 h-16 rounded-full border-2 border-dashed border-gray-600 flex items-center justify-center">
+                                  <span className="material-icons text-gray-500">egg</span>
+                                </div>
                               </div>
-                              <span className="text-gray-400">Boş Yuva</span>
+                              <div className="mt-2 text-gray-400 text-center">
+                                <div>Boş Yuva</div>
+                                <div className="text-xs text-gray-500 mt-1">Yumurta oluşturmak için<br/>3 tüy birleştirin</div>
+                              </div>
                             </>
                           )}
                         </div>
