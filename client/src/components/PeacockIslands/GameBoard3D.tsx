@@ -11,7 +11,6 @@ import {
   Float,
   MeshDistortMaterial,
   PresentationControls,
-  KeyboardControls,
   Line
 } from '@react-three/drei';
 
@@ -349,67 +348,33 @@ const Battlefield = () => {
   );
 };
 
-// Basit Tuş Kontrolleri
-const CameraKeyboardControls = () => {
-  const { camera } = useThree();
-  const position = useRef(camera.position.clone());
-  const [cameraState, setCameraState] = useState({
-    zoom: 1
-  });
-
-  // Tuş durumlarını izle
+// Temel Kamera Kontrol Sistemi
+const SimpleCameraControls = () => {
+  const { camera, gl } = useThree();
+  
   useEffect(() => {
     // Kullanıcıya bilgi ver
-    console.log('Basit klavye kamera kontrolleri aktif:');
-    console.log('1, 3: Kamerayı yatayda döndür');
-    console.log('2, 8: Kamerayı dikeyde döndür');
-    console.log('+, -: Yakınlaşma/Uzaklaşma');
-    
-    const handleKey = (e: KeyboardEvent) => {
-      // Kamera dönüşleri
-      if (e.key === '1') {
-        camera.position.x -= 0.5;
-        camera.lookAt(0, 0, 0);
-      }
-      if (e.key === '3') {
-        camera.position.x += 0.5;
-        camera.lookAt(0, 0, 0);
-      }
-      if (e.key === '2') {
-        camera.position.y += 0.5;
-        camera.lookAt(0, 0, 0);
-      }
-      if (e.key === '8') {
-        camera.position.y -= 0.5;
-        camera.lookAt(0, 0, 0);
-      }
-      
-      // Zoom kontrolü
-      if (e.key === '+' || e.key === '=') {
-        setCameraState(prev => ({
-          ...prev,
-          zoom: prev.zoom * 1.1
-        }));
-        camera.position.z -= 1;
-        camera.lookAt(0, 0, 0);
-      }
-      if (e.key === '-') {
-        setCameraState(prev => ({
-          ...prev,
-          zoom: prev.zoom / 1.1
-        }));
-        camera.position.z += 1;
-        camera.lookAt(0, 0, 0);
-      }
-    };
-    
-    window.addEventListener('keydown', handleKey);
-    return () => {
-      window.removeEventListener('keydown', handleKey);
-    };
-  }, [camera]);
+    console.log('Mouse/Fare Kontrolleri aktif:');
+    console.log('- Sol tuş + sürükle: Kamerayı döndür');
+    console.log('- Fare tekerleği: Yakınlaş/uzaklaş');
+    console.log('- Shift + Sol tuş + sürükle: Kaydır');
+  }, []);
   
-  return null;
+  return (
+    <OrbitControls
+      args={[camera, gl.domElement]}
+      makeDefault
+      enableDamping={true}
+      dampingFactor={0.25}
+      rotateSpeed={0.7}
+      panSpeed={0.7}
+      zoomSpeed={0.7}
+      minDistance={5}
+      maxDistance={50}
+      maxPolarAngle={Math.PI / 1.7}
+      target={[0, 0, 0]}
+    />
+  );
 }
 
 // Ana canvas bileşeni
@@ -517,17 +482,8 @@ const GameBoard3D = () => {
         
         {/* Kamera Kontrolü - Eskiyi kaldır */}
 
-        {/* Keyboard kontrollerimiz için Context */}
-        <KeyboardControls
-          map={[
-            { name: "KeyW", keys: ["ArrowUp", "KeyW"] },
-            { name: "KeyS", keys: ["ArrowDown", "KeyS"] },
-            { name: "KeyA", keys: ["ArrowLeft", "KeyA"] },
-            { name: "KeyD", keys: ["ArrowRight", "KeyD"] }
-          ]}
-        >
-          <PenguinAvatar />
-        </KeyboardControls>
+        {/* Penguen karakteri */}
+        <PenguinAvatar />
         
         {/* Oyun alanı */}
         <Battlefield />
@@ -541,8 +497,8 @@ const GameBoard3D = () => {
           />
         </EffectComposer>
         
-        {/* Kullanıcı tanımlı kamera kontrollerimiz */}
-        <CameraKeyboardControls />
+        {/* Basit fare tabanlı kamera kontrolleri */}
+        <SimpleCameraControls />
         
         {/* Gelişmiş sis efekti - Fazlara göre değişir */}
         <fog 
