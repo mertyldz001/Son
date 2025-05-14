@@ -32,10 +32,10 @@ function HexTile({
   onUnhover 
 }: HexTileProps) {
   // TFT tarzı renkler - ekran görüntüsündeki gibi
-  const baseColor = isPlayerSide ? "#4f9bff" : "#ff4040"; // Ana karo renkleri
+  const baseColor = isPlayerSide ? "#4f9bff" : "#e04040"; // Ekran görüntüsündeki gibi ana renkler
   const hoverColor = isPlayerSide ? "#64bdff" : "#ff6060"; // Vurgu renkleri
-  // Kenar çizgisi rengi içerideki renkle uyumlu (TFT stilinde)
-  const edgeColor = isPlayerSide ? "#60a5ff" : "#ff6060";
+  // Kenar çizgisi renkleri - exact match ekran görüntüsüne göre
+  const edgeColor = isPlayerSide ? "#4692e8" : "#eb6060";
   
   // TFT stili hover animasyonu - yumuşak geçişli
   const hoverScale = useRef(new THREE.Vector3(1, 1, 1));
@@ -87,7 +87,7 @@ function HexTile({
         }}
       >
         {/* TFT stili hexagonal geometri yerine kareden */}
-        <cylinderGeometry args={[size * 1.2, size * 1.2, 0.25, 6, 1, false]} />
+        <cylinderGeometry args={[size * 1.3, size * 1.3, 0.25, 6, 1, false]} />
         <meshPhysicalMaterial 
           color={isHovered ? hoverColor : baseColor} 
           roughness={0.15} // Çok parlak
@@ -104,33 +104,18 @@ function HexTile({
         />
       </mesh>
       
-      {/* TFT stili kenar çizgisi - içerideki renkle uyumlu */}
+      {/* TFT stili kenar çizgisi - ekran görüntüsündeki gibi */}
       <mesh 
         position={[0, 0.03, 0]} 
         rotation={[-Math.PI / 2, 0, 0]}
         scale={hoverScale.current}
       >
-        <ringGeometry args={[size * 1.18, size * 1.24, 6]} />
+        <ringGeometry args={[size * 1.28, size * 1.35, 6]} />
         <meshBasicMaterial 
           color={isHovered ? "#ffffff" : edgeColor} 
           side={THREE.DoubleSide} 
           transparent={true}
-          opacity={isHovered ? 1.0 : 0.95}
-        />
-      </mesh>
-      
-      {/* TFT stili ince kenar çizgisi - ekstra detay */}
-      <mesh 
-        position={[0, 0.035, 0]} 
-        rotation={[-Math.PI / 2, 0, 0]}
-        scale={hoverScale.current}
-      >
-        <ringGeometry args={[size * 1.25, size * 1.27, 6]} />
-        <meshBasicMaterial 
-          color={isHovered ? "#ffffff" : edgeColor} 
-          side={THREE.DoubleSide} 
-          transparent={true}
-          opacity={isHovered ? 0.9 : 0.6}
+          opacity={1.0}
         />
       </mesh>
       
@@ -196,9 +181,9 @@ const HexGrid: React.FC<HexGridProps> = ({
       const s = -q - r;
       const key = `${q},${r},${s}`;
       
-      // Pozisyonlar - sütunlar TFT tarzında daha yakın
-      const x = size * 2.0 * (q - gridWidth/2 + 0.5);  // Yatay olarak optimal boşluk
-      const z = size * 2.0 * r;  // Dikey olarak optimal boşluk
+      // Pozisyonlar - gönderilen ekran görüntüsündeki gibi daha yakın
+      const x = size * 1.8 * (q - gridWidth/2 + 0.5);  // Yatay olarak daha yakın
+      const z = size * 1.8 * r;  // Dikey olarak daha yakın
       
       // TFT tarzı: Oyuncu ve rakip tarafı - net ayrım
       const isPlayerSide = r < gridHeight / 2;

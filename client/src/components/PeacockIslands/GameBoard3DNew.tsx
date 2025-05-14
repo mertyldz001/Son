@@ -455,14 +455,12 @@ const GameScene = () => {
           receiveShadow
         >
           <planeGeometry args={[22, 15]} />
-          <meshPhysicalMaterial 
-            color="#2a8d4e"
+          <meshStandardMaterial 
+            color="#25a047"  // Ekran görüntüsündeki gibi parlak yeşil
             roughness={0.4} 
-            metalness={0.4}
-            clearcoat={0.5}
-            reflectivity={0.4}
-            emissive="#1a5530"
-            emissiveIntensity={0.2}
+            metalness={0.2}
+            emissive="#207537"
+            emissiveIntensity={0.1}
           />
         </mesh>
         
@@ -497,8 +495,8 @@ const GameScene = () => {
         </mesh>
       </group>
       
-      {/* Hexagonal Savaş Alanı - Daha geniş aralıklı */}
-      <group position={[0, 0.1, 0]} scale={1.1}>
+      {/* Hexagonal Savaş Alanı - TFT stili */}
+      <group position={[0, 0.05, 0]} scale={1.0}>
         <HexGrid 
           size={0.7} 
           gridWidth={7} 
