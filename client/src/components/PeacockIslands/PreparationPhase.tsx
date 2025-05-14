@@ -343,11 +343,11 @@ const PreparationPhase = () => {
               Tüy ve Yumurta Yönetimi
             </h3>
             
-            <div className="grid grid-cols-2 gap-4 mb-4">
+            <div className="flex gap-4 mb-4 flex-wrap">
               {/* Tüy birleştirme paneli - WindowPanel */}
               <WindowPanel 
                 title="Tüy Birleştirme" 
-                width="500px" 
+                width="350px" 
                 height="auto"
                 initiallyMinimized={buildingSelected !== "feathers"}
               >
@@ -597,7 +597,7 @@ const PreparationPhase = () => {
               {/* Yumurta yönetimi - WindowPanel */}
               <WindowPanel 
                 title="Yumurta Yönetimi" 
-                width="100%" 
+                width="350px" 
                 height="auto"
                 initiallyMinimized={buildingSelected !== "eggs"}
               >
@@ -630,7 +630,7 @@ const PreparationPhase = () => {
                           ? "bg-indigo-900/80 border-2 border-indigo-500/80"
                           : "bg-gray-800/40 border border-gray-600/40 hover:bg-gray-700/40"
                       } ${
-                        slot.status !== "empty" ? (
+                        slot.status !== "empty" && slot.egg ? (
                           slot.egg.color === "green" 
                             ? "bg-gradient-to-br from-green-900/40 to-emerald-900/20 border-green-600/30" 
                             : slot.egg.color === "blue"
@@ -642,7 +642,7 @@ const PreparationPhase = () => {
                     >
                       {/* Yumurta Görüntüsü */}
                       <div className="h-24 w-full">
-                        {slot.status !== "empty" ? (
+                        {slot.status !== "empty" && slot.egg ? (
                           <EggViewer 
                             color={slot.egg.color} 
                             scale={0.7} 
