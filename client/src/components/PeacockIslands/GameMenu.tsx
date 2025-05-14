@@ -10,6 +10,7 @@ const GameMenu = () => {
   
   // Yeni müzik dosyasını yükle ve arka plan müziği olarak ayarla
   useEffect(() => {
+    // Müzik yükleme işlevi
     const loadMusic = async () => {
       try {
         const newMusic = new Audio("/music/medieval-fantasy-rpg.mp3");
@@ -17,10 +18,25 @@ const GameMenu = () => {
         newMusic.volume = 0.3;
         setBackgroundMusic(newMusic);
         
-        // Yüklendiğinde otomatik olarak başlat (eğer sessize alınmadıysa)
-        if (!isMuted) {
-          await newMusic.play();
-        }
+        // Autoplay Policy: Kullanıcı etkileşimi gerekiyor
+        const playMusic = () => {
+          if (!isMuted && newMusic) {
+            // Play promise'i yakalayıp hataları ele alalım
+            const playPromise = newMusic.play();
+            
+            if (playPromise !== undefined) {
+              playPromise.then(() => {
+                console.log("Müzik başlatıldı!");
+              }).catch(err => {
+                console.error("Müzik başlatılamadı:", err);
+              });
+            }
+          }
+        };
+        
+        // Kullanıcı etkileşimi olmadan müzik çalamayız, bu yüzden click event dinleyelim
+        document.addEventListener('click', playMusic, { once: true });
+        document.addEventListener('keydown', playMusic, { once: true });
         
         setLoading(false);
       } catch (error) {
@@ -37,6 +53,10 @@ const GameMenu = () => {
         backgroundMusic.pause();
         backgroundMusic.currentTime = 0;
       }
+      
+      // Eventleri temizle
+      document.removeEventListener('click', () => {});
+      document.removeEventListener('keydown', () => {});
     };
   }, []);
   
@@ -46,19 +66,71 @@ const GameMenu = () => {
   
   return (
     <div 
-      className="w-full h-full overflow-hidden bg-cover bg-center relative"
-      style={{ backgroundImage: 'url("/images/tft-background-new.jpg")' }}
+      className="w-full h-full overflow-hidden relative"
     >
+      {/* Tamamen kodla tasarlanmış özel arka plan */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-950 via-indigo-950 to-purple-950">
+        {/* Animasyonlu arka plan şekilleri */}
+        <div className="absolute inset-0 opacity-20">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <motion.div
+              key={`hex-bg-${i}`}
+              className="absolute"
+              style={{
+                left: `${10 + (i * 15)}%`,
+                top: `${10 + ((i % 3) * 25)}%`,
+                width: `${150 + (i * 30)}px`,
+                height: `${150 + (i * 30)}px`,
+                border: '1px solid rgba(255,255,255,0.1)',
+                transform: 'rotate(30deg)',
+                opacity: 0.1 + (i * 0.03),
+              }}
+              animate={{
+                rotate: [30, 60, 30],
+                scale: [1, 1.05, 1],
+              }}
+              transition={{
+                duration: 10 + i,
+                repeat: Infinity,
+                repeatType: "reverse",
+                ease: "easeInOut"
+              }}
+            />
+          ))}
+        </div>
+        
+        {/* Üstten ışık efekti */}
+        <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-amber-500/10 to-transparent"></div>
+        
+        {/* Altıgen ızgara deseni */}
+        <div className="absolute inset-0" style={{ 
+          backgroundImage: `radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px)`, 
+          backgroundSize: '30px 30px',
+          opacity: 0.3
+        }}></div>
+      </div>
+      
       {/* Arka plan overlay ve modern efektler */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-slate-900/70 to-transparent"></div>
+      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-indigo-950/10 to-transparent"></div>
       
       {/* Dinamik arka plan parçacıkları */}
-      <div className="absolute inset-0 z-0">
-        {Array.from({ length: 50 }).map((_, i) => (
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        {Array.from({ length: 15 }).map((_, i) => (
           <motion.div
-            key={i}
-            className="absolute w-1 h-1 rounded-full bg-blue-500/40"
+            key={`particle-${i}`}
+            className="absolute rounded-full"
             style={{
+              width: `${Math.random() * 3 + 1}px`,
+              height: `${Math.random() * 3 + 1}px`,
+              backgroundColor: `rgba(${
+                Math.floor(Math.random() * 100) + 100
+              }, ${
+                Math.floor(Math.random() * 100) + 150
+              }, ${
+                Math.floor(Math.random() * 100) + 200
+              }, ${
+                Math.random() * 0.3 + 0.1
+              })`,
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
             }}
