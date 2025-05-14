@@ -348,36 +348,39 @@ const Battlefield = () => {
   );
 };
 
-// + ve - tuşlarıyla yakınlaşma/uzaklaşma kontrollerine sahip kamera
+// + ve - tuşlarıyla animasyonlu yakınlaşma/uzaklaşma kontrollerine sahip kamera
 const CustomCameraControls = () => {
   const { camera, gl } = useThree();
   const controlsRef = useRef<any>(null);
+  const animationRef = useRef<number | null>(null);
   
   // Mevcut zoom seviyesi
-  const [zoomLevel, setZoomLevel] = useState<number>(18);
+  const [targetZoom, setTargetZoom] = useState<number>(18);
+  const [currentZoom, setCurrentZoom] = useState<number>(18);
   const minZoom = 10; // En yakın mesafe
   const maxZoom = 30; // En uzak mesafe
-  const zoomSpeed = 2; // Zoom hızı
+  const zoomSpeed = 2; // Zoom değişim hızı
+  const smoothFactor = 0.1; // Yumuşaklık faktörü - 0.1 demek yavaş ve yumuşak, 1.0 demek anında değişim
   
   useEffect(() => {
     // Kamerayı sıfır noktasına baktır
     camera.lookAt(0, 0, 0);
     
     // Kullanıcıya bilgi ver
-    console.log('Kamera kontrolleri aktif:');
+    console.log('Gelişmiş kamera kontrolleri aktif:');
     console.log('+ tuşu: Yakınlaş');
     console.log('- tuşu: Uzaklaş');
     console.log('Fare tekerleği de desteklenmektedir');
     
     // Klavye olaylarını dinle
     const handleKeyDown = (event: KeyboardEvent) => {
-      // + tuşu yakınlaştırır
+      // + tuşuna basılınca yakınlaş
       if (event.key === '+' || event.key === '=') {
-        setZoomLevel((prev) => Math.max(minZoom, prev - zoomSpeed));
+        setTargetZoom((prev) => Math.max(minZoom, prev - zoomSpeed));
       }
-      // - tuşu uzaklaştırır
+      // - tuşuna basılınca uzaklaş
       else if (event.key === '-' || event.key === '_') {
-        setZoomLevel((prev) => Math.min(maxZoom, prev + zoomSpeed));
+        setTargetZoom((prev) => Math.min(maxZoom, prev + zoomSpeed));
       }
     };
     
@@ -386,29 +389,51 @@ const CustomCameraControls = () => {
     // Temizlik fonksiyonu
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
     };
   }, [camera]);
   
-  // Zoom seviyesini güncelle
-  useEffect(() => {
-    if (camera.position.y !== zoomLevel) {
-      camera.position.y = zoomLevel;
-      camera.position.z = zoomLevel;
-      camera.lookAt(0, 0, 0);
-    }
-  }, [camera, zoomLevel]);
+  // Animasyonlu zoom
+  useFrame(() => {
+    // Hedef zoom ile mevcut zoom arasındaki farkı hesapla
+    const zoomDiff = targetZoom - currentZoom;
+    
+    // Eğer fark önemsiz derecede küçükse güncelleme yapma
+    if (Math.abs(zoomDiff) < 0.01) return;
+    
+    // Yumuşak geçiş için mevcut zoom'u güncelle
+    const newZoom = currentZoom + zoomDiff * smoothFactor;
+    setCurrentZoom(newZoom);
+    
+    // Kamera pozisyonunu güncelle
+    camera.position.y = newZoom;
+    camera.position.z = newZoom;
+    camera.lookAt(0, 0, 0);
+  });
   
+  // Fare tekerleği zoom kontrolü için OrbitControls kullan
   return (
     <OrbitControls
       ref={controlsRef}
       args={[camera, gl.domElement]}
-      enableDamping={false}
+      enableDamping={true}
+      dampingFactor={0.2}
       enableRotate={false}
       enablePan={false}
       enableZoom={true}
-      zoomSpeed={0.8}
+      zoomSpeed={0.5}
       minDistance={minZoom}
       maxDistance={maxZoom}
+      onChange={() => {
+        // OrbitControls'tan zoom değişikliğini yakala
+        if (controlsRef.current) {
+          const distance = controlsRef.current.getDistance();
+          setTargetZoom(distance);
+          setCurrentZoom(distance);
+        }
+      }}
     />
   );
 }
