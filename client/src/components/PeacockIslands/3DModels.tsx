@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from "react";
-import { useGLTF, Float, Sparkles, useTexture } from "@react-three/drei";
+import { useGLTF, Float, Sparkles, useTexture, useFrame } from "@react-three/drei";
 import { GLTF } from "three-stdlib";
 import * as THREE from "three";
 
@@ -20,6 +20,7 @@ useGLTF.preload('/models/peacock_feather.glb');
 useGLTF.preload('/models/magic_egg.glb');
 useGLTF.preload('/models/peacock_warrior.glb');
 useGLTF.preload('/models/human_soldier.glb');
+useGLTF.preload('/models/tft_penguin.glb');
 
 // 3D modelleri işlemede grafik kartı belleğini optimize eden bir sistem
 const modelCache = {
@@ -27,6 +28,7 @@ const modelCache = {
   egg: null as GLTF | null,
   peacockWarrior: null as GLTF | null,
   humanSoldier: null as GLTF | null,
+  penguin: null as GLTF | null,
 };
 
 // Tip tanımlamaları
