@@ -19,7 +19,23 @@ export interface Island {
   army: Army;
   hatchery: HatcherySlot[]; // Kuluçka yuvaları
   featherInventory: FeatherInventory; // Tüy envanteri
+  units: Unit[]; // Asker ve savaşçı birimleri
+  gold: number; // Altın miktarı
 }
+
+// Birim tipi
+export interface Unit {
+  id: string;
+  type: UnitType;
+  health: number;
+  attackPower: number;
+  attackSpeed: number;
+  position?: { q: number, r: number, s: number }; // Hexagonal grid pozisyonu
+  isDeployed: boolean; // Savaş alanına yerleştirildi mi?
+}
+
+// Birim tipleri
+export type UnitType = "warrior" | "soldier";
 
 // Kaynaklar
 export interface Resources {

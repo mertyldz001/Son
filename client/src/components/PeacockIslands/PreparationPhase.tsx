@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { usePeacockIslandsStore } from "../../lib/stores/usePeacockIslandsStore";
 import { useAudio } from "../../lib/stores/useAudio";
-import { FeatherColor, HatcherySlot, Egg } from "../../lib/game/peacockIslands/types";
+import { FeatherColor, HatcherySlot, Egg, Unit } from "../../lib/game/peacockIslands/types";
 import { getFeatherColorName, getBonusTypeName } from "../../lib/game/peacockIslands/battle";
 import GameBoard3D from "./GameBoard3D";
 import { FeatherViewer, EggViewer } from "./ModelViewer";
@@ -117,16 +117,16 @@ const PreparationPhase = () => {
   
   // Asker bilgisi
   const activeWarriors = player.island.units
-    .filter(unit => unit.type === "warrior")
-    .filter(unit => !unit.isDeployed);
+    .filter((unit: Unit) => unit.type === "warrior")
+    .filter((unit: Unit) => !unit.isDeployed);
   const activeSoldiers = player.island.units
-    .filter(unit => unit.type === "soldier")
-    .filter(unit => !unit.isDeployed);
+    .filter((unit: Unit) => unit.type === "soldier")
+    .filter((unit: Unit) => !unit.isDeployed);
   const peacockWarriorCount = activeWarriors.length;
   const humanSoldierCount = activeSoldiers.length;
 
   // Savaş alanındaki konumlandırılmış birimler
-  const deployedUnits = player.island.units.filter(unit => unit.isDeployed);
+  const deployedUnits = player.island.units.filter((unit: Unit) => unit.isDeployed);
   
   return (
     <div className="w-full h-full relative">
