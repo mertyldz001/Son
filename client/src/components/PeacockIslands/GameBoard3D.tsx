@@ -349,39 +349,67 @@ const Battlefield = () => {
   );
 };
 
-// OrbitControls bileşeni - Üçlü Hareket Kontrol Sistemi
-const CameraController = () => {
-  const { camera, gl } = useThree();
-  const controls = useRef(null);
-  
+// Basit Tuş Kontrolleri
+const CameraKeyboardControls = () => {
+  const { camera } = useThree();
+  const position = useRef(camera.position.clone());
+  const [cameraState, setCameraState] = useState({
+    zoom: 1
+  });
+
+  // Tuş durumlarını izle
   useEffect(() => {
-    // Kullanıcıya tuş kontrol bilgileri göster
-    console.log('Kamera kontrol sistemi aktifleştirildi:');
+    // Kullanıcıya bilgi ver
+    console.log('Basit klavye kamera kontrolleri aktif:');
     console.log('1, 3: Kamerayı yatayda döndür');
     console.log('2, 8: Kamerayı dikeyde döndür');
     console.log('+, -: Yakınlaşma/Uzaklaşma');
-    console.log('R: Kamerayı sıfırla');
-  }, []);
+    
+    const handleKey = (e: KeyboardEvent) => {
+      // Kamera dönüşleri
+      if (e.key === '1') {
+        camera.position.x -= 0.5;
+        camera.lookAt(0, 0, 0);
+      }
+      if (e.key === '3') {
+        camera.position.x += 0.5;
+        camera.lookAt(0, 0, 0);
+      }
+      if (e.key === '2') {
+        camera.position.y += 0.5;
+        camera.lookAt(0, 0, 0);
+      }
+      if (e.key === '8') {
+        camera.position.y -= 0.5;
+        camera.lookAt(0, 0, 0);
+      }
+      
+      // Zoom kontrolü
+      if (e.key === '+' || e.key === '=') {
+        setCameraState(prev => ({
+          ...prev,
+          zoom: prev.zoom * 1.1
+        }));
+        camera.position.z -= 1;
+        camera.lookAt(0, 0, 0);
+      }
+      if (e.key === '-') {
+        setCameraState(prev => ({
+          ...prev,
+          zoom: prev.zoom / 1.1
+        }));
+        camera.position.z += 1;
+        camera.lookAt(0, 0, 0);
+      }
+    };
+    
+    window.addEventListener('keydown', handleKey);
+    return () => {
+      window.removeEventListener('keydown', handleKey);
+    };
+  }, [camera]);
   
-  return (
-    <OrbitControls 
-      ref={controls}
-      args={[camera, gl.domElement]}
-      enableDamping
-      dampingFactor={0.05}
-      rotateSpeed={0.5}
-      panSpeed={0.5}
-      zoomSpeed={0.5}
-      minDistance={5}
-      maxDistance={40}
-      maxPolarAngle={Math.PI / 1.5}
-      screenSpacePanning={true}
-      enabled={true}
-      enableZoom={true}
-      enablePan={true}
-      enableRotate={true}
-    />
-  );
+  return null;
 }
 
 // Ana canvas bileşeni
@@ -514,7 +542,7 @@ const GameBoard3D = () => {
         </EffectComposer>
         
         {/* Kullanıcı tanımlı kamera kontrollerimiz */}
-        <CameraController />
+        <CameraKeyboardControls />
         
         {/* Gelişmiş sis efekti - Fazlara göre değişir */}
         <fog 
