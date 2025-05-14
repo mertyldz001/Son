@@ -418,11 +418,11 @@ const GameScene = () => {
         makeDefault
       />
       
-      {/* Işıklandırma - iyileştirilmiş */}
-      <ambientLight intensity={0.5} /> {/* Ortam ışığını arttır */}
+      {/* Işıklandırma - modern ve parlak tarz */}
+      <ambientLight intensity={0.7} /> {/* Ortam ışığını daha da arttır */}
       <directionalLight 
         position={[5, 12, 8]} 
-        intensity={1.8} 
+        intensity={2.0} 
         castShadow 
         shadow-mapSize={[2048, 2048]} 
         shadow-camera-left={-10}
@@ -430,20 +430,38 @@ const GameScene = () => {
         shadow-camera-top={10}
         shadow-camera-bottom={-10}
       />
-      {/* Ekstra dolgu ışık */}
-      <pointLight position={[-5, 10, -5]} intensity={0.8} color="#ffffff" />
+      {/* Ekstra dolgu ışıklar - birden fazla renk */}
+      <pointLight position={[-5, 10, -5]} intensity={0.9} color="#88ccff" />
+      <pointLight position={[5, 8, 5]} intensity={0.7} color="#ffaacc" />
       
-      {/* Arka plan rengi - daha açık ve canlı */}
-      <color attach="background" args={['#263b53']} />
+      {/* Glow efektleri - aşağıdan aydınlatma */}
+      <spotLight
+        position={[0, -5, 0]}
+        intensity={0.3}
+        angle={Math.PI / 4}
+        penumbra={0.8}
+        color="#aaffee"
+      />
       
-      {/* TFT tarzı yeşil zemin - oyun alanının altında - daha parlak ve canlı */}
+      {/* Arka plan rengi - daha açık ve modern */}
+      <color attach="background" args={['#364c6b']} />
+      
+      {/* Neon modern zemin - parlak efektlerle */}
       <mesh 
         rotation={[-Math.PI / 2, 0, 0]} 
         position={[0, -0.2, 6]} 
         receiveShadow
       >
         <planeGeometry args={[20, 13]} />
-        <meshStandardMaterial color="#2a6d3e" roughness={0.8} metalness={0.2} />
+        <meshPhysicalMaterial 
+          color="#2a8d4e"
+          roughness={0.5} 
+          metalness={0.3}
+          clearcoat={0.4}
+          reflectivity={0.3}
+          emissive="#1a5530"
+          emissiveIntensity={0.2}
+        />
       </mesh>
       
       {/* Hexagonal Savaş Alanı - Ortada */}
@@ -494,9 +512,9 @@ const GameBoard3D = () => {
   const { currentPhase } = usePeacockIslandsStore();
   const isBattlePhase = currentPhase === "battle";
   
-  // Sabit kamera pozisyonu - TFT tarzı bakış açısı
-  const cameraPosition: [number, number, number] = [0, 16, 16]; // Biraz daha yüksekten
-  const backgroundColor = isBattlePhase ? "#1e4055" : "#2c5472"; // Daha canlı arkaplan
+  // Sabit kamera pozisyonu - Modern TFT tarzı bakış açısı
+  const cameraPosition: [number, number, number] = [0, 16, 16]; // Yüksekten bakış
+  const backgroundColor = isBattlePhase ? "#2e5a7a" : "#3d6c95"; // Çok daha canlı ve modern arkaplan
   
   return (
     <div className="absolute inset-0 z-0 flex items-center justify-center">

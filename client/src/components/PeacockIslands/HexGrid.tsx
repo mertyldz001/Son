@@ -30,10 +30,10 @@ function HexTile({
   onHover, 
   onUnhover 
 }: HexTileProps) {
-  // TFT tarzı renklendirme - oyuncu tarafı mavi, düşman tarafı kırmızı - daha parlak tonlar
-  const baseColor = isPlayerSide ? "#3578bd" : "#962929"; // Daha parlak mavi ve kırmızı
-  const hoverColor = isPlayerSide ? "#4d9df0" : "#e83838"; // Çok daha parlak vurgu renkleri
-  const edgeColor = isPlayerSide ? "#1a5ca6" : "#6e1d1d";
+  // Neon modern cam efekti - canlı renkler
+  const baseColor = isPlayerSide ? "#4f9bff" : "#ff5252"; // Çok daha parlak neon mavi ve kırmızı
+  const hoverColor = isPlayerSide ? "#64bdff" : "#ff7070"; // Ultra parlak vurgu renkleri
+  const edgeColor = isPlayerSide ? "#0088ff" : "#ff2222";
   
   return (
     <group position={position}>
@@ -66,28 +66,46 @@ function HexTile({
         }}
       >
         <boxGeometry args={[size * 1.7, 0.25, size * 1.7]} />
-        <meshStandardMaterial 
+        <meshPhysicalMaterial 
           color={isHovered ? hoverColor : baseColor} 
-          roughness={0.6}
-          metalness={0.3}
+          roughness={0.2}
+          metalness={0.4}
           transparent={true}
-          opacity={isOccupied ? 0.7 : 0.9}
+          opacity={isOccupied ? 0.8 : 0.9}
           emissive={isHovered ? hoverColor : baseColor}
-          emissiveIntensity={0.2}
+          emissiveIntensity={0.4}
+          clearcoat={0.8}
+          clearcoatRoughness={0.3}
+          transmission={0.6}
+          reflectivity={0.5}
         />
       </mesh>
       
-      {/* Kenar çizgisi - daha kalın ve belirgin */}
+      {/* Modern neon kenar çizgisi */}
       <mesh 
-        position={[0, 0.03, 0]} 
+        position={[0, 0.035, 0]} 
         rotation={[-Math.PI / 2, 0, 0]}
       >
-        <ringGeometry args={[size * 1.7, size * 1.8, 6]} />
+        <ringGeometry args={[size * 1.7, size * 1.75, 6]} />
         <meshBasicMaterial 
-          color={isHovered ? "#ffdd22" : edgeColor} 
+          color={isHovered ? "#ffffff" : edgeColor} 
           side={THREE.DoubleSide} 
           transparent={true}
-          opacity={1.0}
+          opacity={0.9}
+        />
+      </mesh>
+      
+      {/* İç parlama efekti */}
+      <mesh 
+        position={[0, 0.02, 0]} 
+        rotation={[-Math.PI / 2, 0, 0]}
+      >
+        <ringGeometry args={[size * 1.6, size * 1.65, 6]} />
+        <meshBasicMaterial 
+          color={isHovered ? "#ffffff" : baseColor} 
+          side={THREE.DoubleSide} 
+          transparent={true}
+          opacity={0.7}
         />
       </mesh>
       
