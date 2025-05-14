@@ -66,37 +66,51 @@ const createHexPosition = (q: number, r: number, size: number = 1) => {
 const BattleHex = ({ position, color, isHighlighted, isPlayerSide, isOccupied = false }: any) => {
   const meshRef = useRef<THREE.Mesh>(null);
   const lineRef = useRef<THREE.LineSegments>(null);
+  const glowRef = useRef<THREE.Mesh>(null);
   const [hovered, setHovered] = useState(false);
   
   // Hover efektini yönet
   useFrame((_, delta) => {
-    if (!meshRef.current || !lineRef.current) return;
+    if (!meshRef.current || !lineRef.current || !glowRef.current) return;
     
     // Hover durumuna göre yükseklik ayarla
-    const targetY = hovered || isHighlighted ? 0.05 : 0;
+    const targetY = hovered || isHighlighted ? 0.03 : 0;
     meshRef.current.position.y += (targetY - meshRef.current.position.y) * 5 * delta;
-    lineRef.current.position.y = meshRef.current.position.y + 0.02; // Çizgileri yukarıda tut
+    lineRef.current.position.y = meshRef.current.position.y + 0.005; // Çizgileri yukarıda tut
+    glowRef.current.position.y = meshRef.current.position.y + 0.005; // Parlamayı yukarıda tut
     
     // Renk değişimini yönet
     const material = meshRef.current.material as THREE.MeshStandardMaterial;
     const lineMaterial = lineRef.current.material as THREE.LineBasicMaterial;
+    const glowMaterial = glowRef.current.material as THREE.MeshBasicMaterial;
     
     // Altıgen rengi - TFT stili
     const targetColor = new THREE.Color(
-      isHighlighted ? '#4488ff' : 
-      hovered ? '#44aa44' : 
-      isOccupied ? color : // Eğer dolu ise belirgin renk
-      new THREE.Color(color).lerp(new THREE.Color('#ffffff'), 0.7) // Boş ise soldurulmuş renk
+      isHighlighted ? (isPlayerSide ? '#88aaff' : '#ffaa88') : 
+      hovered ? (isPlayerSide ? '#6699ee' : '#ee9966') : 
+      isOccupied ? (isPlayerSide ? '#5588cc' : '#cc8855') : // Eğer dolu ise belirgin renk
+      isPlayerSide ? '#4477aa' : '#aa7744' // Boş ise hafif renkli
     );
-    material.color.lerp(targetColor, 10 * delta);
+    material.color.lerp(targetColor, 8 * delta);
     
     // Kenar çizgisi görünürlüğü
-    const targetOpacity = hovered || isHighlighted || isOccupied ? 1.0 : 0.3;
-    lineMaterial.opacity += (targetOpacity - lineMaterial.opacity) * 10 * delta;
+    const targetOpacity = hovered || isHighlighted || isOccupied ? 0.8 : 0.3;
+    lineMaterial.opacity += (targetOpacity - lineMaterial.opacity) * 5 * delta;
+    
+    // Parlaklık efekti
+    const glowOpacity = hovered || isHighlighted ? 
+                         0.4 : 
+                         isOccupied ? 0.2 : 0.0;
+    glowMaterial.opacity += (glowOpacity - glowMaterial.opacity) * 3 * delta;
     
     // Şeffaflık ayarı - TFT'deki gibi boş altıgenler hafif görünür
-    const targetAlpha = hovered || isHighlighted || isOccupied ? 0.9 : 0.15;
-    material.opacity += (targetAlpha - material.opacity) * 10 * delta;
+    const targetAlpha = isOccupied ? 0.85 : hovered || isHighlighted ? 0.7 : 0.35;
+    material.opacity += (targetAlpha - material.opacity) * 5 * delta;
+    
+    // Rotation animation for glow
+    if (glowRef.current && (hovered || isHighlighted || isOccupied)) {
+      glowRef.current.rotation.z += delta * 0.5;
+    }
   });
   
   // Altıgen şeklini oluştur
