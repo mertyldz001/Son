@@ -482,18 +482,18 @@ const GameBoard3D = () => {
   const { currentPhase } = usePeacockIslandsStore();
   const isBattlePhase = currentPhase === "battle";
   
-  // Sabit kamera pozisyonu - daha yakın bir açı
-  const cameraPosition: [number, number, number] = [0, 18, 18]; // Yakınlaştırılmış kuş bakışı pozisyon
+  // Sabit kamera pozisyonu - daha uzaktan bir açı
+  const cameraPosition: [number, number, number] = [0, 20, 25]; // İyileştirilmiş kuş bakışı pozisyon
   const backgroundColor = isBattlePhase ? "#1a3545" : "#2a4860";
   
   return (
     <div className="absolute inset-0 z-0 flex items-center justify-center">
       <Canvas
         shadows
-        className="w-full max-w-6xl h-full max-h-[80vh] mx-auto my-auto"
+        className="w-full max-w-7xl h-full max-h-screen mx-auto my-auto"
         camera={{
           position: [cameraPosition[0], cameraPosition[1], cameraPosition[2]],
-          fov: 50,
+          fov: 45,
           near: 0.1,
           far: 1000
         }}

@@ -106,7 +106,7 @@ export function PenguinAvatar() {
         receiveShadow 
         onClick={handleGroundClick}
       >
-        <planeGeometry args={[10, 10]} />
+        <planeGeometry args={[30, 30]} />
         <meshStandardMaterial 
           transparent={true} 
           opacity={0.0} 
@@ -120,7 +120,7 @@ export function PenguinAvatar() {
         floatIntensity={0.2}
         position={position}
       >
-        <group ref={model} rotation={rotation} scale={[0.8, 0.8, 0.8]}>
+        <group ref={model} rotation={rotation} scale={[1.2, 1.2, 1.2]}>
           <primitive object={gltf.scene.clone()} />
           
           {/* Efektler performans için kaldırıldı */}
