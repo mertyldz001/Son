@@ -14,7 +14,7 @@ import {
   KeyboardControls,
   Line
 } from '@react-three/drei';
-import { OrbitControls as ThreeOrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+
 import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
 import * as THREE from 'three';
 import { usePeacockIslandsStore } from '../../lib/stores/usePeacockIslandsStore';
@@ -349,133 +349,39 @@ const Battlefield = () => {
   );
 };
 
-// Klavye Kontrollü Kamera Bileşeni
-const CameraControls = () => {
-  const { camera } = useThree();
-  const camPos = useRef(camera.position.clone()); // Kamera başlangıç pozisyonu
-  const targetRef = useRef(new THREE.Vector3(0, 0, 0)); // Kamera hedef noktası
+// OrbitControls bileşeni - Üçlü Hareket Kontrol Sistemi
+const CameraController = () => {
+  const { camera, gl } = useThree();
+  const controls = useRef(null);
   
-  // Başlangıç ayarları
   useEffect(() => {
-    console.log('Klavye kamera kontrolleri aktifleştirildi');
-    console.log('Kamera kontrol tuşları:');
-    console.log('I, K: Kamerayı yukarı/aşağı taşı');
-    console.log('J, L: Kamerayı sola/sağa taşı');
-    console.log('O, U: Kamerayı ileri/geri taşı');
+    // Kullanıcıya tuş kontrol bilgileri göster
+    console.log('Kamera kontrol sistemi aktifleştirildi:');
+    console.log('1, 3: Kamerayı yatayda döndür');
+    console.log('2, 8: Kamerayı dikeyde döndür');
+    console.log('+, -: Yakınlaşma/Uzaklaşma');
     console.log('R: Kamerayı sıfırla');
-    console.log('+ (=), -: Yakınlaş/Uzaklaş');
-    console.log('1, 3: Kamerayı saat yönünde/tersine döndür');
-    console.log('2, 8: Kamerayı yukarı/aşağı açı ile döndür');
   }, []);
   
-  useFrame(() => {
-    // Key event handling için getKeyboardState oluşturulacak
-    const keyState = {
-      // WASD yerine IJKL tuşları kullanılacak
-      up: keyboard.pressed('i') || keyboard.pressed('I'),
-      down: keyboard.pressed('k') || keyboard.pressed('K'),
-      left: keyboard.pressed('j') || keyboard.pressed('J'),
-      right: keyboard.pressed('l') || keyboard.pressed('L'),
-      in: keyboard.pressed('o') || keyboard.pressed('O'),
-      out: keyboard.pressed('u') || keyboard.pressed('U'),
-      reset: keyboard.pressed('r') || keyboard.pressed('R'),
-      zoomIn: keyboard.pressed('=') || keyboard.pressed('+'),
-      zoomOut: keyboard.pressed('-'),
-      rotateLeft: keyboard.pressed('1'),
-      rotateRight: keyboard.pressed('3'),
-      rotateUp: keyboard.pressed('2'),
-      rotateDown: keyboard.pressed('8')
-    };
-    
-    // Kamera hareketi - Daha belirgin hareket
-    if (keyState.up) camera.position.y += 0.5;
-    if (keyState.down) camera.position.y -= 0.5;
-    if (keyState.left) camera.position.x -= 0.5;
-    if (keyState.right) camera.position.x += 0.5;
-    if (keyState.in) {
-      // İleri hareket - baktığı yöne doğru (daha hızlı)
-      const direction = new THREE.Vector3();
-      camera.getWorldDirection(direction);
-      camera.position.addScaledVector(direction, 1.0);
-    }
-    if (keyState.out) {
-      // Geri hareket - baktığı yönün tersine (daha hızlı)
-      const direction = new THREE.Vector3();
-      camera.getWorldDirection(direction);
-      camera.position.addScaledVector(direction, -1.0);
-    }
-    
-    // Zoom
-    if (keyState.zoomIn) {
-      const direction = new THREE.Vector3();
-      camera.getWorldDirection(direction);
-      camera.position.addScaledVector(direction, 0.5);
-    }
-    if (keyState.zoomOut) {
-      const direction = new THREE.Vector3();
-      camera.getWorldDirection(direction);
-      camera.position.addScaledVector(direction, -0.5);
-    }
-    
-    // Döndürme
-    const rotationSpeed = 0.02;
-    if (keyState.rotateLeft) {
-      camera.rotateY(rotationSpeed);
-    }
-    if (keyState.rotateRight) {
-      camera.rotateY(-rotationSpeed);
-    }
-    if (keyState.rotateUp) {
-      // Üst tarafa doğru döndür (dikey eksen)
-      camera.rotateX(rotationSpeed);
-    }
-    if (keyState.rotateDown) {
-      // Alt tarafa doğru döndür (dikey eksen)
-      camera.rotateX(-rotationSpeed);
-    }
-    
-    // Kamera sıfırlama
-    if (keyState.reset) {
-      camera.position.copy(camPos.current);
-      camera.lookAt(targetRef.current);
-    }
-  });
-  
-  return null;
-};
-
-// Basit klavye durumu kontrolü için yardımcı sınıf
-const keyboard = {
-  _pressed: {} as Record<string, boolean>,
-  _justPressed: {} as Record<string, boolean>,
-  
-  pressed: function(keyCode: string): boolean {
-    return this._pressed[keyCode] === true;
-  },
-  
-  justPressed: function(keyCode: string): boolean {
-    const wasPressed = this._justPressed[keyCode] === true;
-    this._justPressed[keyCode] = false;
-    return wasPressed;
-  },
-  
-  keydown: function(event: KeyboardEvent): void {
-    console.log(`Tuş basıldı: ${event.key}`); // Debug log
-    this._pressed[event.key] = true;
-    if (!this._justPressed[event.key]) {
-      this._justPressed[event.key] = true;
-    }
-  },
-  
-  keyup: function(event: KeyboardEvent): void {
-    this._pressed[event.key] = false;
-  }
-};
-
-// Global event listener'ları ekleyelim
-if (typeof window !== 'undefined') {
-  window.addEventListener('keydown', (e) => keyboard.keydown(e));
-  window.addEventListener('keyup', (e) => keyboard.keyup(e));
+  return (
+    <OrbitControls 
+      ref={controls}
+      args={[camera, gl.domElement]}
+      enableDamping
+      dampingFactor={0.05}
+      rotateSpeed={0.5}
+      panSpeed={0.5}
+      zoomSpeed={0.5}
+      minDistance={5}
+      maxDistance={40}
+      maxPolarAngle={Math.PI / 1.5}
+      screenSpacePanning={true}
+      enabled={true}
+      enableZoom={true}
+      enablePan={true}
+      enableRotate={true}
+    />
+  );
 }
 
 // Ana canvas bileşeni
@@ -608,7 +514,7 @@ const GameBoard3D = () => {
         </EffectComposer>
         
         {/* Kullanıcı tanımlı kamera kontrollerimiz */}
-        <CameraControls />
+        <CameraController />
         
         {/* Gelişmiş sis efekti - Fazlara göre değişir */}
         <fog 
