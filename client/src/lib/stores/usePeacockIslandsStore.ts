@@ -61,7 +61,8 @@ const createHatcherySlot = (): HatcherySlot => {
   return {
     id: nanoid(),
     egg: null,
-    isActive: false
+    isActive: false,
+    status: "empty"
   };
 };
 
@@ -621,7 +622,8 @@ export const usePeacockIslandsStore = create<PeacockIslandsStore>((set, get) => 
       const updatedHatchery = [...player.island.hatchery];
       updatedHatchery[slotIndex] = {
         ...slot,
-        isActive: true
+        isActive: true,
+        status: "ready"
       };
       
       const updatedPlayer = { 
@@ -665,7 +667,8 @@ export const usePeacockIslandsStore = create<PeacockIslandsStore>((set, get) => 
       const updatedHatchery = [...npc.island.hatchery];
       updatedHatchery[slotIndex] = {
         ...slot,
-        isActive: true
+        isActive: true,
+        status: "ready"
       };
       
       const updatedNpc = { 
