@@ -11,7 +11,8 @@ import {
   Float,
   MeshDistortMaterial,
   PresentationControls,
-  KeyboardControls
+  KeyboardControls,
+  Line
 } from '@react-three/drei';
 import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
 import * as THREE from 'three';
@@ -248,23 +249,100 @@ const Island = ({ position, isPlayerIsland = false }: any) => {
   );
 };
 
-// Basit savaş meydanı
+// 6x7 Izgara savaş meydanı
 const Battlefield = () => {
   const { currentPhase } = usePeacockIslandsStore();
   
+  // Izgara hücre boyutu ve diğer sabitler
+  const cellSize = 1.0; // Her bir kare hücrenin boyutu
+  const gridWidth = 7; // 7 sütun
+  const gridHeight = 6; // 6 satır
+  const cellGap = 0.1; // Hücreler arası boşluk
+  
+  // Izgaranın tam boyutu (boşluklar dahil)
+  const totalWidth = gridWidth * (cellSize + cellGap) - cellGap;
+  const totalHeight = gridHeight * (cellSize + cellGap) - cellGap;
+  
+  // Merkeze hizalama için ofset hesapla
+  const offsetX = -totalWidth / 2 + cellSize / 2;
+  const offsetZ = -totalHeight / 2 + cellSize / 2;
+
+  // 6x7 kare hücreleri oluştur
+  const cells = [];
+  for (let row = 0; row < gridHeight; row++) {
+    for (let col = 0; col < gridWidth; col++) {
+      // Kare pozisyonunu hesapla
+      const x = offsetX + col * (cellSize + cellGap);
+      const z = offsetZ + row * (cellSize + cellGap);
+      
+      // Hücre ID'si (benzersiz tanımlayıcı)
+      const cellId = `kutu_${row * gridWidth + col + 1}`;
+      
+      // Oyuncu veya düşman tarafını belirle (üst 3 satır: düşman, alt 3 satır: oyuncu)
+      const isPlayerSide = row >= gridHeight / 2;
+      
+      // Başlangıçta hücreler boş
+      const isOccupied = false;
+      
+      // Renk (oyuncu/düşman tarafına göre)
+      const color = isPlayerSide ? "#4477aa" : "#aa7744";
+      
+      cells.push(
+        <group key={cellId} position={[x, 0.05, z]}>
+          {/* Kare zemini */}
+          <mesh receiveShadow>
+            <boxGeometry args={[cellSize, 0.05, cellSize]} />
+            <meshStandardMaterial 
+              color={color} 
+              roughness={0.7} 
+              transparent={true}
+              opacity={isOccupied ? 0.9 : 0.5}
+            />
+          </mesh>
+          
+          {/* Kare kenarları - daha belirgin görünüm için */}
+          <mesh>
+            <boxGeometry args={[cellSize, 0.055, cellSize]} />
+            <meshBasicMaterial 
+              color={isPlayerSide ? "#66aaff" : "#ffaa66"} 
+              wireframe={true}
+            />
+          </mesh>
+          
+          {/* Hücre ID'si (geliştirme aşamasında gösterilir) */}
+          {/* <Text
+            position={[0, 0.1, 0]}
+            rotation={[-Math.PI / 2, 0, 0]}
+            fontSize={0.2}
+            color="#ffffff"
+            anchorX="center"
+            anchorY="middle"
+          >
+            {cellId}
+          </Text> */}
+        </group>
+      );
+    }
+  }
+  
   return (
     <group>
-      {/* Oyuncu alanı */}
-      <group position={[0, 0, 3]}>
+      {/* Oyuncu alanı (ada) */}
+      <group position={[0, 0, 5]}>
         <Island isPlayerIsland={true} />
       </group>
       
-      {/* Düşman alanı */}
-      <group position={[0, 0, -3]}>
+      {/* Düşman alanı (ada) */}
+      <group position={[0, 0, -5]}>
         <Island isPlayerIsland={false} />
       </group>
       
-      {/* Deniz */}
+      {/* Izgara (grid) yapısı - savaş meydanı */}
+      <group position={[0, 0.1, 0]}>
+        {cells}
+      </group>
+      
+      {/* Zemindeki su animasyonu */}
       <AnimatedWater position={[0, -0.5, 0]} size={30} />
     </group>
   );
