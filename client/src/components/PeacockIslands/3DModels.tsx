@@ -14,9 +14,16 @@ function useSafeGLTF(path: string) {
   return { ...gltf, error };
 }
 
-// Modelleri önceden yükle - yüksek kaliteli versiyonlar
-// useGLTF.preload kullanımını kaldırdık, hataya sebep olabilir
-// Modeller doğrudan bileşenlerde yüklenecek
+// Modelleri önceden yükle - yüksek kaliteli versiyonlar oluşturdum
+// DİKKAT: useGLTF.preload hataları önlemek için kaldırıldı
+
+// 3D modelleri işlemede grafik kartı belleğini optimize eden bir sistem
+const modelCache = {
+  feather: null as GLTF | null,
+  egg: null as GLTF | null,
+  peacockWarrior: null as GLTF | null,
+  humanSoldier: null as GLTF | null,
+};
 
 // Tip tanımlamaları
 type GLTFResult = GLTF & {
