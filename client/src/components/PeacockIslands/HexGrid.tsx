@@ -30,10 +30,10 @@ function HexTile({
   onHover, 
   onUnhover 
 }: HexTileProps) {
-  // TFT tarzı renklendirme - oyuncu tarafı mavi, düşman tarafı kırmızı
-  const baseColor = isPlayerSide ? "#235789" : "#701a1a"; // Daha açık mavi ve kırmızı
-  const hoverColor = isPlayerSide ? "#3d8ad8" : "#c02a2a"; // Vurgu renkleri daha parlak
-  const edgeColor = isPlayerSide ? "#113d6c" : "#4d0e0e";
+  // TFT tarzı renklendirme - oyuncu tarafı mavi, düşman tarafı kırmızı - daha parlak tonlar
+  const baseColor = isPlayerSide ? "#3578bd" : "#962929"; // Daha parlak mavi ve kırmızı
+  const hoverColor = isPlayerSide ? "#4d9df0" : "#e83838"; // Çok daha parlak vurgu renkleri
+  const edgeColor = isPlayerSide ? "#1a5ca6" : "#6e1d1d";
   
   return (
     <group position={position}>
@@ -68,10 +68,12 @@ function HexTile({
         <boxGeometry args={[size * 1.7, 0.25, size * 1.7]} />
         <meshStandardMaterial 
           color={isHovered ? hoverColor : baseColor} 
-          roughness={0.7}
-          metalness={0.2}
+          roughness={0.6}
+          metalness={0.3}
           transparent={true}
-          opacity={isOccupied ? 0.7 : 0.85}
+          opacity={isOccupied ? 0.7 : 0.9}
+          emissive={isHovered ? hoverColor : baseColor}
+          emissiveIntensity={0.2}
         />
       </mesh>
       
@@ -82,10 +84,10 @@ function HexTile({
       >
         <ringGeometry args={[size * 1.7, size * 1.8, 6]} />
         <meshBasicMaterial 
-          color={isHovered ? "#ffcc00" : "#2a4055"} 
+          color={isHovered ? "#ffdd22" : edgeColor} 
           side={THREE.DoubleSide} 
           transparent={true}
-          opacity={0.9}
+          opacity={1.0}
         />
       </mesh>
       

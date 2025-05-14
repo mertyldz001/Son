@@ -494,14 +494,15 @@ const GameBoard3D = () => {
   const { currentPhase } = usePeacockIslandsStore();
   const isBattlePhase = currentPhase === "battle";
   
-  // Sabit kamera pozisyonu - daha basit
-  const cameraPosition: [number, number, number] = [0, 15, 15]; // Ortadan sade bakış açısı
-  const backgroundColor = isBattlePhase ? "#1a3545" : "#2a4860";
+  // Sabit kamera pozisyonu - TFT tarzı bakış açısı
+  const cameraPosition: [number, number, number] = [0, 16, 16]; // Biraz daha yüksekten
+  const backgroundColor = isBattlePhase ? "#1e4055" : "#2c5472"; // Daha canlı arkaplan
   
   return (
     <div className="absolute inset-0 z-0 flex items-center justify-center">
       {/* TFT tarzı yeşil zemin eklendi */}
-      <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-green-800 to-green-600 opacity-30 z-0"></div>
+      {/* TFT tarzı gradyan zemin - daha parlak */}
+      <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-green-700 to-green-500 opacity-40 z-0"></div>
       <Canvas
         shadows
         className="w-full max-w-4xl h-full max-h-[85vh] mx-auto my-auto"
