@@ -1,0 +1,22 @@
+Eski kod:
+                              onMouseDown={() => {
+                                if (!unit.isDeployed) {
+                                  setDraggedUnit(unit);
+                                  playClick();
+                                }
+                              }}
+
+Yeni kod:
+                              onMouseDown={() => {
+                                if (!unit.isDeployed) {
+                                  setDraggedUnit(unit);
+                                  playClick();
+                                  
+                                  // Custom event: Birim sürükleme başlatma
+                                  window.dispatchEvent(
+                                    new CustomEvent('unit-drag-start', { 
+                                      detail: { unit } 
+                                    })
+                                  );
+                                }
+                              }}
