@@ -39,7 +39,7 @@ const AnimatedWater = ({ position = [0, 0, 0], size = 20 }) => {
   return (
     <mesh 
       ref={meshRef} 
-      position={position} 
+      position={[position[0], position[1], position[2]]} 
       rotation={[-Math.PI / 2, 0, 0]} 
       receiveShadow
     >

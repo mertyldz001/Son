@@ -118,9 +118,9 @@ export function PenguinAvatar() {
         speed={1.5}
         rotationIntensity={0.2}
         floatIntensity={0.2}
-        position={position}
+        position={[position[0], position[1], position[2]]}
       >
-        <group ref={model} rotation={rotation} scale={[1.0, 1.0, 1.0]}>
+        <group ref={model} rotation={[rotation[0], rotation[1], rotation[2]]} scale={[1.5, 1.5, 1.5]}>
           <primitive object={gltf.scene.clone()} />
           
           {/* Efektler performans için kaldırıldı */}
