@@ -155,17 +155,29 @@ const PreparationPhase = () => {
             <div className="bg-gray-700/90 rounded-md p-3 mb-4">
               <h4 className="text-md font-semibold mb-2">Tüy Envanteri</h4>
               <div className="grid grid-cols-3 gap-2">
-                <div className="bg-green-900/60 p-2 rounded text-center">
+                <div className="bg-green-900/60 p-2 rounded text-center flex flex-col items-center">
+                  <div className="feather-icon flex items-center justify-center w-8 h-8 rounded-full bg-green-800/60 mb-1">
+                    <span className="material-icons text-green-400">eco</span>
+                  </div>
                   <div className="text-green-400 font-bold">{player.island.featherInventory.green}</div>
                   <div className="text-xs">Yeşil</div>
+                  <div className="text-xs text-green-300/70 mt-1">+20 Can</div>
                 </div>
-                <div className="bg-blue-900/60 p-2 rounded text-center">
+                <div className="bg-blue-900/60 p-2 rounded text-center flex flex-col items-center">
+                  <div className="feather-icon flex items-center justify-center w-8 h-8 rounded-full bg-blue-800/60 mb-1">
+                    <span className="material-icons text-blue-400">air</span>
+                  </div>
                   <div className="text-blue-400 font-bold">{player.island.featherInventory.blue}</div>
                   <div className="text-xs">Mavi</div>
+                  <div className="text-xs text-blue-300/70 mt-1">+20% Hız</div>
                 </div>
-                <div className="bg-orange-900/60 p-2 rounded text-center">
+                <div className="bg-orange-900/60 p-2 rounded text-center flex flex-col items-center">
+                  <div className="feather-icon flex items-center justify-center w-8 h-8 rounded-full bg-orange-800/60 mb-1">
+                    <span className="material-icons text-orange-400">bolt</span>
+                  </div>
                   <div className="text-orange-400 font-bold">{player.island.featherInventory.orange}</div>
                   <div className="text-xs">Turuncu</div>
+                  <div className="text-xs text-orange-300/70 mt-1">+20 Saldırı</div>
                 </div>
               </div>
             </div>
@@ -244,63 +256,159 @@ const PreparationPhase = () => {
                       Her renk farklı bonuslar sağlar.
                     </p>
                     
+                    <h5 className="text-sm font-medium text-gray-300 mb-2">Tüy Renkleri:</h5>
                     <div className="grid grid-cols-3 gap-2 mb-3">
                       <button
-                        className={`p-2 rounded flex flex-col items-center justify-center ${
-                          featherColorSelected === "green" ? "bg-green-800 border border-green-500" : "bg-green-900/40"
+                        className={`p-3 rounded-lg flex flex-col items-center justify-center h-24 ${
+                          featherColorSelected === "green" 
+                            ? "bg-green-950 border-2 border-green-500 shadow-lg shadow-green-900/40" 
+                            : "bg-green-950/40 border border-green-800 hover:bg-green-900/30"
                         }`}
                         onClick={() => {
                           playClick();
                           setFeatherColorSelected("green");
                         }}
                       >
+                        <div className="feather-icon flex items-center justify-center w-10 h-10 rounded-full bg-green-800/60 mb-2">
+                          <span className="material-icons text-green-400 text-xl">eco</span>
+                        </div>
                         <span className="text-green-400 font-bold">Yeşil</span>
-                        <span className="text-xs">+20 Can</span>
+                        <div className="bonus-badge mt-1 px-2 py-0.5 bg-green-900/60 rounded-full text-xs text-green-300">
+                          +20 Can
+                        </div>
+                        <div className="count-badge absolute top-2 right-2 bg-green-700/80 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                          {player.island.featherInventory.green}
+                        </div>
                       </button>
                       
                       <button
-                        className={`p-2 rounded flex flex-col items-center justify-center ${
-                          featherColorSelected === "blue" ? "bg-blue-800 border border-blue-500" : "bg-blue-900/40"
+                        className={`p-3 rounded-lg flex flex-col items-center justify-center h-24 ${
+                          featherColorSelected === "blue" 
+                            ? "bg-blue-950 border-2 border-blue-500 shadow-lg shadow-blue-900/40" 
+                            : "bg-blue-950/40 border border-blue-800 hover:bg-blue-900/30"
                         }`}
                         onClick={() => {
                           playClick();
                           setFeatherColorSelected("blue");
                         }}
                       >
+                        <div className="feather-icon flex items-center justify-center w-10 h-10 rounded-full bg-blue-800/60 mb-2">
+                          <span className="material-icons text-blue-400 text-xl">air</span>
+                        </div>
                         <span className="text-blue-400 font-bold">Mavi</span>
-                        <span className="text-xs">+20% Hız</span>
+                        <div className="bonus-badge mt-1 px-2 py-0.5 bg-blue-900/60 rounded-full text-xs text-blue-300">
+                          +20% Hız
+                        </div>
+                        <div className="count-badge absolute top-2 right-2 bg-blue-700/80 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                          {player.island.featherInventory.blue}
+                        </div>
                       </button>
                       
                       <button
-                        className={`p-2 rounded flex flex-col items-center justify-center ${
-                          featherColorSelected === "orange" ? "bg-orange-800 border border-orange-500" : "bg-orange-900/40"
+                        className={`p-3 rounded-lg flex flex-col items-center justify-center h-24 ${
+                          featherColorSelected === "orange" 
+                            ? "bg-orange-950 border-2 border-orange-500 shadow-lg shadow-orange-900/40" 
+                            : "bg-orange-950/40 border border-orange-800 hover:bg-orange-900/30"
                         }`}
                         onClick={() => {
                           playClick();
                           setFeatherColorSelected("orange");
                         }}
                       >
+                        <div className="feather-icon flex items-center justify-center w-10 h-10 rounded-full bg-orange-800/60 mb-2">
+                          <span className="material-icons text-orange-400 text-xl">bolt</span>
+                        </div>
                         <span className="text-orange-400 font-bold">Turuncu</span>
-                        <span className="text-xs">+20 Saldırı</span>
+                        <div className="bonus-badge mt-1 px-2 py-0.5 bg-orange-900/60 rounded-full text-xs text-orange-300">
+                          +20 Saldırı
+                        </div>
+                        <div className="count-badge absolute top-2 right-2 bg-orange-700/80 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                          {player.island.featherInventory.orange}
+                        </div>
                       </button>
                     </div>
                     
                     {featherColorSelected && (
-                      <div className="flex gap-2">
-                        <button
-                          className="bg-purple-600 hover:bg-purple-700 text-white py-1 px-3 rounded text-sm flex-1"
-                          onClick={() => handleCollectFeathers(featherColorSelected)}
-                        >
-                          {getFeatherColorName(featherColorSelected)} Tüy Topla
-                        </button>
+                      <div className="mt-3 space-y-3">
+                        <div className="combine-container p-3 bg-gray-800/70 rounded-lg">
+                          <div className="flex justify-between items-center mb-2">
+                            <h5 className="text-sm font-semibold text-gray-200">
+                              {getFeatherColorName(featherColorSelected)} Tüy İşlemleri
+                            </h5>
+                            
+                            <div className="feather-count px-2 py-1 rounded bg-gray-700/70 text-xs text-white">
+                              Mevcut: <span className="font-bold">{player.island.featherInventory[featherColorSelected]}</span> adet
+                            </div>
+                          </div>
+                          
+                          <div className="grid grid-cols-2 gap-2">
+                            <button
+                              className={`flex items-center justify-center gap-2 py-2 px-3 rounded-md text-sm ${
+                                featherColorSelected === "green" 
+                                  ? "bg-green-700 hover:bg-green-600 text-white" 
+                                  : featherColorSelected === "blue"
+                                  ? "bg-blue-700 hover:bg-blue-600 text-white"
+                                  : "bg-orange-700 hover:bg-orange-600 text-white"
+                              }`}
+                              onClick={() => handleCollectFeathers(featherColorSelected)}
+                            >
+                              <span className="material-icons text-sm">add</span>
+                              Tüy Topla
+                            </button>
+                            
+                            <button
+                              className={`flex items-center justify-center gap-2 py-2 px-3 rounded-md text-sm ${
+                                player.island.featherInventory[featherColorSelected] >= 3
+                                  ? (featherColorSelected === "green" 
+                                      ? "bg-green-700 hover:bg-green-600 text-white" 
+                                      : featherColorSelected === "blue"
+                                      ? "bg-blue-700 hover:bg-blue-600 text-white"
+                                      : "bg-orange-700 hover:bg-orange-600 text-white")
+                                  : "bg-gray-700 text-gray-400 cursor-not-allowed"
+                              }`}
+                              onClick={() => {
+                                if (player.island.featherInventory[featherColorSelected] >= 3) {
+                                  handleCombineFeathers(featherColorSelected);
+                                }
+                              }}
+                              disabled={player.island.featherInventory[featherColorSelected] < 3}
+                            >
+                              <span className="material-icons text-sm">merge_type</span>
+                              3 Tüyü Birleştir
+                            </button>
+                          </div>
+                        </div>
                         
-                        <button
-                          className="bg-yellow-600 hover:bg-yellow-700 text-white py-1 px-3 rounded text-sm flex-1"
-                          onClick={() => handleCombineFeathers(featherColorSelected)}
-                          disabled={player.island.featherInventory[featherColorSelected] < 3}
-                        >
-                          3 Tüyü Birleştir
-                        </button>
+                        {player.island.featherInventory[featherColorSelected] >= 3 && (
+                          <div className="combine-preview bg-gray-900/60 p-3 rounded-lg flex items-center text-sm">
+                            <div className="flex-1 flex items-center gap-2">
+                              <div className="flex items-center">
+                                <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
+                                  featherColorSelected === "green" ? "bg-green-800/70" :
+                                  featherColorSelected === "blue" ? "bg-blue-800/70" :
+                                  "bg-orange-800/70"
+                                }`}>
+                                  <span className="material-icons text-xs">eco</span>
+                                </div>
+                                <span className="mx-1">×</span>
+                                <span className="font-bold">3</span>
+                              </div>
+                              <span className="mx-2">→</span>
+                              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                                featherColorSelected === "green" ? "bg-green-800/70" :
+                                featherColorSelected === "blue" ? "bg-blue-800/70" :
+                                "bg-orange-800/70"
+                              }`}>
+                                <span className="material-icons text-sm">egg</span>
+                              </div>
+                            </div>
+                            <div className="text-xs text-gray-300">
+                              {featherColorSelected === "green" ? "+20 Can" :
+                               featherColorSelected === "blue" ? "+20% Hız" :
+                               "+20 Saldırı"} bonusu
+                            </div>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
@@ -342,18 +450,19 @@ const PreparationPhase = () => {
                       </div>
                     )}
                     
-                    <div className="grid grid-cols-3 gap-2">
+                    <h5 className="text-sm font-medium text-gray-300 mb-2">Kuluçka Yuvaları:</h5>
+                    <div className="grid grid-cols-3 gap-3">
                       {player.island.hatchery.map((slot) => (
                         <div 
                           key={slot.id}
-                          className={`p-2 rounded flex flex-col items-center justify-center ${
-                            selectedHatcherySlot?.id === slot.id ? "bg-purple-800 border border-purple-500" : 
+                          className={`p-3 rounded-lg border flex flex-col items-center justify-center h-28 ${
+                            selectedHatcherySlot?.id === slot.id ? "bg-purple-950 border-purple-500" : 
                             slot.egg ? (
-                              slot.egg.color === "green" ? "bg-green-900/40" :
-                              slot.egg.color === "blue" ? "bg-blue-900/40" :
-                              "bg-orange-900/40"
-                            ) : "bg-gray-800/40"
-                          } ${slot.isActive ? "opacity-50" : "cursor-pointer"}`}
+                              slot.egg.color === "green" ? "bg-green-950/80 border-green-700" :
+                              slot.egg.color === "blue" ? "bg-blue-950/80 border-blue-700" :
+                              "bg-orange-950/80 border-orange-700"
+                            ) : "bg-gray-850/40 border-gray-700"
+                          } ${slot.isActive ? "opacity-70" : "cursor-pointer hover:shadow-inner"}`}
                           onClick={() => {
                             if (!slot.isActive && slot.egg) {
                               playClick();
@@ -363,22 +472,51 @@ const PreparationPhase = () => {
                         >
                           {slot.egg ? (
                             <>
+                              <div className="egg-icon w-12 h-12 mb-1 rounded-full flex items-center justify-center"
+                                style={{
+                                  background: `radial-gradient(circle, ${
+                                    slot.egg.color === "green" ? "#4caf50" :
+                                    slot.egg.color === "blue" ? "#2196f3" :
+                                    "#ff9800"
+                                  }, transparent)`
+                                }}
+                              >
+                                <span className="material-icons text-2xl">
+                                  {slot.egg.color === "green" ? "favorite" :
+                                    slot.egg.color === "blue" ? "speed" :
+                                    "bolt"}
+                                </span>
+                              </div>
+                              
                               <span className={`font-medium ${
                                 slot.egg.color === "green" ? "text-green-400" :
                                 slot.egg.color === "blue" ? "text-blue-400" :
                                 "text-orange-400"
                               }`}>
-                                {getFeatherColorName(slot.egg.color)} Yumurta
+                                {getFeatherColorName(slot.egg.color)} 
                               </span>
-                              <span className="text-xs">
-                                {slot.isActive ? "Aktif" : "Pasif"}
-                              </span>
-                              <span className="text-xs">
+                              
+                              <div className="flex items-center text-xs mt-1">
+                                <span className={`px-2 py-0.5 rounded-full ${
+                                  slot.isActive 
+                                    ? "bg-green-900/60 text-green-300" 
+                                    : "bg-gray-800/60 text-gray-300"
+                                }`}>
+                                  {slot.isActive ? "Aktif" : "Pasif"}
+                                </span>
+                              </div>
+                              
+                              <span className="text-xs text-gray-300 mt-1">
                                 +{slot.egg.bonusValue} {getBonusTypeName(slot.egg.bonusType)}
                               </span>
                             </>
                           ) : (
-                            <span className="text-gray-400">Boş Yuva</span>
+                            <>
+                              <div className="empty-egg w-12 h-12 rounded-full border-2 border-dashed border-gray-600 flex items-center justify-center mb-2">
+                                <span className="material-icons text-gray-500">egg</span>
+                              </div>
+                              <span className="text-gray-400">Boş Yuva</span>
+                            </>
                           )}
                         </div>
                       ))}
