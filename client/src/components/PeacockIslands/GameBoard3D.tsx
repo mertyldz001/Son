@@ -8,12 +8,49 @@ import {
   Environment, 
   Sparkles,
   Cloud,
-  Float
+  Float,
+  MeshDistortMaterial,
+  PresentationControls
 } from '@react-three/drei';
 import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
 import * as THREE from 'three';
 import { usePeacockIslandsStore } from '../../lib/stores/usePeacockIslandsStore';
 import { PeacockWarriorModel, HumanSoldierModel } from './3DModels';
+
+// Animasyonlu su yüzeyi bileşeni
+const AnimatedWater = ({ position = [0, 0, 0], size = 20 }) => {
+  const meshRef = useRef<THREE.Mesh>(null);
+  const [time, setTime] = useState(0);
+  
+  useFrame((_, delta) => {
+    setTime(prev => prev + delta * 0.3);
+    
+    if (meshRef.current) {
+      // Hafif dalgalanma efekti
+      meshRef.current.position.y = Math.sin(time * 0.5) * 0.05;
+    }
+  });
+  
+  return (
+    <mesh 
+      ref={meshRef} 
+      position={[position[0], position[1], position[2]]}
+      rotation={[-Math.PI / 2, 0, 0]}
+      receiveShadow
+    >
+      <planeGeometry args={[size, size, 32, 32]} />
+      <MeshDistortMaterial
+        color="#4488aa"
+        transparent
+        opacity={0.7}
+        distort={0.3} // dalgalanma miktarı
+        speed={1.5} // dalgalanma hızı
+        roughness={0.4}
+        metalness={0.2}
+      />
+    </mesh>
+  );
+};
 
 // Hex harita oluşturucu yardımcı fonksiyonlar
 const createHexPosition = (q: number, r: number, size: number = 1) => {
@@ -577,8 +614,20 @@ const Battlefield = () => {
           <meshStandardMaterial color="#385048" />
         </mesh>
         
-        {/* Gelişmiş Su Efekti */}
-        <WaterSurface position={[0, -0.15, 0]} size={28} />
+        {/* Gelişmiş Su Efekti - Basit Animasyonlu Versiyon */}
+        <mesh 
+          position={[0, -0.15, 0]} 
+          rotation={[-Math.PI / 2, 0, 0]} 
+        >
+          <planeGeometry args={[28, 28]} />
+          <meshStandardMaterial 
+            color="#4488aa" 
+            transparent 
+            opacity={0.8}
+            roughness={0.1}
+            metalness={0.3}
+          />
+        </mesh>
         
         {/* Oyuncu adası */}
         <Island 
@@ -707,25 +756,30 @@ const GameBoard3D = () => {
           castShadow={false}
         />
         
+        {/* Ortam Işığı - Aydınlık efekti */}
+        <pointLight
+          position={[0, 8, 0]}
+          intensity={0.8}
+          color={isBattlePhase ? "#3366cc" : "#ffcc66"}
+          distance={25}
+          decay={2}
+        />
+        
         {/* Atmosferik Efektler */}
         {!isBattlePhase && (
           <>
-            <Cloud 
-              opacity={0.5}
-              speed={0.3}
-              width={20}
-              depth={1.5}
-              segments={15}
-              position={[15, 15, -10]}
-            />
-            <Cloud 
-              opacity={0.4}
-              speed={0.2}
-              width={18}
-              depth={1.0}
-              segments={12}
-              position={[-15, 12, -5]}
-            />
+            <group position={[15, 15, -10]}>
+              <Cloud 
+                opacity={0.5}
+                speed={0.3}
+              />
+            </group>
+            <group position={[-15, 12, -5]}>
+              <Cloud 
+                opacity={0.4}
+                speed={0.2}
+              />
+            </group>
           </>
         )}
         
