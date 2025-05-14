@@ -436,24 +436,22 @@ const Battlefield = () => {
   // Savaş alanının kareli düzeni
   const isBattlePhase = currentPhase === "battle";
   
-  // Hex harita ızgarası: 40 adet altıgen (8x5 grid)
-  const hexGrid = { width: 8, height: 5 };
-  const hexSize = 1;
-  const hexPositions: any[] = [];
+  // Kare ızgara: 8x5 = 40 kare
+  const grid = { width: 8, height: 5 };
+  const squareSize = 1;
+  const gridPositions: any[] = [];
   
-  // Hex pozisyonlarını hesapla
-  for (let col = 0; col < hexGrid.width; col++) {
-    for (let row = 0; row < hexGrid.height; row++) {
-      // Offset, her satır için altıgenleri kaydırarak yerleştir
-      const xOffset = (row % 2) * 0.5;
-      const x = (col + xOffset) * (hexSize * 1.5);
-      const z = row * (hexSize * Math.sqrt(3) * 0.85);
+  // Kare pozisyonlarını hesapla
+  for (let col = 0; col < grid.width; col++) {
+    for (let row = 0; row < grid.height; row++) {
+      const x = col * squareSize - (grid.width * squareSize / 2) + squareSize / 2;
+      const z = row * squareSize - (grid.height * squareSize / 2) + squareSize / 2;
       
       // Oyuncu ve düşman alanlarını ayır
-      const isPlayerSide = row < Math.floor(hexGrid.height / 2);
+      const isPlayerSide = row < Math.floor(grid.height / 2);
       
-      hexPositions.push({
-        position: [x - (hexGrid.width * 0.75), 0, z - (hexGrid.height * 0.6)] as [number, number, number],
+      gridPositions.push({
+        position: [x, 0.05, z] as [number, number, number],
         col, row,
         isPlayerSide,
         isEnemySide: !isPlayerSide
@@ -467,43 +465,43 @@ const Battlefield = () => {
   
   // Oyuncu askerlerini rastgele yerleştir
   if (player) {
-    const playerHexes = hexPositions.filter(hex => hex.isPlayerSide);
-    const soldierCount = Math.min(player.island.army.soldiers, playerHexes.length);
+    const playerSquares = gridPositions.filter(square => square.isPlayerSide);
+    const soldierCount = Math.min(player.island.army.soldiers, playerSquares.length);
     
     for (let i = 0; i < soldierCount; i++) {
-      const randomHexIndex = Math.floor(Math.random() * playerHexes.length);
-      const selectedHex = playerHexes[randomHexIndex];
+      const randomIndex = Math.floor(Math.random() * playerSquares.length);
+      const selectedSquare = playerSquares[randomIndex];
       
       playerUnits.push({
-        position: selectedHex.position,
+        position: selectedSquare.position,
         power: player.island.army.attackPower + player.island.army.bonuses.attackPower,
         health: player.island.army.health + player.island.army.bonuses.health
       });
       
-      // Kullanılan hexi kaldır
-      playerHexes.splice(randomHexIndex, 1);
+      // Kullanılan kareyi kaldır
+      playerSquares.splice(randomIndex, 1);
     }
   }
   
   // Düşman birimlerini yerleştir
   if (currentEnemyWave && isBattlePhase) {
-    const enemyHexes = hexPositions.filter(hex => hex.isEnemySide);
-    const enemyCount = Math.min(currentEnemyWave.enemies.length, enemyHexes.length);
+    const enemySquares = gridPositions.filter(square => square.isEnemySide);
+    const enemyCount = Math.min(currentEnemyWave.enemies.length, enemySquares.length);
     
     for (let i = 0; i < enemyCount; i++) {
       const enemy = currentEnemyWave.enemies[i];
-      const randomHexIndex = Math.floor(Math.random() * enemyHexes.length);
-      const selectedHex = enemyHexes[randomHexIndex];
+      const randomIndex = Math.floor(Math.random() * enemySquares.length);
+      const selectedSquare = enemySquares[randomIndex];
       
       enemyUnits.push({
-        position: selectedHex.position,
+        position: selectedSquare.position,
         power: enemy.attackPower,
         health: enemy.health,
         type: enemy.type
       });
       
-      // Kullanılan hexi kaldır
-      enemyHexes.splice(randomHexIndex, 1);
+      // Kullanılan kareyi kaldır
+      enemySquares.splice(randomIndex, 1);
     }
   }
   
@@ -540,28 +538,28 @@ const Battlefield = () => {
           <meshStandardMaterial color="#88aa99" roughness={0.8} />
         </mesh>
         
-        {/* Hex harita - Dolu veya boş durumlarına göre render et */}
-        {hexPositions.map((hex, i) => {
-          // Bu hex'e birim yerleştirilmiş mi?
+        {/* Kare ızgara - TFT stilinde savaş alanı */}
+        {gridPositions.map((square, i) => {
+          // Bu kareye birim yerleştirilmiş mi?
           const playerUnitHere = playerUnits.find(unit => 
-            unit.position[0] === hex.position[0] && 
-            unit.position[2] === hex.position[2]
+            unit.position[0] === square.position[0] && 
+            unit.position[2] === square.position[2]
           );
           
           const enemyUnitHere = enemyUnits.find(unit => 
-            unit.position[0] === hex.position[0] && 
-            unit.position[2] === hex.position[2]
+            unit.position[0] === square.position[0] && 
+            unit.position[2] === square.position[2]
           );
           
           const isOccupied = Boolean(playerUnitHere || enemyUnitHere);
           
           return (
-            <HexTile 
+            <BattleSquare 
               key={i}
-              position={hex.position}
-              color={hex.isPlayerSide ? "#77aa88" : "#aa7788"}
+              position={square.position}
+              color={square.isPlayerSide ? "#77aa88" : "#aa7788"}
               isHighlighted={false}
-              isPlayerSide={hex.isPlayerSide}
+              isPlayerSide={square.isPlayerSide}
               isOccupied={isOccupied}
             />
           );
