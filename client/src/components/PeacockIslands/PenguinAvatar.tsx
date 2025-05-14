@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from "react";
-import { useGLTF, Float, Sparkles } from "@react-three/drei";
+import { useGLTF, Float } from "@react-three/drei";
 import { useFrame, ThreeEvent, useThree } from "@react-three/fiber";
 import { GLTF } from "three-stdlib";
 import * as THREE from "three";
@@ -89,8 +89,8 @@ export function PenguinAvatar() {
     }
   });
   
-  // Model yükle
-  const gltf = useGLTF('/models/tft_penguin.glb');
+  // Model yükle - daha küçük model kullan
+  const gltf = useGLTF('/models/penguin_-_tft.glb');
   
   // Eğer model yüklenmediyse veya hazırlık aşamasında değilsek gösterme
   if (!gltf.scene || currentPhase !== "preparation") {
@@ -123,28 +123,12 @@ export function PenguinAvatar() {
         <group ref={model} rotation={rotation} scale={[0.8, 0.8, 0.8]}>
           <primitive object={gltf.scene.clone()} />
           
-          {/* Avatar efektleri */}
-          <Sparkles 
-            count={10}
-            scale={0.8}
-            size={0.1}
-            speed={0.3}
-            color="#aaddff"
-            position={[0, 0.3, 0]}
-          />
-          
-          {/* Oyuncu vurgusu */}
-          <pointLight
-            position={[0, 0.2, 0]}
-            intensity={0.3}
-            distance={1}
-            color="#66ccff"
-          />
+          {/* Efektler performans için kaldırıldı */}
         </group>
       </Float>
     </>
   );
 }
 
-// Modelimizi önceden yükle
-useGLTF.preload('/models/tft_penguin.glb');
+// Modelimizi önceden yükle - daha küçük modeli kullan
+useGLTF.preload('/models/penguin_-_tft.glb');
