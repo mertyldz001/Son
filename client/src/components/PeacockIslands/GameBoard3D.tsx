@@ -60,8 +60,8 @@ const createHexPosition = (q: number, r: number, size: number = 1) => {
   return [x, 0, z];
 };
 
-// Hex şeklinde geometri oluştur
-const HexTile = ({ position, color, isHighlighted, isPlayerSide, isOccupied = false }: any) => {
+// Kare savaş meydanı hücresi - TFT stilinde
+const BattleSquare = ({ position, color, isHighlighted, isPlayerSide, isOccupied = false }: any) => {
   const meshRef = useRef<THREE.Mesh>(null);
   const lineRef = useRef<THREE.LineSegments>(null);
   const [hovered, setHovered] = useState(false);
@@ -79,7 +79,7 @@ const HexTile = ({ position, color, isHighlighted, isPlayerSide, isOccupied = fa
     const material = meshRef.current.material as THREE.MeshStandardMaterial;
     const lineMaterial = lineRef.current.material as THREE.LineBasicMaterial;
     
-    // Altıgen rengi
+    // Kare rengi - TFT stili
     const targetColor = new THREE.Color(
       isHighlighted ? '#4488ff' : 
       hovered ? '#44aa44' : 
@@ -92,61 +92,26 @@ const HexTile = ({ position, color, isHighlighted, isPlayerSide, isOccupied = fa
     const targetOpacity = hovered || isHighlighted || isOccupied ? 1.0 : 0.3;
     lineMaterial.opacity += (targetOpacity - lineMaterial.opacity) * 10 * delta;
     
-    // Şeffaflık ayarı - TFT'deki gibi boş kareler hafif görünür olacak
+    // Şeffaflık ayarı - TFT'deki gibi boş kareler hafif görünür
     const targetAlpha = hovered || isHighlighted || isOccupied ? 0.9 : 0.15;
     material.opacity += (targetAlpha - material.opacity) * 10 * delta;
   });
-
-  // Hex geometrisi oluştur
-  const hexShape = new THREE.Shape();
-  const size = 0.95; // Kenar aralarında boşluk bırakmak için biraz küçült
-  const points = [];
   
-  for (let i = 0; i < 6; i++) {
-    const angle = (Math.PI / 3) * i;
-    const x = size * Math.cos(angle);
-    const y = size * Math.sin(angle);
-    points.push(new THREE.Vector2(x, y));
-    
-    if (i === 0) {
-      hexShape.moveTo(x, y);
-    } else {
-      hexShape.lineTo(x, y);
-    }
-  }
-  // Şekli kapatmak için ilk noktaya dön
-  hexShape.closePath();
-  
-  // Kenar çizgisi için geometri
+  // Kare kenarları için geometri
   const edgeGeometry = new THREE.EdgesGeometry(
-    new THREE.ExtrudeGeometry(hexShape, { 
-      depth: 0.1,
-      bevelEnabled: false
-    })
+    new THREE.BoxGeometry(0.9, 0.1, 0.9)
   );
   
   return (
     <group position={position}>
-      {/* Altıgen dolgusu */}
+      {/* Kare dolgusu */}
       <mesh 
         ref={meshRef}
-        rotation={[-Math.PI / 2, 0, 0]}
         receiveShadow
         onPointerOver={() => setHovered(true)}
         onPointerOut={() => setHovered(false)}
       >
-        <extrudeGeometry 
-          args={[
-            hexShape, 
-            { 
-              depth: 0.1,
-              bevelEnabled: true,
-              bevelSegments: 2,
-              bevelSize: 0.02,
-              bevelThickness: 0.02
-            }
-          ]} 
-        />
+        <boxGeometry args={[0.9, 0.1, 0.9]} />
         <meshStandardMaterial 
           color={color} 
           roughness={0.7}
@@ -156,10 +121,9 @@ const HexTile = ({ position, color, isHighlighted, isPlayerSide, isOccupied = fa
         />
       </mesh>
       
-      {/* Altıgen kenar çizgileri */}
+      {/* Kare kenar çizgileri */}
       <lineSegments 
-        ref={lineRef} 
-        rotation={[-Math.PI / 2, 0, 0]}
+        ref={lineRef}
       >
         <primitive object={edgeGeometry} />
         <lineBasicMaterial 
@@ -290,8 +254,8 @@ const Island = ({ position, isPlayerIsland = false }: any) => {
       roofs: "#553322"
     };
   
-  // Ada süsleme faktörü
-  const decorationCount = 8;
+  // Ada süsleme faktörü - kenarlar boyunca
+  const decorationCount = 12;  // Daha fazla süs ekle
     
   return (
     <group position={position}>
@@ -333,54 +297,93 @@ const Island = ({ position, isPlayerIsland = false }: any) => {
         />
       </mesh>
       
-      {/* Merkez bina - Ana kale/kışla */}
-      <group position={[0, 0.5, 0]}>
+      {/* Merkez bina - Ada kenarına taşındı */}
+      <group position={[3.5, 0.5, 0]}>
         {/* Temel */}
         <mesh position={[0, 0, 0]} castShadow receiveShadow>
-          <boxGeometry args={[1.8, 0.8, 1.8]} />
+          <boxGeometry args={[1.2, 0.6, 1.2]} />
           <meshStandardMaterial color={islandColors.buildings} roughness={0.8} />
         </mesh>
         
         {/* Kule 1 */}
-        <mesh position={[-0.6, 1.0, -0.6]} castShadow>
-          <cylinderGeometry args={[0.3, 0.3, 1.2, 8]} />
+        <mesh position={[-0.4, 0.8, -0.4]} castShadow>
+          <cylinderGeometry args={[0.2, 0.2, 1.0, 8]} />
           <meshStandardMaterial color={islandColors.buildings} roughness={0.7} />
         </mesh>
         
         {/* Kule 1 Çatısı */}
-        <mesh position={[-0.6, 1.5, -0.6]} castShadow>
-          <coneGeometry args={[0.4, 0.6, 8]} />
-          <meshStandardMaterial color={islandColors.roofs} roughness={0.6} />
-        </mesh>
-        
-        {/* Kule 2 */}
-        <mesh position={[0.6, 1.0, -0.6]} castShadow>
-          <cylinderGeometry args={[0.3, 0.3, 1.2, 8]} />
-          <meshStandardMaterial color={islandColors.buildings} roughness={0.7} />
-        </mesh>
-        
-        {/* Kule 2 Çatısı */}
-        <mesh position={[0.6, 1.5, -0.6]} castShadow>
-          <coneGeometry args={[0.4, 0.6, 8]} />
+        <mesh position={[-0.4, 1.3, -0.4]} castShadow>
+          <coneGeometry args={[0.3, 0.4, 8]} />
           <meshStandardMaterial color={islandColors.roofs} roughness={0.6} />
         </mesh>
         
         {/* Ana bina çatısı */}
-        <mesh position={[0, 1.0, 0.2]} rotation={[0.2, 0, 0]} castShadow>
-          <boxGeometry args={[1.4, 0.6, 1.2]} />
+        <mesh position={[0, 0.8, 0]} castShadow>
+          <boxGeometry args={[1.0, 0.5, 1.0]} />
           <meshStandardMaterial color={islandColors.roofs} roughness={0.6} />
         </mesh>
       </group>
       
-      {/* Ada süslemeleri - ağaçlar, yapılar ve kayalar */}
+      {/* İkinci bina, karşı tarafa */}
+      <group position={[-3.2, 0.5, -1.0]}>
+        {/* Temel */}
+        <mesh position={[0, 0, 0]} castShadow receiveShadow>
+          <boxGeometry args={[1.0, 0.6, 1.0]} />
+          <meshStandardMaterial color={islandColors.buildings} roughness={0.8} />
+        </mesh>
+        
+        {/* Çatı - piramit şeklinde */}
+        <mesh position={[0, 0.6, 0]} castShadow>
+          <coneGeometry args={[0.7, 0.8, 4]} />
+          <meshStandardMaterial color={islandColors.roofs} roughness={0.6} />
+        </mesh>
+      </group>
+      
+      {/* Savaş alanını belirginleştiren mermer düzlem - ortadaki alanı belirtmek için */}
+      <mesh 
+        position={[0, 0.25, 0]} 
+        rotation={[-Math.PI / 2, 0, 0]}
+        receiveShadow
+      >
+        <planeGeometry args={[6, 6]} />
+        <meshStandardMaterial 
+          color={isPlayerIsland ? "#9bb5a5" : "#b59b9b"}
+          roughness={0.7}
+          metalness={0.1}
+          transparent={true}
+          opacity={0.6}
+        />
+      </mesh>
+      
+      {/* Ortadaki savaş alanının sınırlarını belirten taşlar */}
+      {Array.from({ length: 4 }).map((_, i) => {
+        const angle = (Math.PI / 2) * i;
+        const x = Math.cos(angle) * 3;
+        const z = Math.sin(angle) * 3;
+        
+        return (
+          <group key={`corner-${i}`} position={[x, 0.3, z]}>
+            <mesh castShadow>
+              <boxGeometry args={[0.3, 0.3, 0.3]} />
+              <meshStandardMaterial color="#aaaaaa" roughness={0.9} />
+            </mesh>
+          </group>
+        );
+      })}
+      
+      {/* Ada süslemeleri - Sadece kenarlar boyunca dizilmiş */}
       {Array.from({ length: decorationCount }).map((_, i) => {
         const angle = (Math.PI * 2 / decorationCount) * i;
-        const radius = 3; // Adanın dış çevresine daha yakın
+        const radius = 4; // Adanın en dış çevresine yerleştir
         const x = Math.cos(angle) * radius;
         const z = Math.sin(angle) * radius;
         
         // Dekorasyon türünü belirle: ağaç, bina veya kaya
         const decorationType = i % 3; // 0: ağaç, 1: bina, 2: kaya
+        
+        // Merkezi 3x3 alanına gelecek süslemeleri engelle
+        const distanceFromCenter = Math.sqrt(x*x + z*z);
+        if (distanceFromCenter < 2.5) return null; // Merkez alanı boş bırak
         
         return (
           <group key={i} position={[x, 0.3, z]}>
@@ -402,11 +405,11 @@ const Island = ({ position, isPlayerIsland = false }: any) => {
               // Küçük bina
               <>
                 <mesh position={[0, 0.3, 0]} castShadow>
-                  <boxGeometry args={[0.6, 0.6, 0.6]} />
+                  <boxGeometry args={[0.5, 0.5, 0.5]} />
                   <meshStandardMaterial color={islandColors.buildings} roughness={0.8} />
                 </mesh>
                 <mesh position={[0, 0.7, 0]} castShadow>
-                  <coneGeometry args={[0.45, 0.5, 4]} />
+                  <coneGeometry args={[0.4, 0.4, 4]} />
                   <meshStandardMaterial color={islandColors.roofs} roughness={0.7} />
                 </mesh>
               </>
