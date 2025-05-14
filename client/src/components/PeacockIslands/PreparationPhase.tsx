@@ -456,41 +456,58 @@ const PreparationPhase = () => {
                     
                     {featherColorSelected && (
                       <div className="mt-3 space-y-3">
-                        <div className="combine-container p-3 bg-gray-800/70 rounded-lg">
-                          <div className="flex justify-between items-center mb-2">
-                            <h5 className="text-sm font-semibold text-gray-200">
-                              {getFeatherColorName(featherColorSelected)} Tüy İşlemleri
+                        <div className="glass-panel bg-slate-900/40 rounded-lg p-4 border border-slate-600/30">
+                          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-3">
+                            <h5 className="text-sm font-semibold text-gray-200 flex items-center">
+                              <span className="material-icons mr-1 text-sm">
+                                {featherColorSelected === "green" ? "emoji_nature" : 
+                                 featherColorSelected === "blue" ? "water_drop" : "local_fire_department"}
+                              </span>
+                              <span className={
+                                featherColorSelected === "green" ? "text-green-400" : 
+                                featherColorSelected === "blue" ? "text-blue-400" : "text-orange-400"
+                              }>
+                                {getFeatherColorName(featherColorSelected)}
+                              </span>
+                              <span className="text-gray-300"> Tüy İşlemleri</span>
                             </h5>
                             
-                            <div className="feather-count px-2 py-1 rounded bg-gray-700/70 text-xs text-white">
-                              Mevcut: <span className="font-bold">{player.island.featherInventory[featherColorSelected]}</span> adet
+                            <div className={`feather-count px-3 py-1 rounded-full text-xs border flex items-center mt-2 sm:mt-0 ${
+                              featherColorSelected === "green" 
+                                ? "bg-green-900/40 text-green-300 border-green-700/50" 
+                                : featherColorSelected === "blue"
+                                ? "bg-blue-900/40 text-blue-300 border-blue-700/50"
+                                : "bg-orange-900/40 text-orange-300 border-orange-700/50"
+                            }`}>
+                              <span className="material-icons text-xs mr-1">inventory_2</span>
+                              Mevcut: <span className="font-bold ml-1">{player.island.featherInventory[featherColorSelected]}</span> adet
                             </div>
                           </div>
                           
-                          <div className="grid grid-cols-2 gap-2">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <button
-                              className={`flex items-center justify-center gap-2 py-2 px-3 rounded-md text-sm ${
+                              className={`flex items-center justify-center gap-2 py-2 px-4 rounded-lg text-sm shadow-md transition-all duration-300 ${
                                 featherColorSelected === "green" 
-                                  ? "bg-green-700 hover:bg-green-600 text-white" 
+                                  ? "bg-gradient-to-r from-green-700 to-green-800 hover:from-green-600 hover:to-green-700 text-white border border-green-600/50" 
                                   : featherColorSelected === "blue"
-                                  ? "bg-blue-700 hover:bg-blue-600 text-white"
-                                  : "bg-orange-700 hover:bg-orange-600 text-white"
+                                  ? "bg-gradient-to-r from-blue-700 to-blue-800 hover:from-blue-600 hover:to-blue-700 text-white border border-blue-600/50"
+                                  : "bg-gradient-to-r from-orange-700 to-orange-800 hover:from-orange-600 hover:to-orange-700 text-white border border-orange-600/50"
                               }`}
                               onClick={() => handleCollectFeathers(featherColorSelected)}
                             >
-                              <span className="material-icons text-sm">add</span>
+                              <span className="material-icons text-sm">eco</span>
                               Tüy Topla
                             </button>
                             
                             <button
-                              className={`flex items-center justify-center gap-2 py-2 px-3 rounded-md text-sm ${
+                              className={`flex items-center justify-center gap-2 py-2 px-4 rounded-lg text-sm shadow-md transition-all duration-300 ${
                                 player.island.featherInventory[featherColorSelected] >= 3
                                   ? (featherColorSelected === "green" 
-                                      ? "bg-green-700 hover:bg-green-600 text-white" 
+                                      ? "bg-gradient-to-r from-green-700 to-green-800 hover:from-green-600 hover:to-green-700 text-white border border-green-600/50" 
                                       : featherColorSelected === "blue"
-                                      ? "bg-blue-700 hover:bg-blue-600 text-white"
-                                      : "bg-orange-700 hover:bg-orange-600 text-white")
-                                  : "bg-gray-700 text-gray-400 cursor-not-allowed"
+                                      ? "bg-gradient-to-r from-blue-700 to-blue-800 hover:from-blue-600 hover:to-blue-700 text-white border border-blue-600/50"
+                                      : "bg-gradient-to-r from-orange-700 to-orange-800 hover:from-orange-600 hover:to-orange-700 text-white border border-orange-600/50")
+                                  : "bg-gray-800/70 text-gray-400 cursor-not-allowed border border-gray-700/30"
                               }`}
                               onClick={() => {
                                 if (player.island.featherInventory[featherColorSelected] >= 3) {
