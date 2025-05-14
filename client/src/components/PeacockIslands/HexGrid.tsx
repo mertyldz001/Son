@@ -57,6 +57,7 @@ function HexTile({
   
   return (
     <group position={position}>
+      {/* Ana hexagon - İçi ve kenarı tamamen aynı şekil ve boyutta */}
       <mesh 
         position={[0, hoverHeight.current, 0]} 
         rotation={[-Math.PI / 2, 0, 0]}
@@ -65,7 +66,6 @@ function HexTile({
         onPointerOut={onUnhover}
         onClick={(e) => {
           e.stopPropagation();
-          // Özel olay tetikle
           window.dispatchEvent(
             new CustomEvent('hex-click', { 
               detail: { 
@@ -86,53 +86,33 @@ function HexTile({
           isOccupied
         }}
       >
-        {/* TFT stili hexagonal geometri yerine kareden */}
-        <cylinderGeometry args={[size * 1.3, size * 1.3, 0.25, 6, 1, false]} />
+        {/* 6 kenarlı altıgen form */}
+        <cylinderGeometry args={[size * 1.15, size * 1.15, 0.15, 6, 1, false]} />
         <meshPhysicalMaterial 
           color={isHovered ? hoverColor : baseColor} 
-          roughness={0.15} // Çok parlak
-          metalness={0.7}  // Daha metalik görünüm
+          roughness={0.1}
+          metalness={0.6}
           transparent={true}
-          opacity={isOccupied ? 0.85 : 0.95}
+          opacity={0.9}
           emissive={isHovered ? hoverColor : baseColor}
-          emissiveIntensity={glowIntensity.current} // Animasyonlu glow efekti
-          clearcoat={1.0}  // Tam parlak yüzey
-          clearcoatRoughness={0.2}
-          transmission={0.4}
+          emissiveIntensity={glowIntensity.current}
+          clearcoat={0.8}
           reflectivity={0.8}
-          envMapIntensity={1.5} // Çevre yansıması
         />
       </mesh>
       
-      {/* TFT stili kenar çizgisi - ekran görüntüsündeki gibi */}
-      <mesh 
-        position={[0, 0.03, 0]} 
-        rotation={[-Math.PI / 2, 0, 0]}
-        scale={hoverScale.current}
-      >
-        <ringGeometry args={[size * 1.28, size * 1.35, 6]} />
-        <meshBasicMaterial 
-          color={isHovered ? "#ffffff" : edgeColor} 
-          side={THREE.DoubleSide} 
-          transparent={true}
-          opacity={1.0}
-        />
-      </mesh>
-      
-      {/* TFT stili glow efekti */}
+      {/* Kenar çizgisi - içindeki altıgen ile tam aynı boyut ve şekilde */}
       <mesh 
         position={[0, 0.02, 0]} 
         rotation={[-Math.PI / 2, 0, 0]}
         scale={hoverScale.current}
       >
-        <ringGeometry args={[size * 1.15, size * 1.17, 6]} />
-        <meshStandardMaterial 
-          color={isHovered ? "#ffffff" : baseColor} 
+        <ringGeometry args={[size * 1.14, size * 1.16, 6]} />
+        <meshBasicMaterial 
+          color={isHovered ? "#ffffff" : edgeColor} 
           side={THREE.DoubleSide} 
           transparent={true}
-          opacity={isHovered ? 0.9 : 0.7}
-          emissive={isHovered ? "#ffffff" : baseColor}
-          emissiveIntensity={glowIntensity.current}
+          opacity={1.0}
         />
       </mesh>
       
