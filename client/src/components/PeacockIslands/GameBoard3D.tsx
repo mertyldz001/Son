@@ -1,8 +1,9 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, Suspense } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, Text, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 import { usePeacockIslandsStore } from '../../lib/stores/usePeacockIslandsStore';
+import { PeacockWarriorModel, HumanSoldierModel } from './3DModels';
 
 // Hex harita oluşturucu yardımcı fonksiyonlar
 const createHexPosition = (q: number, r: number, size: number = 1) => {
@@ -140,46 +141,75 @@ const UnitPiece = ({ position, color, power, health, type, size = 0.4 }: any) =>
   useFrame((_, delta) => {
     if (!meshRef.current) return;
     meshRef.current.position.y = adjustedPosition[1] + Math.sin(Date.now() * 0.003) * 0.05;
-    meshRef.current.rotation.y += delta * 0.5; // Yavaşça dön
+    meshRef.current.rotation.y += delta * 0.3; // Yavaşça dön
   });
   
   // Tavus kuşu düşman birimi mi belirle
   const isPeacock = type === "chick" || type === "juvenile" || type === "adult" || type === "alpha";
   
+  // Model ölçeği hesapla
+  let modelScale = size;
+  if (isPeacock) {
+    switch (type) {
+      case "chick": modelScale *= 0.8; break;
+      case "juvenile": modelScale *= 1.0; break;
+      case "adult": modelScale *= 1.2; break;
+      case "alpha": modelScale *= 1.5; break;
+    }
+  }
+  
   return (
     <group ref={meshRef} position={adjustedPosition}>
-      {/* Karakter gövdesi */}
-      {isPeacock ? (
+      <Suspense fallback={
         <>
-          {/* Tavus kuşu gövdesi */}
-          <mesh castShadow position={[0, 0, 0]}>
-            <sphereGeometry args={[size * 0.8, 16, 16]} />
-            <meshStandardMaterial color={color} roughness={0.5} />
-          </mesh>
-          
-          {/* Tavus kuşu kafası */}
-          <mesh castShadow position={[0, size * 0.4, size * 0.6]}>
-            <sphereGeometry args={[size * 0.4, 16, 16]} />
-            <meshStandardMaterial color={color} roughness={0.5} />
-          </mesh>
-          
-          {/* Tavus kuşu kuyruğu */}
-          <mesh castShadow position={[0, size * 0.5, -size * 0.6]} rotation={[Math.PI * 0.2, 0, 0]}>
-            <coneGeometry args={[size * 0.6, size * 1.2, 8]} />
-            <meshStandardMaterial color={color} roughness={0.5} />
-          </mesh>
+          {/* Fallback basit geometriler */}
+          {isPeacock ? (
+            <group>
+              {/* Tavus kuşu gövdesi */}
+              <mesh castShadow position={[0, 0, 0]}>
+                <sphereGeometry args={[size * 0.8, 16, 16]} />
+                <meshStandardMaterial color={color} roughness={0.5} />
+              </mesh>
+              
+              {/* Tavus kuşu kafası */}
+              <mesh castShadow position={[0, size * 0.4, size * 0.6]}>
+                <sphereGeometry args={[size * 0.4, 16, 16]} />
+                <meshStandardMaterial color={color} roughness={0.5} />
+              </mesh>
+              
+              {/* Tavus kuşu kuyruğu */}
+              <mesh castShadow position={[0, size * 0.5, -size * 0.6]} rotation={[Math.PI * 0.2, 0, 0]}>
+                <coneGeometry args={[size * 0.6, size * 1.2, 8]} />
+                <meshStandardMaterial color={color} roughness={0.5} />
+              </mesh>
+            </group>
+          ) : (
+            // Normal asker birimi
+            <mesh castShadow>
+              <boxGeometry args={[size, size * 1.5, size]} />
+              <meshStandardMaterial color={color} roughness={0.5} />
+            </mesh>
+          )}
         </>
-      ) : (
-        // Normal asker birimi
-        <mesh castShadow>
-          <boxGeometry args={[size, size * 1.5, size]} />
-          <meshStandardMaterial color={color} roughness={0.5} />
-        </mesh>
-      )}
+      }>
+        {/* 3D modeller */}
+        {isPeacock ? (
+          <PeacockWarriorModel 
+            position={[0, -0.2, 0]} 
+            scale={modelScale * 1.0} 
+            type={type as any}
+          />
+        ) : (
+          <HumanSoldierModel 
+            position={[0, -0.2, 0]} 
+            scale={modelScale * 0.8}
+          />
+        )}
+      </Suspense>
       
       {/* Güç göstergesi */}
       <Text
-        position={[0, size + 0.2, 0]}
+        position={[0, size + 0.3, 0]}
         rotation={[0, 0, 0]}
         fontSize={0.25}
         color="white"

@@ -4,6 +4,7 @@ import { useAudio } from "../../lib/stores/useAudio";
 import { FeatherColor, HatcherySlot, Egg } from "../../lib/game/peacockIslands/types";
 import { getFeatherColorName, getBonusTypeName } from "../../lib/game/peacockIslands/battle";
 import GameBoard3D from "./GameBoard3D";
+import { FeatherViewer, EggViewer } from "./ModelViewer";
 
 const PreparationPhase = () => {
   const { 
@@ -156,26 +157,26 @@ const PreparationPhase = () => {
               <h4 className="text-md font-semibold mb-2">Tüy Envanteri</h4>
               <div className="grid grid-cols-3 gap-2">
                 <div className="bg-green-900/60 p-2 rounded text-center flex flex-col items-center">
-                  <div className="feather-icon flex items-center justify-center w-8 h-8 rounded-full bg-green-800/60 mb-1">
-                    <span className="material-icons text-green-400">eco</span>
+                  <div className="h-16 w-full">
+                    <FeatherViewer color="green" scale={0.5} />
                   </div>
-                  <div className="text-green-400 font-bold">{player.island.featherInventory.green}</div>
+                  <div className="text-green-400 font-bold text-xl mt-1">{player.island.featherInventory.green}</div>
                   <div className="text-xs">Yeşil</div>
                   <div className="text-xs text-green-300/70 mt-1">+20 Can</div>
                 </div>
                 <div className="bg-blue-900/60 p-2 rounded text-center flex flex-col items-center">
-                  <div className="feather-icon flex items-center justify-center w-8 h-8 rounded-full bg-blue-800/60 mb-1">
-                    <span className="material-icons text-blue-400">air</span>
+                  <div className="h-16 w-full">
+                    <FeatherViewer color="blue" scale={0.5} />
                   </div>
-                  <div className="text-blue-400 font-bold">{player.island.featherInventory.blue}</div>
+                  <div className="text-blue-400 font-bold text-xl mt-1">{player.island.featherInventory.blue}</div>
                   <div className="text-xs">Mavi</div>
                   <div className="text-xs text-blue-300/70 mt-1">+20% Hız</div>
                 </div>
                 <div className="bg-orange-900/60 p-2 rounded text-center flex flex-col items-center">
-                  <div className="feather-icon flex items-center justify-center w-8 h-8 rounded-full bg-orange-800/60 mb-1">
-                    <span className="material-icons text-orange-400">bolt</span>
+                  <div className="h-16 w-full">
+                    <FeatherViewer color="orange" scale={0.5} />
                   </div>
-                  <div className="text-orange-400 font-bold">{player.island.featherInventory.orange}</div>
+                  <div className="text-orange-400 font-bold text-xl mt-1">{player.island.featherInventory.orange}</div>
                   <div className="text-xs">Turuncu</div>
                   <div className="text-xs text-orange-300/70 mt-1">+20 Saldırı</div>
                 </div>
