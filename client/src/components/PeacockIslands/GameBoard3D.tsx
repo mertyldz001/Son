@@ -451,15 +451,7 @@ const GameBoard3D = () => {
           noise={1}
         />
         
-        {/* Kamera Kontrolü */}
-        <OrbitControls
-          enableZoom={true}
-          enablePan={true}
-          enableRotate={true}
-          minDistance={5}
-          maxDistance={15}
-          maxPolarAngle={Math.PI / 2 - 0.1}
-        />
+        {/* Kamera Kontrolü - Eskiyi kaldır */}
 
         {/* Keyboard kontrollerimiz için Context */}
         <KeyboardControls
@@ -487,17 +479,19 @@ const GameBoard3D = () => {
         
         {/* Kamera kontrolleri - Aktifleştirilmiş ve daha geniş açılı */}
         <OrbitControls
+          makeDefault
           enableDamping
           dampingFactor={0.1}
-          rotateSpeed={0.8}
-          minDistance={8}
-          maxDistance={30}
+          rotateSpeed={1.2}
+          minDistance={5}
+          maxDistance={40}
           enableZoom={true}
-          zoomSpeed={1.2}
+          zoomSpeed={1.5}
           enablePan={true}
-          panSpeed={0.8}
+          panSpeed={1.0}
           enabled={true}
-          maxPolarAngle={Math.PI / 1.5}
+          maxPolarAngle={Math.PI / 1.2}
+          target={[0, 0, 0]}
         />
         
         {/* Gelişmiş sis efekti - Fazlara göre değişir */}
