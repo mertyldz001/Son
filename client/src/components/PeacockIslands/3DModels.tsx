@@ -1,10 +1,9 @@
 import { useRef, useState, useEffect } from "react";
-import { useGLTF } from "@react-three/drei";
-import { useFrame } from "@react-three/fiber";
+import { useGLTF, Float, Sparkles } from "@react-three/drei";
 import { GLTF } from "three-stdlib";
 import * as THREE from "three";
 
-// Modelleri önceden yükle
+// Modelleri önceden yükle - yüksek kaliteli versiyonlar
 useGLTF.preload('/models/peacock_feather.glb');
 useGLTF.preload('/models/magic_egg.glb');
 useGLTF.preload('/models/peacock_warrior.glb');
