@@ -1,5 +1,6 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useGLTF } from "@react-three/drei";
+import { useFrame } from "@react-three/fiber";
 import { GLTF } from "three-stdlib";
 import * as THREE from "three";
 
@@ -29,26 +30,65 @@ export function FeatherModel({ color = "green", position = [0, 0, 0], rotation =
   const group = useRef<THREE.Group>(null);
   const { scene } = useGLTF('/models/peacock_feather.glb') as GLTFResult;
   
-  // Tüy rengini ayarla
+  // Tüy animasyonu için başlangıç değeri
+  const [rotationOffset, setRotationOffset] = useState(Math.random() * Math.PI * 2);
+  
+  // Animasyon için useFrame hook'u
+  useFrame((_: any, delta: number) => {
+    if (group.current) {
+      // Hafif dalgalanma efekti
+      group.current.rotation.z = rotation[2] + Math.sin(Date.now() * 0.001 + rotationOffset) * 0.1;
+      group.current.position.y = position[1] + Math.sin(Date.now() * 0.0015 + rotationOffset) * 0.05;
+    }
+  });
+  
+  // Tüy rengini ve materyal özelliklerini ayarla
   scene.traverse((child) => {
     if (child instanceof THREE.Mesh && child.material instanceof THREE.MeshStandardMaterial) {
-      // Rengi değiştir
+      child.material = child.material.clone();
+      
+      // Rengi değiştir ve renk canlılığını artır
       if (color === "green") {
-        child.material = child.material.clone();
         child.material.color.set(new THREE.Color(0x00ff88));
+        // Yeşil tüyler için metalik yeşil yansıma
+        child.material.emissive = new THREE.Color(0x005522);
       } else if (color === "blue") {
-        child.material = child.material.clone();
         child.material.color.set(new THREE.Color(0x2288ff));
+        // Mavi tüyler için metalik mavi yansıma
+        child.material.emissive = new THREE.Color(0x002255);
       } else if (color === "orange") {
-        child.material = child.material.clone();
         child.material.color.set(new THREE.Color(0xff8800));
+        // Turuncu tüyler için ateş benzeri yansıma
+        child.material.emissive = new THREE.Color(0x551100);
       }
+      
+      // Gelişmiş materyal özellikleri
+      child.material.emissiveIntensity = 0.2;
+      child.material.metalness = 0.3;
+      child.material.roughness = 0.4;
+      child.material.envMapIntensity = 1.2;
+      
+      // Gölge oluşturma ve alma
+      child.castShadow = true;
+      child.receiveShadow = true;
     }
   });
   
   return (
     <group ref={group} position={position} rotation={rotation} scale={[scale, scale, scale]}>
       <primitive object={scene.clone()} />
+      
+      {/* Renge göre nokta ışık kaynağı */}
+      <pointLight
+        position={[0, 0.2, 0]}
+        intensity={0.3}
+        distance={1.0}
+        color={
+          color === "green" ? "#00ff88" : 
+          color === "blue" ? "#2288ff" : 
+          "#ff8800"
+        }
+      />
     </group>
   );
 }
@@ -64,10 +104,34 @@ export function EggModel({ color = "green", position = [0, 0, 0], rotation = [0,
   const group = useRef<THREE.Group>(null);
   const { scene } = useGLTF('/models/magic_egg.glb') as GLTFResult;
   
-  // Yumurta rengini ayarla
+  // Animasyon için başlangıç değeri
+  const [rotationOffset] = useState(Math.random() * Math.PI * 2);
+  
+  // Animasyon için useFrame hook'u
+  useFrame((_: any, delta: number) => {
+    if (group.current) {
+      if (isActive) {
+        // Aktif yumurtalar için titreme animasyonu
+        group.current.rotation.y = rotation[1] + Math.sin(Date.now() * 0.003 + rotationOffset) * 0.1;
+        group.current.rotation.x = rotation[0] + Math.cos(Date.now() * 0.002 + rotationOffset) * 0.05;
+        // Hafif yukarı-aşağı hareketi
+        group.current.position.y = position[1] + Math.sin(Date.now() * 0.002) * 0.05;
+        group.current.scale.set(
+          scale + Math.sin(Date.now() * 0.004) * 0.03, 
+          scale + Math.sin(Date.now() * 0.004) * 0.03, 
+          scale + Math.sin(Date.now() * 0.004) * 0.03
+        );
+      } else {
+        // Aktif olmayan yumurtalar için yavaş dönüş 
+        group.current.rotation.y = rotation[1] + Math.sin(Date.now() * 0.001) * 0.05;
+      }
+    }
+  });
+  
+  // Yumurta rengini ve materyal özelliklerini gelişmiş hale getir
   scene.traverse((child) => {
     if (child instanceof THREE.Mesh && child.material instanceof THREE.MeshStandardMaterial) {
-      // Rengi değiştir
+      // Rengi ve materyal özelliklerini değiştir
       child.material = child.material.clone();
       
       if (color === "green") {
@@ -81,9 +145,20 @@ export function EggModel({ color = "green", position = [0, 0, 0], rotation = [0,
         child.material.emissive.set(new THREE.Color(0xaa4400));
       }
       
-      // Aktif yumurtalar daha parlak
+      // Gelişmiş materyal özellikleri
+      child.material.metalness = 0.6;
+      child.material.roughness = 0.2;
+      child.material.envMapIntensity = 1.8;
+      
+      // Gölge oluşturma ve alma
+      child.castShadow = true;
+      child.receiveShadow = true;
+      
+      // Aktif yumurtalar daha parlak ve daha metalik
       if (isActive) {
-        child.material.emissiveIntensity = 1.0;
+        child.material.emissiveIntensity = 1.2;
+        child.material.metalness = 0.8;
+        child.material.roughness = 0.1;
       } else {
         child.material.emissiveIntensity = 0.3;
       }
@@ -183,7 +258,7 @@ export function HumanSoldierModel({ position = [0, 0, 0], rotation = [0, 0, 0], 
   const { scene } = useGLTF('/models/human_soldier.glb') as GLTFResult;
   
   // Model animasyonu için
-  useFrame((_, delta) => {
+  useFrame((_: any, delta: number) => {
     if (group.current) {
       // Hafif nefes alma hareketi
       group.current.position.y = position[1] + Math.sin(Date.now() * 0.002) * 0.03;
