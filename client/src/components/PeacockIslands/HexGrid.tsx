@@ -45,13 +45,13 @@ function HexTile({
   // Hover animasyonu - TFT stili yumuşak geçiş
   useFrame(() => {
     if (isHovered) {
-      hoverScale.current.lerp(new THREE.Vector3(1.05, 1.05, 1.05), 0.15);
-      hoverHeight.current += (0.1 - hoverHeight.current) * 0.1;
-      glowIntensity.current += (1.0 - glowIntensity.current) * 0.15;
+      hoverScale.current.lerp(new THREE.Vector3(1.1, 1.1, 1.1), 0.15);
+      hoverHeight.current += (0.15 - hoverHeight.current) * 0.15;
+      glowIntensity.current += (1.0 - glowIntensity.current) * 0.2;
     } else {
       hoverScale.current.lerp(new THREE.Vector3(1, 1, 1), 0.1);
-      hoverHeight.current += (0 - hoverHeight.current) * 0.1;
-      glowIntensity.current += (0.4 - glowIntensity.current) * 0.1;
+      hoverHeight.current += (0 - hoverHeight.current) * 0.15;
+      glowIntensity.current += (0.3 - glowIntensity.current) * 0.15;
     }
   });
   
@@ -87,28 +87,31 @@ function HexTile({
         }}
       >
         {/* TFT style hexagon - single piece with outline */}
-        <cylinderGeometry args={[size, size, 0.1, 6, 1, false]} />
-        <meshStandardMaterial 
+        <cylinderGeometry args={[size, size, 0.08, 6, 1, false]} />
+        <meshPhysicalMaterial 
           color={isHovered ? hoverColor : baseColor} 
           emissive={isHovered ? hoverColor : baseColor}
-          emissiveIntensity={0.3}
-          roughness={0.3}
+          emissiveIntensity={0.4}
+          roughness={0.2}
           metalness={0.8}
+          clearcoat={0.8}
+          reflectivity={0.7}
+          transmission={0.1}
         />
       </mesh>
       
-      {/* Line along the edge */}
+      {/* Kenar çizgisi - tam boyutta */}
       <mesh 
-        position={[0, 0.06, 0]} 
+        position={[0, 0.05, 0]} 
         rotation={[-Math.PI / 2, 0, 0]}
         scale={hoverScale.current}
       >
-        <ringGeometry args={[size * 0.98, size * 1.02, 6]} />
+        <ringGeometry args={[size * 0.99, size * 1.01, 6]} />
         <meshBasicMaterial 
           color={isHovered ? "#ffffff" : edgeColor}
           side={THREE.DoubleSide}
           transparent={true}
-          opacity={0.8}
+          opacity={isHovered ? 1 : 0.9}
         />
       </mesh>
       
@@ -157,9 +160,9 @@ const HexGrid: React.FC<HexGridProps> = ({
       const s = -q - r;
       const key = `${q},${r},${s}`;
       
-      // Pozisyonlar - gönderilen ekran görüntüsündeki gibi daha yakın
-      const x = size * 1.8 * (q - gridWidth/2 + 0.5);  // Yatay olarak daha yakın
-      const z = size * 1.8 * r;  // Dikey olarak daha yakın
+      // Pozisyonlar - TFT tarzı daha yakın sütunlar
+      const x = size * 2.2 * (q - gridWidth/2 + 0.5);  // Yatay olarak optimal aralık
+      const z = size * 2.0 * r;  // Dikey olarak optimal aralık
       
       // TFT tarzı: Oyuncu ve rakip tarafı - net ayrım
       const isPlayerSide = r < gridHeight / 2;
