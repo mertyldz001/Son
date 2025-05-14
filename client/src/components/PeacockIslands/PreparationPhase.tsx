@@ -723,7 +723,7 @@ const PreparationPhase = () => {
                     </div>
                   </div>
                   <div className="text-[10px] text-blue-200/80 mt-1">
-                    Saha: {player.island.units.filter(u => u.type === "warrior" && u.isDeployed).length} / {player.island.units.filter(u => u.type === "warrior").length}
+                    Saha: {player.island.units.filter((u: Unit) => u.type === "warrior" && u.isDeployed).length} / {player.island.units.filter((u: Unit) => u.type === "warrior").length}
                   </div>
                 </div>
                 
@@ -738,7 +738,7 @@ const PreparationPhase = () => {
                     </div>
                   </div>
                   <div className="text-[10px] text-amber-200/80 mt-1">
-                    Saha: {player.island.units.filter(u => u.type === "soldier" && u.isDeployed).length} / {player.island.units.filter(u => u.type === "soldier").length}
+                    Saha: {player.island.units.filter((u: Unit) => u.type === "soldier" && u.isDeployed).length} / {player.island.units.filter((u: Unit) => u.type === "soldier").length}
                   </div>
                 </div>
               </div>

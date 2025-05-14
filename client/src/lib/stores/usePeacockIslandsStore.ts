@@ -129,7 +129,9 @@ const createIsland = (ownerId: string, name: string): Island => {
       bonuses: createInitialBonuses()
     },
     hatchery,
-    featherInventory: createEmptyFeatherInventory()
+    featherInventory: createEmptyFeatherInventory(),
+    units: [], // Başlangıçta boş birim dizisi
+    gold: INITIAL_GOLD // Ada için altın miktarı
   };
 };
 
