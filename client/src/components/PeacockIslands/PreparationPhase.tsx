@@ -5,6 +5,7 @@ import { FeatherColor, HatcherySlot, Egg } from "../../lib/game/peacockIslands/t
 import { getFeatherColorName, getBonusTypeName } from "../../lib/game/peacockIslands/battle";
 import GameBoard3D from "./GameBoard3D";
 import { FeatherViewer, EggViewer } from "./ModelViewer";
+import WindowPanel from "../UI/WindowPanel";
 
 const PreparationPhase = () => {
   const { 

@@ -395,7 +395,7 @@ export function PeacockWarriorModel({ position = [0, 0, 0], rotation = [0, 0, 0]
   }
   
   // Düşman türüne göre boyut ve renk ayarla
-  let modelScale = scale;
+  const actualScale = scale;
   const colorRef = useRef(new THREE.Color(0xffffff));
   
   // Farklı düşman tiplerine göre ayarlar
@@ -443,7 +443,7 @@ export function PeacockWarriorModel({ position = [0, 0, 0], rotation = [0, 0, 0]
         }
       }
     });
-  }, [scene, type, modelScale]);
+  }, [scene, type, actualScale]);
   
   // Savaşçı animasyonu için
   useEffect(() => {
