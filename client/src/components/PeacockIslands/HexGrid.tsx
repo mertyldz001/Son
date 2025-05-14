@@ -71,7 +71,7 @@ function HexTile({
           roughness={0.7}
           metalness={0.2}
           transparent={true}
-          opacity={isOccupied ? 0.8 : 0.95}
+          opacity={isOccupied ? 0.7 : 0.85}
         />
       </mesh>
       
@@ -80,10 +80,12 @@ function HexTile({
         position={[0, 0.03, 0]} 
         rotation={[-Math.PI / 2, 0, 0]}
       >
-        <ringGeometry args={[size * 1.6, size * 1.8, 6]} />
+        <ringGeometry args={[size * 1.7, size * 1.8, 6]} />
         <meshBasicMaterial 
-          color={isHovered ? "#ffcc00" : "#3a506b"} 
+          color={isHovered ? "#ffcc00" : "#2a4055"} 
           side={THREE.DoubleSide} 
+          transparent={true}
+          opacity={0.9}
         />
       </mesh>
       
@@ -113,7 +115,7 @@ interface HexGridProps {
 }
 
 const HexGrid: React.FC<HexGridProps> = ({ 
-  size = 0.8, 
+  size = 0.7, 
   gridWidth = 6, 
   gridHeight = 6,
   unitPositions,

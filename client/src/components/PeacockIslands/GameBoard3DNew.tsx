@@ -408,11 +408,11 @@ const GameScene = () => {
   
   return (
     <>
-      {/* Düz görünüm için kamera - daha uzaktan bakma */}
+      {/* Düz görünüm için kamera - basit ve net görüş */}
       <PerspectiveCamera 
-        position={[0, 20, 20]} 
-        rotation={[-Math.PI/3, 0, 0]} 
-        fov={25}
+        position={[0, 16, 16]} 
+        rotation={[-Math.PI/4, 0, 0]} 
+        fov={30}
         near={0.1} 
         far={100}
         makeDefault
@@ -435,9 +435,9 @@ const GameScene = () => {
       <color attach="background" args={['#1a1a2e']} />
       
       {/* Hexagonal Savaş Alanı - Ortada */}
-      <group position={[0, 0.1, 0]} scale={1.2}>
+      <group position={[0, 0.1, 0]} scale={1}>
         <HexGrid 
-          size={0.8} 
+          size={0.7} 
           gridWidth={6} 
           gridHeight={6} 
           unitPositions={deployedUnitPositions}
@@ -447,9 +447,9 @@ const GameScene = () => {
         {/* Sürüklenen birimin görsel önizlemesi - eğer varsa ve cursor hex üzerindeyse */}
         {dragCursor.visible && hoveredHex && (
           <group position={[
-            hoveredHex.q * 0.8 * 2, // hex boyutuna göre x pozisyonu - yeni boyuta göre ayarlandı
+            hoveredHex.q * 0.7 * 2, // hex boyutuna göre x pozisyonu - yeni boyuta göre ayarlandı
             0.5, // y pozisyonu (yerden yükseklik)
-            hoveredHex.r * 0.8 * 2 // hex boyutuna göre z pozisyonu - yeni boyuta göre ayarlandı
+            hoveredHex.r * 0.7 * 2 // hex boyutuna göre z pozisyonu - yeni boyuta göre ayarlandı
           ]}>
             {dragCursor.type === 'warrior' ? (
               <PeacockWarriorModel 
@@ -482,18 +482,18 @@ const GameBoard3D = () => {
   const { currentPhase } = usePeacockIslandsStore();
   const isBattlePhase = currentPhase === "battle";
   
-  // Sabit kamera pozisyonu - daha uzaktan bir açı
-  const cameraPosition: [number, number, number] = [0, 20, 25]; // İyileştirilmiş kuş bakışı pozisyon
+  // Sabit kamera pozisyonu - daha basit
+  const cameraPosition: [number, number, number] = [0, 15, 15]; // Ortadan sade bakış açısı
   const backgroundColor = isBattlePhase ? "#1a3545" : "#2a4860";
   
   return (
     <div className="absolute inset-0 z-0 flex items-center justify-center">
       <Canvas
         shadows
-        className="w-full max-w-7xl h-full max-h-screen mx-auto my-auto"
+        className="w-full max-w-4xl h-full max-h-[85vh] mx-auto my-auto"
         camera={{
           position: [cameraPosition[0], cameraPosition[1], cameraPosition[2]],
-          fov: 45,
+          fov: 40,
           near: 0.1,
           far: 1000
         }}
