@@ -704,7 +704,7 @@ const Battlefield = () => {
   }
 };
 
-// Kamera kontrolü
+// Kamera kontrolü - Zoom ve rotasyon özellikleri eklenmiş
 const CameraController = () => {
   const { camera, gl } = useThree();
   const controls = useRef<any>();
@@ -712,6 +712,12 @@ const CameraController = () => {
   
   // Fazlara göre kamera pozisyonları
   const isBattlePhase = currentPhase === "battle";
+  
+  // Zoom limitleri (TFT tarzında yakınlaşıp uzaklaşma)
+  const zoomLimits = {
+    min: isBattlePhase ? 6 : 5,  // Minimum zoom (daha yakın)
+    max: isBattlePhase ? 20 : 15  // Maximum zoom (daha uzak)
+  };
   
   useEffect(() => {
     // Kamera başlangıç pozisyonu - Faza göre değişir
