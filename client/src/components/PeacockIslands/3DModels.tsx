@@ -360,10 +360,10 @@ export function PeacockWarriorModel({ position = [0, 0, 0], rotation = [0, 0, 0]
       >
         <group>
           {/* Gövde */}
-          <mesh scale={[0.3 * modelScale, 0.7 * modelScale, 0.3 * modelScale]}>
+          <mesh scale={[0.3 * fallbackScale, 0.7 * fallbackScale, 0.3 * fallbackScale]}>
             <boxGeometry />
             <meshStandardMaterial 
-              color={modelColor}
+              color={fallbackColor}
               emissive={type === "alpha" ? "#ff3300" : "#000000"}
               emissiveIntensity={type === "alpha" ? 0.3 : 0}
               metalness={0.4}
@@ -373,11 +373,11 @@ export function PeacockWarriorModel({ position = [0, 0, 0], rotation = [0, 0, 0]
           
           {/* Kafa */}
           <mesh 
-            position={[0, 0.45 * modelScale, 0]} 
-            scale={[0.2 * modelScale, 0.2 * modelScale, 0.2 * modelScale]}
+            position={[0, 0.45 * fallbackScale, 0]} 
+            scale={[0.2 * fallbackScale, 0.2 * fallbackScale, 0.2 * fallbackScale]}
           >
             <sphereGeometry />
-            <meshStandardMaterial color={modelColor} />
+            <meshStandardMaterial color={fallbackColor} />
           </mesh>
           
           {/* Alpha olanlar için ışık efekti */}
@@ -400,21 +400,24 @@ export function PeacockWarriorModel({ position = [0, 0, 0], rotation = [0, 0, 0]
   
   // Farklı düşman tiplerine göre ayarlar
   useEffect(() => {
+    // actualScale değerini etkilemeyelim, yeni bir değişken kullanıyoruz
+    let typeScale = 1.0;
+    
     switch (type) {
       case "chick":
-        modelScale *= 0.5;
+        typeScale = 0.5;
         colorRef.current.set(0xffcc44);
         break;
       case "juvenile":
-        modelScale *= 0.75;
+        typeScale = 0.75;
         colorRef.current.set(0xff9944);
         break;
       case "adult":
-        modelScale *= 1.0;
+        typeScale = 1.0;
         colorRef.current.set(0xff6644);
         break;
       case "alpha":
-        modelScale *= 1.3;
+        typeScale = 1.3;
         colorRef.current.set(0xff3333);
         break;
     }
@@ -482,7 +485,7 @@ export function PeacockWarriorModel({ position = [0, 0, 0], rotation = [0, 0, 0]
       position={position}
       rotation={rotation}
     >
-      <group ref={group} scale={[modelScale * 1.5, modelScale * 1.5, modelScale * 1.5]}>
+      <group ref={group} scale={[actualScale * 1.5, actualScale * 1.5, actualScale * 1.5]}>
         <primitive object={scene} />
         
         {/* Alpha düşmanlar için özel efektler */}
@@ -516,7 +519,70 @@ export function HumanSoldierModel({ position = [0, 0, 0], rotation = [0, 0, 0], 
   scale?: number;
 }) {
   const group = useRef<THREE.Group>(null);
-  const { scene } = useGLTF('/models/human_soldier.glb') as GLTFResult;
+  const { scene, error } = useSafeGLTF('/models/human_soldier.glb') as GLTFResult & { error: boolean };
+  
+  // Model yüklenemezse basit bir alternatif gösteriyoruz
+  if (error) {
+    console.warn("İnsan askeri modeli yüklenemedi, basit alternatif kullanılıyor");
+    
+    return (
+      <Float 
+        speed={1.2}
+        rotationIntensity={0.1}
+        floatIntensity={0.1}
+        position={position}
+        rotation={rotation}
+      >
+        <group>
+          {/* Gövde */}
+          <mesh scale={[0.25 * scale, 0.6 * scale, 0.25 * scale]}>
+            <boxGeometry />
+            <meshStandardMaterial 
+              color="#5566aa"
+              metalness={0.3}
+              roughness={0.4}
+            />
+          </mesh>
+          
+          {/* Kafa */}
+          <mesh 
+            position={[0, 0.4 * scale, 0]} 
+            scale={[0.2 * scale, 0.2 * scale, 0.2 * scale]}
+          >
+            <sphereGeometry />
+            <meshStandardMaterial color="#ffddbb" />
+          </mesh>
+          
+          {/* Kask */}
+          <mesh 
+            position={[0, 0.45 * scale, 0]} 
+            scale={[0.22 * scale, 0.1 * scale, 0.22 * scale]}
+          >
+            <cylinderGeometry />
+            <meshStandardMaterial 
+              color="#7788cc"
+              metalness={0.7}
+              roughness={0.2}
+            />
+          </mesh>
+          
+          {/* Kılıç */}
+          <mesh 
+            position={[0.25 * scale, 0.2 * scale, 0]} 
+            rotation={[0, 0, Math.PI / 4]}
+            scale={[0.05 * scale, 0.4 * scale, 0.05 * scale]}
+          >
+            <boxGeometry />
+            <meshStandardMaterial 
+              color="#aabbdd"
+              metalness={0.8}
+              roughness={0.1}
+            />
+          </mesh>
+        </group>
+      </Float>
+    );
+  }
   
   // Asker animasyonu için
   useEffect(() => {

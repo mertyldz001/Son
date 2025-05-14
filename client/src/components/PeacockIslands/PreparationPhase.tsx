@@ -327,37 +327,25 @@ const PreparationPhase = () => {
             </h3>
             
             <div className="grid grid-cols-2 gap-4 mb-4">
-              {/* Tüy birleştirme paneli - Açılır panel */}
-              <div className="glass-panel bg-indigo-900/20 rounded-lg p-3 relative border border-indigo-500/20">
-                <div className="flex justify-between items-center mb-2">
-                  <h4 className="text-md font-semibold flex items-center">
-                    <span className="material-icons mr-2 text-teal-400">merge_type</span>
-                    Tüy Birleştirme
-                  </h4>
-                  <button 
-                    className="text-gray-300 hover:text-white bg-slate-800/50 rounded-full p-1 hover:bg-slate-700/70"
-                    onClick={() => setBuildingSelected(buildingSelected === "feathers" ? null : "feathers")}
-                  >
-                    <span className="material-icons">
-                      {buildingSelected === "feathers" ? "expand_less" : "expand_more"}
-                    </span>
-                  </button>
+              {/* Tüy birleştirme paneli - WindowPanel kullanımı */}
+              <WindowPanel 
+                title="Tüy Birleştirme" 
+                width="100%" 
+                height="auto"
+                initiallyMinimized={buildingSelected !== "feathers"}
+              >
+                <div className="glass-panel bg-slate-900/40 rounded-lg p-3 mb-3 border border-slate-600/20">
+                  <p className="text-xs text-gray-300">
+                    Aynı renkteki 3 tüyü birleştirerek yumurta elde edebilirsiniz.
+                    Her renk farklı bonuslar sağlar.
+                  </p>
                 </div>
                 
-                {buildingSelected === "feathers" ? (
-                  <div>
-                    <div className="glass-panel bg-slate-900/40 rounded-lg p-3 mb-3 border border-slate-600/20">
-                      <p className="text-xs text-gray-300">
-                        Aynı renkteki 3 tüyü birleştirerek yumurta elde edebilirsiniz.
-                        Her renk farklı bonuslar sağlar.
-                      </p>
-                    </div>
-                    
-                    <h5 className="text-sm font-medium text-blue-300 mb-2 flex items-center">
-                      <span className="material-icons mr-1 text-xs">palette</span>
-                      Tüy Renkleri:
-                    </h5>
-                    <div className="grid grid-cols-3 gap-2 mb-3">
+                <h5 className="text-sm font-medium text-blue-300 mb-2 flex items-center">
+                  <span className="material-icons mr-1 text-xs">palette</span>
+                  Tüy Renkleri:
+                </h5>
+                <div className="grid grid-cols-3 gap-2 mb-3">
                       <button
                         className={`p-3 rounded-lg flex flex-col items-center justify-between ${
                           featherColorSelected === "green" 
