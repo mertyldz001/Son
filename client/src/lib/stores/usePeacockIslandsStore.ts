@@ -49,6 +49,10 @@ interface PeacockIslandsStore extends GameState {
   hatchEgg: (playerId: string, color: FeatherColor) => void;
   activateEgg: (playerId: string, slotId: string) => void;
   
+  // Birim yerleştirme eylemleri
+  deployUnit: (playerId: string, unitId: string, position: {q: number, r: number, s: number}) => void;
+  undeployUnit: (playerId: string, unitId: string) => void;
+  
   // Savaş eylemleri
   processBattle: () => BattleResult;
   
