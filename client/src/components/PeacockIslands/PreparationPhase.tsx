@@ -115,6 +115,19 @@ const PreparationPhase = () => {
     setActionLog(prev => [...prev, "Kuluçka yuvasındaki bonus aktifleştirildi!"]);
   };
   
+  // Asker bilgisi
+  const activeWarriors = player.island.units
+    .filter(unit => unit.type === "warrior")
+    .filter(unit => !unit.isDeployed);
+  const activeSoldiers = player.island.units
+    .filter(unit => unit.type === "soldier")
+    .filter(unit => !unit.isDeployed);
+  const peacockWarriorCount = activeWarriors.length;
+  const humanSoldierCount = activeSoldiers.length;
+
+  // Savaş alanındaki konumlandırılmış birimler
+  const deployedUnits = player.island.units.filter(unit => unit.isDeployed);
+  
   return (
     <div className="w-full h-full relative">
       {/* 3D Game Board as background */}
@@ -690,6 +703,86 @@ const PreparationPhase = () => {
                 </div>
               </div>
             )}
+          </div>
+        </div>
+        
+        {/* Alt panel - Asker yönetimi için */}
+        <div className="fixed bottom-0 left-0 right-0 h-24 pointer-events-auto">
+          <div className="bg-gradient-to-t from-slate-900/95 to-slate-900/85 backdrop-blur-sm border-t border-slate-700/50 h-full shadow-lg">
+            <div className="mx-auto max-w-7xl h-full flex items-center justify-between px-4">
+              {/* Birimler ve yönetim */}
+              <div className="flex items-center gap-4">
+                <div className="flex flex-col items-center bg-slate-800/60 rounded-md p-2 border border-slate-600/40">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-12 h-12 bg-slate-800 rounded-md flex items-center justify-center border border-blue-400/30">
+                      <span className="material-icons text-blue-400">shield</span>
+                    </div>
+                    <div>
+                      <h4 className="text-xs text-blue-300 font-medium">Tavus Askerleri</h4>
+                      <p className="text-lg font-bold text-white">{peacockWarriorCount}</p>
+                    </div>
+                  </div>
+                  <div className="text-[10px] text-blue-200/80 mt-1">
+                    Saha: {player.island.units.filter(u => u.type === "warrior" && u.isDeployed).length} / {player.island.units.filter(u => u.type === "warrior").length}
+                  </div>
+                </div>
+                
+                <div className="flex flex-col items-center bg-slate-800/60 rounded-md p-2 border border-slate-600/40">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-12 h-12 bg-slate-800 rounded-md flex items-center justify-center border border-amber-400/30">
+                      <span className="material-icons text-amber-400">person_outline</span>
+                    </div>
+                    <div>
+                      <h4 className="text-xs text-amber-300 font-medium">İnsan Askerleri</h4>
+                      <p className="text-lg font-bold text-white">{humanSoldierCount}</p>
+                    </div>
+                  </div>
+                  <div className="text-[10px] text-amber-200/80 mt-1">
+                    Saha: {player.island.units.filter(u => u.type === "soldier" && u.isDeployed).length} / {player.island.units.filter(u => u.type === "soldier").length}
+                  </div>
+                </div>
+              </div>
+              
+              {/* Hazırlık Ipuçları */}
+              <div className="w-96 h-16 bg-slate-800/60 rounded-md border border-slate-600/40 p-2">
+                <h4 className="text-xs text-slate-300 font-medium flex items-center">
+                  <span className="material-icons text-xs mr-1">tips_and_updates</span>
+                  İPUCU
+                </h4>
+                <p className="text-xs text-slate-300/80 mt-1">
+                  Askerlerinizi savaş alanına yerleştirmek için, önce karakteriniz (penguen) ile askerlerinizin yanına gidin, 
+                  sonra onları haritaya taşıyın.
+                </p>
+              </div>
+              
+              {/* Düğmeler */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    playClick();
+                    trainSoldiers(player.id, 1);
+                    setActionLog(prev => [...prev, "Yeni insan askeri eğitildi!"]);
+                  }}
+                  disabled={player.island.gold < 5}
+                  className={`px-3 py-2 bg-gradient-to-b from-amber-800 to-amber-900 border border-amber-600/50 rounded-md text-sm text-amber-200 font-medium flex items-center transition hover:bg-gradient-to-b hover:from-amber-700 hover:to-amber-800 ${player.island.gold < 5 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                  <span className="material-icons text-sm mr-1">person_add</span>
+                  Asker Eğit (5 Altın)
+                </button>
+                
+                <button
+                  onClick={() => {
+                    playClick();
+                    updatePreparationTime(-preparationTimeLeft); // Zamanı bitir
+                    setActionLog(prev => [...prev, "Savaş fazı başlatıldı!"]);
+                  }}
+                  className="px-3 py-2 bg-gradient-to-b from-red-800 to-red-900 border border-red-600/50 rounded-md text-sm text-red-200 font-medium flex items-center transition hover:bg-gradient-to-b hover:from-red-700 hover:to-red-800"
+                >
+                  <span className="material-icons text-sm mr-1">swords</span>
+                  Savaşa Başla
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>

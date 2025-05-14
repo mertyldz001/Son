@@ -746,19 +746,81 @@ const CameraController = () => {
     };
   }, [camera, currentPhase, isBattlePhase]);
 
+  // Kullanıcı eylemsizliğini izle ve yönlendir
+  const [inactiveTimer, setInactiveTimer] = useState(0);
+  const [showHint, setShowHint] = useState(false);
+  
+  useEffect(() => {
+    let timer: number;
+    const incrementTimer = () => {
+      setInactiveTimer(prev => {
+        const newValue = prev + 1;
+        if (newValue > 5 && !showHint) { // 5 saniye hareketsiz kalındığında ipucu göster
+          setShowHint(true);
+        }
+        return newValue;
+      });
+    };
+    
+    // Eylemsizlik zamanlayıcısı
+    timer = window.setInterval(incrementTimer, 1000);
+    
+    // Herhangi bir fare hareketi veya tıklaması olduğunda zamanlayıcıyı sıfırla
+    const resetTimer = () => {
+      setInactiveTimer(0);
+      setShowHint(false);
+    };
+    
+    window.addEventListener('mousemove', resetTimer);
+    window.addEventListener('mousedown', resetTimer);
+    window.addEventListener('touchstart', resetTimer);
+    window.addEventListener('keydown', resetTimer);
+    
+    return () => {
+      window.clearInterval(timer);
+      window.removeEventListener('mousemove', resetTimer);
+      window.removeEventListener('mousedown', resetTimer);
+      window.removeEventListener('touchstart', resetTimer);
+      window.removeEventListener('keydown', resetTimer);
+    };
+  }, [showHint]);
+  
   return (
-    <OrbitControls
-      ref={controls}
-      args={[camera, gl.domElement]}
-      enableZoom={true}
-      enablePan={true}
-      enableRotate={true}
-      minDistance={isBattlePhase ? 8 : 5}
-      maxDistance={isBattlePhase ? 20 : 25}
-      minPolarAngle={isBattlePhase ? Math.PI / 3 : Math.PI / 6} // Alt açı limiti
-      maxPolarAngle={isBattlePhase ? Math.PI / 2.1 : Math.PI / 2.5} // Üst açı limiti
-      target={[0, 0, 0]}
-    />
+    <>
+      <OrbitControls
+        ref={controls}
+        args={[camera, gl.domElement]}
+        enableZoom={true}
+        enablePan={false} // Kamera kaydırma kapalı
+        enableRotate={!isBattlePhase} // Savaş fazında rotasyonu engelle
+        minDistance={zoomLimits.min}
+        maxDistance={zoomLimits.max}
+        minPolarAngle={isBattlePhase ? Math.PI / 3 : Math.PI / 6} // Alt açı limiti
+        maxPolarAngle={isBattlePhase ? Math.PI / 2.1 : Math.PI / 2.5} // Üst açı limiti
+        target={[0, 0, 0]}
+        zoomSpeed={1.2} // Zoom hızı arttırıldı
+      />
+      
+      {/* Kullanıcı ipucu - 5 saniyeden fazla hareketsiz kalınca gösterilir */}
+      {showHint && !isBattlePhase && (
+        <Text
+          position={[0, 5, 0]}
+          color="white"
+          fontSize={0.5}
+          maxWidth={5}
+          textAlign="center"
+          anchorX="center"
+          anchorY="middle"
+          outlineWidth={0.05}
+          outlineColor="#000000"
+        >
+          {currentPhase === "preparation" ? 
+            "Fare tekerleği ile yakınlaşıp uzaklaşabilirsiniz. WASD tuşları ile pengueni hareket ettirebilirsiniz." :
+            "Savaş devam ediyor..."
+          }
+        </Text>
+      )}
+    </>
   );
 };
 
