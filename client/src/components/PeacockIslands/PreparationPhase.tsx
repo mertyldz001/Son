@@ -347,7 +347,7 @@ const PreparationPhase = () => {
               {/* Tüy birleştirme paneli - WindowPanel */}
               <WindowPanel 
                 title="Tüy Birleştirme" 
-                width="100%" 
+                width="500px" 
                 height="auto"
                 initiallyMinimized={buildingSelected !== "feathers"}
               >
