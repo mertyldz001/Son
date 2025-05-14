@@ -36,6 +36,27 @@ const GameUI = () => {
   
   // Determine if end turn button should be disabled
   const isEndTurnDisabled = gamePhase !== "playing";
+
+  // Translate card class name to Turkish
+  const translateClass = (className: string) => {
+    switch(className) {
+      case "warrior": return "Savaşçı";
+      case "mage": return "Büyücü";
+      case "rogue": return "Haydut";
+      default: return className;
+    }
+  };
+
+  // Translate card rarity to Turkish
+  const translateRarity = (rarity: string) => {
+    switch(rarity) {
+      case "common": return "Sıradan";
+      case "rare": return "Nadir";
+      case "epic": return "Destansı";
+      case "legendary": return "Efsanevi";
+      default: return rarity;
+    }
+  };
   
   return (
     <div className="absolute inset-0 pointer-events-none">
@@ -43,7 +64,7 @@ const GameUI = () => {
       <div className="absolute top-0 left-0 right-0 bg-black/70 p-4 flex justify-between items-center">
         <div className="flex items-center gap-4">
           <div className="text-white">
-            <span className="text-lg font-bold">Round: {round}</span>
+            <span className="text-lg font-bold">Tur: {round}</span>
           </div>
           
           {/* Enemy stats */}
@@ -61,8 +82,8 @@ const GameUI = () => {
         
         {/* Game phase indicator */}
         <div className="bg-purple-900/80 text-white px-4 py-2 rounded-md">
-          {gamePhase === "playing" && "Your Turn"}
-          {gamePhase === "enemyTurn" && "Enemy Turn"}
+          {gamePhase === "playing" && "Senin Turun"}
+          {gamePhase === "enemyTurn" && "Düşman Turu"}
         </div>
         
         {/* Player stats */}
@@ -117,10 +138,10 @@ const GameUI = () => {
               </div>
             </div>
             <div className="text-xs text-center mt-4 bg-blue-900/80 py-1 rounded">
-              {card.class}
+              {translateClass(card.class)}
             </div>
             <div className="text-xs text-gray-300 mt-1 text-center">
-              {card.rarity}
+              {translateRarity(card.rarity)}
             </div>
           </div>
         ))}
@@ -131,19 +152,19 @@ const GameUI = () => {
         <div className="absolute bottom-48 left-1/2 transform -translate-x-1/2 bg-black/90 p-4 rounded-lg text-white max-w-sm">
           <h3 className="font-bold text-lg">{showCardDetails.name}</h3>
           <div className="flex justify-between mt-2">
-            <div>Attack: {showCardDetails.attack}</div>
-            <div>Health: {showCardDetails.health}</div>
+            <div>Saldırı: {showCardDetails.attack}</div>
+            <div>Sağlık: {showCardDetails.health}</div>
           </div>
           <div className="mt-2">
-            <span className="font-semibold">Class:</span> {showCardDetails.class}
+            <span className="font-semibold">Sınıf:</span> {translateClass(showCardDetails.class)}
           </div>
           <div className="mt-1">
-            <span className="font-semibold">Rarity:</span> {showCardDetails.rarity}
+            <span className="font-semibold">Nadirlik:</span> {translateRarity(showCardDetails.rarity)}
           </div>
           <p className="text-sm mt-2 text-gray-300">
-            {showCardDetails.class === "warrior" && "Strong against mages, weak against rogues."}
-            {showCardDetails.class === "mage" && "Strong against rogues, weak against warriors."}
-            {showCardDetails.class === "rogue" && "Strong against warriors, weak against mages."}
+            {showCardDetails.class === "warrior" && "Büyücülere karşı güçlü, haydutlara karşı zayıf."}
+            {showCardDetails.class === "mage" && "Haydutlara karşı güçlü, savaşçılara karşı zayıf."}
+            {showCardDetails.class === "rogue" && "Savaşçılara karşı güçlü, büyücülere karşı zayıf."}
           </p>
         </div>
       )}
@@ -158,18 +179,18 @@ const GameUI = () => {
           onClick={handleEndTurn}
           disabled={isEndTurnDisabled}
         >
-          End Turn
+          Turu Bitir
         </button>
       </div>
       
       {/* Game instructions */}
       <div className="absolute top-20 left-4 bg-black/70 p-3 rounded-md text-white text-sm max-w-xs">
         <p>
-          <strong>Instructions:</strong><br/>
-          1. Click a card to select it<br/>
-          2. Hover over a hex tile on the board<br/>
-          3. Press SPACE to place the card<br/>
-          4. End your turn when ready
+          <strong>Talimatlar:</strong><br/>
+          1. Bir kart seçmek için tıkla<br/>
+          2. Tahtadaki bir altıgen karoya gel<br/>
+          3. Kartı yerleştirmek için SPACE tuşuna bas<br/>
+          4. Hazır olduğunda turunu bitir
         </p>
       </div>
       

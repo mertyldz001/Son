@@ -11,35 +11,35 @@ const RARITIES = ["common", "rare", "epic", "legendary"];
 const CHAMPIONS = [
   // Warriors
   { 
-    name: "Knight", 
+    name: "Şövalye", 
     class: "warrior", 
     attack: 4, 
     health: 6, 
     rarity: "common" 
   },
   { 
-    name: "Berserker", 
+    name: "Kızgın Savaşçı", 
     class: "warrior", 
     attack: 6, 
     health: 4, 
     rarity: "rare" 
   },
   { 
-    name: "Paladin", 
+    name: "Kutsal Şövalye", 
     class: "warrior", 
     attack: 3, 
     health: 8, 
     rarity: "rare" 
   },
   { 
-    name: "Gladiator", 
+    name: "Gladyatör", 
     class: "warrior", 
     attack: 7, 
     health: 5, 
     rarity: "epic" 
   },
   { 
-    name: "Warlord", 
+    name: "Savaş Lordu", 
     class: "warrior", 
     attack: 8, 
     health: 8, 
@@ -48,35 +48,35 @@ const CHAMPIONS = [
   
   // Mages
   { 
-    name: "Apprentice", 
+    name: "Çırak", 
     class: "mage", 
     attack: 3, 
     health: 3, 
     rarity: "common" 
   },
   { 
-    name: "Sorcerer", 
+    name: "Büyücü", 
     class: "mage", 
     attack: 5, 
     health: 3, 
     rarity: "rare" 
   },
   { 
-    name: "Enchanter", 
+    name: "Sihirdar", 
     class: "mage", 
     attack: 2, 
     health: 7, 
     rarity: "rare" 
   },
   { 
-    name: "Arcanist", 
+    name: "Usta Büyücü", 
     class: "mage", 
     attack: 6, 
     health: 4, 
     rarity: "epic" 
   },
   { 
-    name: "Archmage", 
+    name: "Baş Büyücü", 
     class: "mage", 
     attack: 7, 
     health: 7, 
@@ -85,35 +85,35 @@ const CHAMPIONS = [
   
   // Rogues
   { 
-    name: "Thief", 
+    name: "Hırsız", 
     class: "rogue", 
     attack: 2, 
     health: 4, 
     rarity: "common" 
   },
   { 
-    name: "Assassin", 
+    name: "Suikastçı", 
     class: "rogue", 
     attack: 7, 
     health: 2, 
     rarity: "rare" 
   },
   { 
-    name: "Scout", 
+    name: "İzci", 
     class: "rogue", 
     attack: 4, 
     health: 4, 
     rarity: "rare" 
   },
   { 
-    name: "Infiltrator", 
+    name: "Gizli Ajan", 
     class: "rogue", 
     attack: 5, 
     health: 6, 
     rarity: "epic" 
   },
   { 
-    name: "Shadowblade", 
+    name: "Gölge Kılıcı", 
     class: "rogue", 
     attack: 9, 
     health: 6, 
