@@ -1,6 +1,16 @@
 import { useRef, useState, useEffect, Suspense } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { OrbitControls, Text, useTexture } from '@react-three/drei';
+import { 
+  OrbitControls, 
+  Text, 
+  useTexture, 
+  Sky, 
+  Environment, 
+  Sparkles,
+  Cloud,
+  Float
+} from '@react-three/drei';
+import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
 import * as THREE from 'three';
 import { usePeacockIslandsStore } from '../../lib/stores/usePeacockIslandsStore';
 import { PeacockWarriorModel, HumanSoldierModel } from './3DModels';
@@ -567,20 +577,8 @@ const Battlefield = () => {
           <meshStandardMaterial color="#385048" />
         </mesh>
         
-        {/* Su efekti */}
-        <mesh 
-          position={[0, -0.15, 0]} 
-          rotation={[-Math.PI / 2, 0, 0]} 
-        >
-          <planeGeometry args={[28, 28]} />
-          <meshStandardMaterial 
-            color="#4488aa" 
-            transparent 
-            opacity={0.7}
-            roughness={0.1}
-            metalness={0.2}
-          />
-        </mesh>
+        {/* Gelişmiş Su Efekti */}
+        <WaterSurface position={[0, -0.15, 0]} size={28} />
         
         {/* Oyuncu adası */}
         <Island 
@@ -676,20 +674,69 @@ const GameBoard3D = () => {
       >
         <color attach="background" args={[backgroundColor]} />
         
-        {/* Işıklandırma */}
-        <ambientLight intensity={0.5} />
+        {/* Gelişmiş Gökyüzü */}
+        <Sky
+          distance={450000}
+          sunPosition={isBattlePhase ? [0, 0.1, -1] : [1, 0.25, 0]}
+          inclination={0.5}
+          azimuth={0.25}
+          rayleigh={isBattlePhase ? 3 : 1}
+          turbidity={isBattlePhase ? 15 : 10}
+          mieCoefficient={0.005}
+          mieDirectionalG={0.8}
+        />
+        
+        {/* Ortam Aydınlatma */}
+        <Environment preset={isBattlePhase ? "night" : "sunset"} />
+        
+        {/* Temel Işıklandırma */}
+        <ambientLight intensity={0.6} />
         <directionalLight 
           position={[10, 10, 5]} 
-          intensity={1.2} 
+          intensity={1.5} 
           castShadow 
           shadow-mapSize={[2048, 2048]} 
+          shadow-bias={-0.001}
         />
         
         {/* İkincil ışık - daha yumuşak gölgeler için */}
         <directionalLight 
           position={[-8, 8, -5]} 
-          intensity={0.5} 
+          intensity={0.7} 
+          color={isBattlePhase ? "#5080ff" : "#ffb86c"}
           castShadow={false}
+        />
+        
+        {/* Atmosferik Efektler */}
+        {!isBattlePhase && (
+          <>
+            <Cloud 
+              opacity={0.5}
+              speed={0.3}
+              width={20}
+              depth={1.5}
+              segments={15}
+              position={[15, 15, -10]}
+            />
+            <Cloud 
+              opacity={0.4}
+              speed={0.2}
+              width={18}
+              depth={1.0}
+              segments={12}
+              position={[-15, 12, -5]}
+            />
+          </>
+        )}
+        
+        {/* Parçacık Efektleri */}
+        <Sparkles
+          count={100}
+          scale={20}
+          size={0.5}
+          speed={0.3}
+          opacity={0.2}
+          color={isBattlePhase ? "#5050ff" : "#ffbb33"}
         />
         
         {/* Kamera kontrolleri */}
@@ -697,6 +744,20 @@ const GameBoard3D = () => {
         
         {/* Oyun alanı */}
         <Battlefield />
+        
+        {/* Post-processing Efektleri */}
+        <EffectComposer>
+          <Bloom
+            intensity={0.2}
+            luminanceThreshold={0.8}
+            luminanceSmoothing={0.9}
+          />
+          <Vignette
+            offset={0.3}
+            darkness={0.5}
+            eskil={false}
+          />
+        </EffectComposer>
         
         {/* Hafif sis efekti */}
         <fog attach="fog" args={[backgroundColor, 25, 50]} />
