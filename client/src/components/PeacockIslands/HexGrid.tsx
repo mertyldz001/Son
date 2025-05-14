@@ -45,7 +45,7 @@ function HexTile({
   // Hover animasyonu - TFT stili yumuşak geçiş
   useFrame(() => {
     if (isHovered) {
-      hoverScale.current.lerp(new THREE.Vector3(1.08, 1.1, 1.08), 0.15);
+      hoverScale.current.lerp(new THREE.Vector3(1.05, 1.05, 1.05), 0.15);
       hoverHeight.current += (0.1 - hoverHeight.current) * 0.1;
       glowIntensity.current += (1.0 - glowIntensity.current) * 0.15;
     } else {
@@ -57,7 +57,7 @@ function HexTile({
   
   return (
     <group position={position}>
-      {/* Ana hexagon - İçi ve kenarı tamamen aynı şekil ve boyutta */}
+      {/* SADECE tek bir altıgen - TFT tarzı basit */}
       <mesh 
         position={[0, hoverHeight.current, 0]} 
         rotation={[-Math.PI / 2, 0, 0]}
@@ -86,33 +86,29 @@ function HexTile({
           isOccupied
         }}
       >
-        {/* 6 kenarlı altıgen form */}
-        <cylinderGeometry args={[size * 1.15, size * 1.15, 0.15, 6, 1, false]} />
-        <meshPhysicalMaterial 
+        {/* TFT style hexagon - single piece with outline */}
+        <cylinderGeometry args={[size, size, 0.1, 6, 1, false]} />
+        <meshStandardMaterial 
           color={isHovered ? hoverColor : baseColor} 
-          roughness={0.1}
-          metalness={0.6}
-          transparent={true}
-          opacity={0.9}
           emissive={isHovered ? hoverColor : baseColor}
-          emissiveIntensity={glowIntensity.current}
-          clearcoat={0.8}
-          reflectivity={0.8}
+          emissiveIntensity={0.3}
+          roughness={0.3}
+          metalness={0.8}
         />
       </mesh>
       
-      {/* Kenar çizgisi - içindeki altıgen ile tam aynı boyut ve şekilde */}
+      {/* Line along the edge */}
       <mesh 
-        position={[0, 0.02, 0]} 
+        position={[0, 0.06, 0]} 
         rotation={[-Math.PI / 2, 0, 0]}
         scale={hoverScale.current}
       >
-        <ringGeometry args={[size * 1.14, size * 1.16, 6]} />
+        <ringGeometry args={[size * 0.98, size * 1.02, 6]} />
         <meshBasicMaterial 
-          color={isHovered ? "#ffffff" : edgeColor} 
-          side={THREE.DoubleSide} 
+          color={isHovered ? "#ffffff" : edgeColor}
+          side={THREE.DoubleSide}
           transparent={true}
-          opacity={1.0}
+          opacity={0.8}
         />
       </mesh>
       
