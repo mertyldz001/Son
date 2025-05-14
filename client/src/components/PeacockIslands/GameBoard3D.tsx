@@ -92,12 +92,12 @@ const Island = ({ position, isPlayerIsland = false }: any) => {
         />
       </mesh>
       
-      {/* Ana ada platformu */}
+      {/* Ana ada platformu - düzleştirilmiş */}
       <mesh 
         position={[0, -0.1, 0]} 
         receiveShadow
       >
-        <cylinderGeometry args={[5, 5.5, 0.8, 8]} />
+        <cylinderGeometry args={[5, 5.5, 0.2, 8]} />
         <meshStandardMaterial 
           color={islandColors.base} 
           roughness={0.8}
@@ -105,12 +105,12 @@ const Island = ({ position, isPlayerIsland = false }: any) => {
         />
       </mesh>
       
-      {/* İkinci seviye toprak katmanı */}
+      {/* İkinci seviye toprak katmanı - düzleştirilmiş */}
       <mesh 
-        position={[0, 0.1, 0]} 
+        position={[0, 0.05, 0]} 
         receiveShadow
       >
-        <cylinderGeometry args={[4, 4.5, 0.4, 8]} />
+        <cylinderGeometry args={[4, 4.5, 0.1, 8]} />
         <meshStandardMaterial 
           color={islandColors.terrain} 
           roughness={0.9}
@@ -301,11 +301,12 @@ const Battlefield = () => {
           </mesh>
           
           {/* Kare kenarları - daha belirgin görünüm için */}
-          <mesh>
-            <boxGeometry args={[cellSize, 0.055, cellSize]} />
+          <mesh position={[0, 0.01, 0]}>
+            <boxGeometry args={[cellSize, 0.01, cellSize]} />
             <meshBasicMaterial 
               color={isPlayerSide ? "#66aaff" : "#ffaa66"} 
               wireframe={true}
+              linewidth={3}
             />
           </mesh>
           
@@ -337,8 +338,8 @@ const Battlefield = () => {
         <Island isPlayerIsland={false} />
       </group>
       
-      {/* Izgara (grid) yapısı - savaş meydanı */}
-      <group position={[0, 0.1, 0]}>
+      {/* Izgara (grid) yapısı - savaş meydanı - daha yukarıda */}
+      <group position={[0, 0.3, 0]}>
         {cells}
       </group>
       
