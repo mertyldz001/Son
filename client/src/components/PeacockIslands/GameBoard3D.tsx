@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, Suspense } from 'react';
+import { useRef, useState, useEffect, Suspense, useMemo } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { 
   OrbitControls, 
@@ -612,7 +612,7 @@ const Battlefield = () => {
           const isOccupied = Boolean(playerUnitHere || enemyUnitHere);
           
           return (
-            <BattleSquare 
+            <BattleHex 
               key={i}
               position={square.position}
               color={square.isPlayerSide ? "#77aa88" : "#aa7788"}
