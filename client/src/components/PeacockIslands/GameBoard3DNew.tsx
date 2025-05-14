@@ -3,11 +3,9 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { 
   OrbitControls, 
   Text, 
-  useTexture, 
-  Sky, 
+  useTexture,
   Environment, 
   Sparkles,
-  Cloud,
   Float,
   MeshDistortMaterial,
   PresentationControls,
@@ -430,20 +428,8 @@ const GameScene = () => {
         shadow-camera-bottom={-10}
       />
       
-      {/* Gökyüzü */}
-      <Sky 
-        distance={450000} 
-        sunPosition={[5, 1, 8]} 
-        inclination={0} 
-        azimuth={0.25} 
-      />
-      
-      {/* Deniz */}
-      <AnimatedWater position={[0, -0.3, 0]} size={60} />
-      
-      {/* Ana adalar - eski konumlar */}
-      <PlayerIsland position={[0, 0, 4]} /> {/* Oyuncu adası önde */}
-      <EnemyIsland position={[0, 0, -4]} /> {/* Düşman adası arkada */}
+      {/* Arka plan rengi - sabit düz renk */}
+      <color attach="background" args={['#1a1a2e']} />
       
       {/* Hexagonal Savaş Alanı - Ortada */}
       <group position={[0, 0.1, 0]}>
@@ -479,11 +465,6 @@ const GameScene = () => {
           </group>
         )}
       </group>
-      
-      {/* Dekoratif Bulutlar */}
-      <Cloud position={[-8, 8, -5]} scale={1.5} color="#FFA9A9" />
-      <Cloud position={[10, 5, 0]} scale={2} color="#E4ABFF" />
-      <Cloud position={[-6, 10, 8]} scale={1.8} color="#D6ADFF" />
       
       {/* Oyuncu karakteri */}
       <PenguinAvatar />
