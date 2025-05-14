@@ -1,16 +1,21 @@
 import { useEffect, useState } from "react";
 import { usePeacockIslandsStore } from "../../lib/stores/usePeacockIslandsStore";
 import { useAudio } from "../../lib/stores/useAudio";
+import { getEnemyTypeName, getEnemyTypeDescription } from "../../lib/game/peacockIslands/enemies";
+import { PeacockEnemy, BattleResult, FeatherInventory } from "../../lib/game/peacockIslands/types";
+import { getFeatherColorName } from "../../lib/game/peacockIslands/battle";
 import GameBoard3D from "./GameBoard3D";
 
 const BattlePhase = () => {
-  const { player, npc, currentEnemyWave, endBattlePhase } = usePeacockIslandsStore();
+  const { player, npc, currentEnemyWave, endBattlePhase, processBattle } = usePeacockIslandsStore();
   const { playHit, playSuccess } = useAudio();
   
   const [battleProgress, setBattleProgress] = useState(0);
   const [battleResult, setBattleResult] = useState<"pending" | "victory" | "defeat">("pending");
   const [battleLog, setBattleLog] = useState<string[]>([]);
   const [battleEffects, setBattleEffects] = useState<string[]>([]);
+  const [collectedFeathers, setCollectedFeathers] = useState<FeatherInventory | null>(null);
+  const [defeatedEnemies, setDefeatedEnemies] = useState<PeacockEnemy[]>([]);
   
   // Savaş simülasyonu
   useEffect(() => {
@@ -21,20 +26,35 @@ const BattlePhase = () => {
     
     // Zamanlanmış savaş simülasyonu
     const timer = setTimeout(() => {
-      // Basit savaş mekaniği
-      const playerPower = player.island.army.power;
-      const enemyPower = currentEnemyWave.power;
+      // Savaş mekaniği ve tüy kazanımı
+      const result = processBattle();
       
       // Savaş logu ekle
       setBattleLog(prev => [
         ...prev, 
-        `Savaş başladı! Oyuncu gücü: ${playerPower}, Düşman gücü: ${enemyPower}`
+        `Savaş başladı! Oyuncu ordusu: ${player.island.army.soldiers} asker, 
+        Düşman: ${currentEnemyWave.enemies.length} Tavus Kuşu`
       ]);
       
       playHit(); // Savaş sesi çal
       
       // Savaş efektleri
       setBattleEffects(prev => [...prev, "attack"]);
+      
+      // Eğer düşmanlar yenildi ise
+      if (result.enemiesDefeated > 0) {
+        const defeatedCount = Math.min(
+          result.enemiesDefeated,
+          currentEnemyWave.enemies.length
+        );
+        
+        // Yenilen düşmanları kaydet
+        const defeated = currentEnemyWave.enemies.slice(0, defeatedCount);
+        setDefeatedEnemies(defeated);
+        
+        // Toplanan tüyleri göster
+        setCollectedFeathers(result.feathersCollected);
+      }
       
       // Savaş simülasyonu - adım adım göster
       let currentProgress = 0;
@@ -46,40 +66,79 @@ const BattlePhase = () => {
         if (currentProgress % 25 === 0) {
           playHit();
           setBattleEffects(prev => [...prev, "hit"]);
-          setBattleLog(prev => [
-            ...prev,
-            currentProgress === 25 ? "Savaşçılar çarpışıyor!" : 
-            currentProgress === 50 ? "Büyük bir savaş!" : 
-            currentProgress === 75 ? "Son darbeye hazırlanıyor..." : ""
-          ].filter(Boolean));
+          
+          // Olay tipine göre log mesajı
+          if (currentProgress === 25) {
+            setBattleLog(prev => [
+              ...prev,
+              "Savaşçılar düşmanlara saldırıyor!"
+            ]);
+          } else if (currentProgress === 50) {
+            if (currentEnemyWave.enemies.length > 0) {
+              const enemy = currentEnemyWave.enemies[0];
+              setBattleLog(prev => [
+                ...prev,
+                `${getEnemyTypeName(enemy.type)} karşılık veriyor!`
+              ]);
+            }
+          } else if (currentProgress === 75) {
+            setBattleLog(prev => [
+              ...prev,
+              "Son darbeye hazırlanıyor..."
+            ]);
+          }
         }
         
         if (currentProgress >= 100) {
           clearInterval(battleInterval);
           
           // Savaş sonucu
-          const victorious = playerPower >= enemyPower;
+          const victorious = result.playerVictory;
           
           if (victorious) {
             playSuccess(); // Zafer sesi çal
             setBattleResult("victory");
             setBattleEffects(prev => [...prev, "victory"]);
-            setBattleLog(prev => [...prev, "Zafer! Düşman dalgasını püskürttünüz."]);
             
-            // 2 saniye sonra bir sonraki faza geç
+            // Toplamı göster
+            let featherText = "";
+            if (collectedFeathers) {
+              const totalFeathers = 
+                collectedFeathers.green + 
+                collectedFeathers.blue + 
+                collectedFeathers.orange;
+                
+              featherText = `${totalFeathers} tüy kazandınız! (${
+                collectedFeathers.green > 0 ? `${collectedFeathers.green} yeşil, ` : ""}${
+                collectedFeathers.blue > 0 ? `${collectedFeathers.blue} mavi, ` : ""}${
+                collectedFeathers.orange > 0 ? `${collectedFeathers.orange} turuncu` : ""}
+              )`;
+            }
+            
+            setBattleLog(prev => [
+              ...prev, 
+              `Zafer! ${result.enemiesDefeated} düşmanı yendiniz.`,
+              featherText
+            ]);
+            
+            // 3 saniye sonra bir sonraki faza geç
             setTimeout(() => {
               endBattlePhase(true);
-            }, 2000);
+            }, 3000);
           } else {
             playHit(); // Yenilgi sesi
             setBattleResult("defeat");
             setBattleEffects(prev => [...prev, "defeat"]);
-            setBattleLog(prev => [...prev, "Yenilgi! Düşman adanızı ele geçirdi."]);
+            setBattleLog(prev => [
+              ...prev, 
+              "Yenilgi! Düşman tavus kuşları çok güçlüydü.",
+              "Adanız talan edildi ve kontrolü kaybettiniz."
+            ]);
             
-            // 2 saniye sonra bir sonraki faza geç
+            // 3 saniye sonra bir sonraki faza geç
             setTimeout(() => {
               endBattlePhase(false);
-            }, 2000);
+            }, 3000);
           }
         }
       }, 500); // Her 500ms'de ilerleme
@@ -92,7 +151,7 @@ const BattlePhase = () => {
     return () => {
       clearTimeout(timer);
     };
-  }, [currentEnemyWave, player.island.army.power, endBattlePhase, playHit, playSuccess]);
+  }, [currentEnemyWave, player.island.army, endBattlePhase, playHit, playSuccess, processBattle]);
   
   return (
     <div className="w-full h-full relative">
@@ -125,21 +184,49 @@ const BattlePhase = () => {
             <h3 className="text-lg font-bold mb-2">{player.island.name}</h3>
             
             <div className="bg-gray-700/90 rounded-md p-3 mb-4">
-              <h4 className="text-md font-semibold mb-2">Savunma Gücü</h4>
-              <div className="flex items-center justify-center">
-                <div className="bg-blue-900/90 rounded-full w-24 h-24 flex items-center justify-center">
-                  <span className="text-2xl font-bold">{player.island.army.power}</span>
+              <h4 className="text-md font-semibold mb-2">Ordu Gücü</h4>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="bg-red-900/60 p-2 rounded text-center">
+                  <div className="text-red-400 font-bold">{player.island.army.soldiers}</div>
+                  <div className="text-xs">Asker</div>
+                </div>
+                <div className="bg-purple-900/60 p-2 rounded text-center">
+                  <div className="text-purple-400 font-bold">
+                    {player.island.army.attackPower + player.island.army.bonuses.attackPower}
+                  </div>
+                  <div className="text-xs">Saldırı</div>
                 </div>
               </div>
             </div>
             
             <div className="bg-gray-700/90 rounded-md p-3 mb-4">
-              <h4 className="text-md font-semibold mb-2">Ordu</h4>
+              <h4 className="text-md font-semibold mb-2">Bonuslar</h4>
               <div className="grid grid-cols-1 gap-2">
-                <div className="bg-red-900/60 p-2 rounded text-center">
-                  <div className="text-red-400 font-bold">{player.island.army.soldiers}</div>
-                  <div className="text-xs">Asker</div>
-                </div>
+                {player.island.army.bonuses.health > 0 && (
+                  <div className="bg-green-900/60 p-2 rounded text-center">
+                    <div className="text-green-400 font-bold">+{player.island.army.bonuses.health}</div>
+                    <div className="text-xs">Can</div>
+                  </div>
+                )}
+                {player.island.army.bonuses.attackPower > 0 && (
+                  <div className="bg-red-900/60 p-2 rounded text-center">
+                    <div className="text-red-400 font-bold">+{player.island.army.bonuses.attackPower}</div>
+                    <div className="text-xs">Saldırı Gücü</div>
+                  </div>
+                )}
+                {player.island.army.bonuses.attackSpeed > 0 && (
+                  <div className="bg-blue-900/60 p-2 rounded text-center">
+                    <div className="text-blue-400 font-bold">+{player.island.army.bonuses.attackSpeed}%</div>
+                    <div className="text-xs">Saldırı Hızı</div>
+                  </div>
+                )}
+                {player.island.army.bonuses.health === 0 && 
+                 player.island.army.bonuses.attackPower === 0 && 
+                 player.island.army.bonuses.attackSpeed === 0 && (
+                  <div className="p-2 rounded text-center text-gray-400">
+                    Henüz bonus yok
+                  </div>
+                )}
               </div>
             </div>
             
@@ -162,6 +249,33 @@ const BattlePhase = () => {
               <div className="bg-red-600/40 mt-4 p-3 rounded-md text-center animate-pulse">
                 <div className="material-icons text-3xl text-red-500">warning</div>
                 <div className="text-red-500 font-bold">Mağlubiyet!</div>
+              </div>
+            )}
+            
+            {/* Toplanan tüyler */}
+            {collectedFeathers && battleResult === "victory" && (
+              <div className="bg-green-600/40 mt-4 p-3 rounded-md text-center">
+                <h4 className="font-semibold mb-2">Toplanan Tüyler</h4>
+                <div className="grid grid-cols-3 gap-2">
+                  {collectedFeathers.green > 0 && (
+                    <div className="bg-green-800/60 p-1 rounded text-center">
+                      <div className="text-green-300 font-bold">{collectedFeathers.green}</div>
+                      <div className="text-xs">Yeşil</div>
+                    </div>
+                  )}
+                  {collectedFeathers.blue > 0 && (
+                    <div className="bg-blue-800/60 p-1 rounded text-center">
+                      <div className="text-blue-300 font-bold">{collectedFeathers.blue}</div>
+                      <div className="text-xs">Mavi</div>
+                    </div>
+                  )}
+                  {collectedFeathers.orange > 0 && (
+                    <div className="bg-orange-800/60 p-1 rounded text-center">
+                      <div className="text-orange-300 font-bold">{collectedFeathers.orange}</div>
+                      <div className="text-xs">Turuncu</div>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </div>
@@ -225,28 +339,52 @@ const BattlePhase = () => {
             
             <div className="bg-gray-700/90 rounded-md p-3 mb-4">
               <h4 className="text-md font-semibold mb-2">Saldırı Gücü</h4>
-              <div className="flex items-center justify-center">
-                <div className="bg-red-900/90 rounded-full w-24 h-24 flex items-center justify-center">
-                  <span className="text-2xl font-bold">
-                    {currentEnemyWave ? currentEnemyWave.power : "?"}
-                  </span>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="bg-red-900/60 p-2 rounded text-center">
+                  <div className="text-red-400 font-bold">
+                    {currentEnemyWave ? currentEnemyWave.enemies.length : "?"}
+                  </div>
+                  <div className="text-xs">Düşman</div>
+                </div>
+                <div className="bg-purple-900/60 p-2 rounded text-center">
+                  <div className="text-purple-400 font-bold">
+                    {currentEnemyWave ? currentEnemyWave.totalAttackPower : "?"}
+                  </div>
+                  <div className="text-xs">Saldırı</div>
                 </div>
               </div>
             </div>
             
-            <div className="bg-gray-700/90 rounded-md p-3 mb-4">
-              <h4 className="text-md font-semibold mb-2">Düşman Bilgileri</h4>
+            <div className="bg-gray-700/90 rounded-md p-3 mb-4 flex-1 overflow-auto">
+              <h4 className="text-md font-semibold mb-2">Düşman Birlikleri</h4>
               <div className="space-y-2">
-                <div className="bg-gray-800/90 p-2 rounded flex justify-between">
-                  <span>Seviye:</span>
-                  <span className="font-bold text-red-400">
-                    {currentEnemyWave ? currentEnemyWave.level : "?"}
-                  </span>
-                </div>
-                <div className="bg-gray-800/90 p-2 rounded flex justify-between">
-                  <span>Tip:</span>
-                  <span className="font-bold text-yellow-400">Tavus Kuşu Yavrusu</span>
-                </div>
+                {currentEnemyWave && currentEnemyWave.enemies.map((enemy, index) => {
+                  const isDefeated = defeatedEnemies.some(e => e.id === enemy.id);
+                  return (
+                    <div 
+                      key={enemy.id} 
+                      className={`bg-gray-800/90 p-2 rounded ${isDefeated ? 'opacity-50' : ''}`}
+                    >
+                      <div className="font-medium flex justify-between">
+                        <span>{getEnemyTypeName(enemy.type)}</span>
+                        <span className={isDefeated ? "line-through text-red-400" : "text-yellow-400"}>
+                          {isDefeated ? "Yenildi" : "Savaşıyor"}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-1 mt-1">
+                        <div className="bg-red-900/40 p-1 rounded text-xs text-center">
+                          HP: {enemy.health}
+                        </div>
+                        <div className="bg-purple-900/40 p-1 rounded text-xs text-center">
+                          Güç: {enemy.attackPower}
+                        </div>
+                      </div>
+                      <div className="text-xs text-gray-400 mt-1">
+                        {getEnemyTypeDescription(enemy.type)}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
             
