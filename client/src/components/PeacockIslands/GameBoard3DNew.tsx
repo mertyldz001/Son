@@ -464,8 +464,8 @@ const GameScene = () => {
         />
       </mesh>
       
-      {/* Hexagonal Savaş Alanı - Ortada */}
-      <group position={[0, 0.1, 0]} scale={1}>
+      {/* Hexagonal Savaş Alanı - Daha geniş aralıklı */}
+      <group position={[0, 0.1, 0]} scale={1.1}>
         <HexGrid 
           size={0.7} 
           gridWidth={7} 

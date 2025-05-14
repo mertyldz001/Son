@@ -65,7 +65,7 @@ function HexTile({
           isOccupied
         }}
       >
-        <boxGeometry args={[size * 1.7, 0.25, size * 1.7]} />
+        <boxGeometry args={[size * 1.5, 0.25, size * 1.5]} />
         <meshPhysicalMaterial 
           color={isHovered ? hoverColor : baseColor} 
           roughness={0.2}
@@ -86,7 +86,7 @@ function HexTile({
         position={[0, 0.035, 0]} 
         rotation={[-Math.PI / 2, 0, 0]}
       >
-        <ringGeometry args={[size * 1.7, size * 1.75, 6]} />
+        <ringGeometry args={[size * 1.5, size * 1.55, 6]} />
         <meshBasicMaterial 
           color={isHovered ? "#ffffff" : edgeColor} 
           side={THREE.DoubleSide} 
@@ -100,7 +100,7 @@ function HexTile({
         position={[0, 0.02, 0]} 
         rotation={[-Math.PI / 2, 0, 0]}
       >
-        <ringGeometry args={[size * 1.6, size * 1.65, 6]} />
+        <ringGeometry args={[size * 1.4, size * 1.45, 6]} />
         <meshBasicMaterial 
           color={isHovered ? "#ffffff" : baseColor} 
           side={THREE.DoubleSide} 
@@ -154,9 +154,9 @@ const HexGrid: React.FC<HexGridProps> = ({
       const s = -q - r;
       const key = `${q},${r},${s}`;
       
-      // Pozisyonlar - tam dikey sütunlar için
-      const x = size * 2 * (q - gridWidth/2 + 0.5);  // Merkezi hizalama için ofset ekle
-      const z = size * 2 * r;  // Tam dikey hizalama
+      // Pozisyonlar - sütunlar arasında çok daha fazla boşluk bırak
+      const x = size * 3.0 * (q - gridWidth/2 + 0.5);  // Yatay olarak çok daha fazla boşluk
+      const z = size * 3.0 * r;  // Dikey olarak da çok daha fazla boşluk
       
       // TFT tarzı: Oyuncu ve rakip tarafı - net ayrım
       const isPlayerSide = r < gridHeight / 2;
