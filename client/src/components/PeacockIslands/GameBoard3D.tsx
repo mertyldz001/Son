@@ -723,16 +723,12 @@ const GameBoard3D = () => {
       >
         <color attach="background" args={[backgroundColor]} />
         
-        {/* Gelişmiş Gökyüzü */}
+        {/* Basitleştirilmiş Gökyüzü */}
         <Sky
-          distance={450000}
+          distance={300000}
           sunPosition={isBattlePhase ? [0, 0.1, -1] : [1, 0.25, 0]}
           inclination={0.5}
           azimuth={0.25}
-          rayleigh={isBattlePhase ? 3 : 1}
-          turbidity={isBattlePhase ? 15 : 10}
-          mieCoefficient={0.005}
-          mieDirectionalG={0.8}
         />
         
         {/* Ortam Aydınlatma */}
@@ -768,28 +764,29 @@ const GameBoard3D = () => {
         {/* Atmosferik Efektler */}
         {!isBattlePhase && (
           <>
+            {/* Bulutları geçici olarak kaldırdık, THREE.js uyumluluk sorunu vardı */}
             <group position={[15, 15, -10]}>
-              <Cloud 
-                opacity={0.5}
-                speed={0.3}
-              />
+              <mesh>
+                <sphereGeometry args={[2, 16, 16]} />
+                <meshStandardMaterial color="#ffffff" transparent opacity={0.5} />
+              </mesh>
             </group>
             <group position={[-15, 12, -5]}>
-              <Cloud 
-                opacity={0.4}
-                speed={0.2}
-              />
+              <mesh>
+                <sphereGeometry args={[1.8, 16, 16]} />
+                <meshStandardMaterial color="#ffffff" transparent opacity={0.4} />
+              </mesh>
             </group>
           </>
         )}
         
-        {/* Parçacık Efektleri */}
+        {/* Parçacık Efektleri - Basitleştirilmiş versiyon */}
         <Sparkles
-          count={100}
-          scale={20}
-          size={0.5}
-          speed={0.3}
-          opacity={0.2}
+          count={50}
+          scale={10}
+          size={0.4}
+          speed={0.2}
+          opacity={0.15}
           color={isBattlePhase ? "#5050ff" : "#ffbb33"}
         />
         
@@ -799,8 +796,8 @@ const GameBoard3D = () => {
         {/* Oyun alanı */}
         <Battlefield />
         
-        {/* Post-processing Efektleri */}
-        <EffectComposer>
+        {/* Post-processing Efektleri - Performans için basitleştirildi */}
+        {/* <EffectComposer>
           <Bloom
             intensity={0.2}
             luminanceThreshold={0.8}
@@ -811,7 +808,7 @@ const GameBoard3D = () => {
             darkness={0.5}
             eskil={false}
           />
-        </EffectComposer>
+        </EffectComposer> */}
         
         {/* Hafif sis efekti */}
         <fog attach="fog" args={[backgroundColor, 25, 50]} />

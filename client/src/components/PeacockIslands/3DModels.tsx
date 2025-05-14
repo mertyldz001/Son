@@ -147,7 +147,7 @@ export function PeacockWarriorModel({ position = [0, 0, 0], rotation = [0, 0, 0]
   scene.traverse((child) => {
     if (child instanceof THREE.Mesh && child.material instanceof THREE.MeshStandardMaterial) {
       child.material = child.material.clone();
-      child.material.color.multiplyRGB(color);
+      child.material.color.multiply(color);
     }
   });
   
