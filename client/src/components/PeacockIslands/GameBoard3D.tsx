@@ -348,33 +348,20 @@ const Battlefield = () => {
   );
 };
 
-// Temel Kamera Kontrol Sistemi
-const SimpleCameraControls = () => {
-  const { camera, gl } = useThree();
+// Kamera Kontrolleri Kaldırıldı
+const FixedCameraView = () => {
+  const { camera } = useThree();
   
   useEffect(() => {
+    // Kamerayı sıfır noktasına baktır
+    camera.lookAt(0, 0, 0);
+    
     // Kullanıcıya bilgi ver
-    console.log('Mouse/Fare Kontrolleri aktif:');
-    console.log('- Sol tuş + sürükle: Kamerayı döndür');
-    console.log('- Fare tekerleği: Yakınlaş/uzaklaş');
-    console.log('- Shift + Sol tuş + sürükle: Kaydır');
-  }, []);
+    console.log('Sabit kamera görünümü aktif.');
+    console.log('Kamera kontrolleri devre dışı bırakıldı.');
+  }, [camera]);
   
-  return (
-    <OrbitControls
-      args={[camera, gl.domElement]}
-      makeDefault
-      enableDamping={true}
-      dampingFactor={0.25}
-      rotateSpeed={0.7}
-      panSpeed={0.7}
-      zoomSpeed={0.7}
-      minDistance={5}
-      maxDistance={50}
-      maxPolarAngle={Math.PI / 1.7}
-      target={[0, 0, 0]}
-    />
-  );
+  return null;
 }
 
 // Ana canvas bileşeni
@@ -382,8 +369,8 @@ const GameBoard3D = () => {
   const { currentPhase } = usePeacockIslandsStore();
   const isBattlePhase = currentPhase === "battle";
   
-  // Fazlara göre farklı kamera ve arka plan renkleri
-  const cameraPosition: [number, number, number] = isBattlePhase ? [0, 18, 5] : [12, 14, 16];
+  // Sabit kamera pozisyonu - en iyi görüntü pozisyonu
+  const cameraPosition: [number, number, number] = [0, 25, 25]; // Kuş bakışı pozisyon
   const backgroundColor = isBattlePhase ? "#1a3545" : "#2a4860";
   
   return (
@@ -497,8 +484,8 @@ const GameBoard3D = () => {
           />
         </EffectComposer>
         
-        {/* Basit fare tabanlı kamera kontrolleri */}
-        <SimpleCameraControls />
+        {/* Sabit kamera pozisyonu */}
+        <FixedCameraView />
         
         {/* Gelişmiş sis efekti - Fazlara göre değişir */}
         <fog 
