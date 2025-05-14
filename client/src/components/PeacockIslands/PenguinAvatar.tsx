@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from "react";
-import { useGLTF, Float, Sparkles, useKeyboardControls } from "@react-three/drei";
-import { useFrame } from "@react-three/fiber";
+import { useGLTF, Float, Sparkles } from "@react-three/drei";
+import { useFrame, ThreeEvent, useThree } from "@react-three/fiber";
 import { GLTF } from "three-stdlib";
 import * as THREE from "three";
 import { usePeacockIslandsStore } from "../../lib/stores/usePeacockIslandsStore";
@@ -9,109 +9,140 @@ import { usePeacockIslandsStore } from "../../lib/stores/usePeacockIslandsStore"
 export function PenguinAvatar() {
   const { currentPhase } = usePeacockIslandsStore();
   const model = useRef<THREE.Group>(null);
-  const [position, setPosition] = useState<[number, number, number]>([0, 0.05, 0]);
+  const [position, setPosition] = useState<[number, number, number]>([0, 0.2, 0]);
   const [rotation, setRotation] = useState<[number, number, number]>([0, 0, 0]);
   const [isMoving, setIsMoving] = useState(false);
-  
-  // Keyboard kontrolleri
-  const moveForward = useKeyboardControls(state => state.KeyW);
-  const moveBackward = useKeyboardControls(state => state.KeyS);
-  const moveLeft = useKeyboardControls(state => state.KeyA);
-  const moveRight = useKeyboardControls(state => state.KeyD);
+  const [targetPosition, setTargetPosition] = useState<THREE.Vector3 | null>(null);
   
   // Hareket hızı
-  const speed = 0.04; // Daha kontrollü hareket için hızı azalttık
-  const rotateSpeed = 0.08; // Dönüş hızını azalttık
+  const speed = 0.05;
+  
+  // Zemin ile mouse etkileşimi için gerekli
+  const { raycaster, camera, scene } = useThree();
+  
+  // Zemine tıklama işleyicisi
+  const handleGroundClick = (event: ThreeEvent<MouseEvent>) => {
+    // Eğer hazırlık aşamasında değilsek işlem yapma
+    if (currentPhase !== "preparation") return;
+    
+    // Tıklanan noktayı al
+    event.stopPropagation();
+    
+    // Tıklanan nokta için hedef pozisyon belirle
+    // Y değerini (yükseklik) sabit tutuyoruz, sadece x ve z değişecek
+    const target = new THREE.Vector3(
+      event.point.x,
+      position[1], // Y pozisyonunu değiştirme (yerden yükseklik)
+      event.point.z
+    );
+    
+    // Adanın sınırlarını kontrol et
+    const distanceFromCenter = Math.sqrt(target.x * target.x + target.z * target.z);
+    if (distanceFromCenter > 4.5) {  // Ada yarıçapı
+      const angle = Math.atan2(target.x, target.z);
+      target.x = Math.sin(angle) * 4.5;
+      target.z = Math.cos(angle) * 4.5;
+    }
+    
+    // Hedef pozisyonu güncelle
+    setTargetPosition(target);
+    setIsMoving(true);
+    
+    // Hedef yöne dönecek şekilde rotasyonu ayarla
+    const deltaX = target.x - position[0];
+    const deltaZ = target.z - position[2];
+    const angle = Math.atan2(deltaX, deltaZ);
+    setRotation([0, angle, 0]);
+  };
   
   // Animasyon ve hareket
   useFrame((_, delta) => {
-    if (currentPhase === "preparation") {  // Sadece hazırlık aşamasında hareket etsin
-      let moving = false;
-      const newPosition = [...position] as [number, number, number];
-      let newRotation = rotation[1];
+    if (currentPhase === "preparation" && targetPosition && isMoving) {
+      // Mevcut pozisyonu al
+      const currentPos = new THREE.Vector3(position[0], position[1], position[2]);
       
-      if (moveForward) {
-        newPosition[0] += Math.sin(rotation[1]) * speed;
-        newPosition[2] += Math.cos(rotation[1]) * speed;
-        moving = true;
+      // Hedefe olan mesafe
+      const distance = currentPos.distanceTo(targetPosition);
+      
+      // Eğer hedefe yeterince yaklaşmışsak, hareketi durdur
+      if (distance < 0.1) {
+        setIsMoving(false);
+        setTargetPosition(null);
+        return;
       }
       
-      if (moveBackward) {
-        newPosition[0] -= Math.sin(rotation[1]) * speed;
-        newPosition[2] -= Math.cos(rotation[1]) * speed;
-        moving = true;
-      }
+      // Yeni pozisyonu hesapla (hedefe doğru hareket)
+      const direction = new THREE.Vector3().subVectors(targetPosition, currentPos).normalize();
+      const moveDistance = speed * delta * 60; // 60 FPS'de normal hız
       
-      if (moveLeft) {
-        newRotation += rotateSpeed;
-        moving = true;
-      }
+      const newX = currentPos.x + direction.x * Math.min(moveDistance, distance);
+      const newZ = currentPos.z + direction.z * Math.min(moveDistance, distance);
       
-      if (moveRight) {
-        newRotation -= rotateSpeed;
-        moving = true;
-      }
+      // Pozisyonu güncelle
+      setPosition([newX, position[1], newZ]);
       
-      // Adanın sınırlarını kontrol et
-      const distanceFromCenter = Math.sqrt(newPosition[0] * newPosition[0] + newPosition[2] * newPosition[2]);
-      if (distanceFromCenter > 4.5) {  // Ada yarıçapı
-        const angle = Math.atan2(newPosition[0], newPosition[2]);
-        newPosition[0] = Math.sin(angle) * 4.5;
-        newPosition[2] = Math.cos(angle) * 4.5;
-      }
-      
-      // Pozisyon ve rotasyon güncelle
-      setPosition(newPosition);
-      setRotation([0, newRotation, 0]);
-      setIsMoving(moving);
-      
-      // Kamera takibi için kullanılabilir
-      if (model.current) {
-        // Model animasyonu
-        if (moving) {
-          const bounce = Math.sin(Date.now() * 0.01) * 0.05;
-          model.current.position.y = 0.05 + bounce; // Düşük y değeri ile zemine yakın tutuyoruz
-        }
+      // Model animasyonu
+      if (model.current && isMoving) {
+        const bounce = Math.sin(Date.now() * 0.01) * 0.05;
+        model.current.position.y = 0.05 + bounce; // Hareket ederken zıplama efekti
       }
     }
   });
   
-  // Model (useGLTF fonksiyonu error özelliğini döndürmez)
+  // Model yükle
   const gltf = useGLTF('/models/tft_penguin.glb');
   
+  // Eğer model yüklenmediyse veya hazırlık aşamasında değilsek gösterme
   if (!gltf.scene || currentPhase !== "preparation") {
-    return null;  // Sadece hazırlık aşamasında görünür
+    return null;
   }
   
   return (
-    <Float 
-      speed={1.5}
-      rotationIntensity={0.2}
-      floatIntensity={0.2}
-      position={position}
-    >
-      <group ref={model} rotation={rotation} scale={[0.5, 0.5, 0.5]}>
-        <primitive object={gltf.scene.clone()} />
-        
-        {/* Avatar efektleri */}
-        <Sparkles 
-          count={10}
-          scale={0.8}
-          size={0.1}
-          speed={0.3}
-          color="#aaddff"
-          position={[0, 0.3, 0]}
+    <>
+      {/* Tıklanabilir zemin oluştur - görünmez ama tıklanabilir */}
+      <mesh 
+        position={[0, 0, 0]} 
+        rotation={[-Math.PI / 2, 0, 0]} 
+        receiveShadow 
+        onClick={handleGroundClick}
+      >
+        <planeGeometry args={[10, 10]} />
+        <meshStandardMaterial 
+          transparent={true} 
+          opacity={0.0} 
         />
-        
-        {/* Oyuncu vurgusu */}
-        <pointLight
-          position={[0, 0.2, 0]}
-          intensity={0.3}
-          distance={1}
-          color="#66ccff"
-        />
-      </group>
-    </Float>
+      </mesh>
+      
+      {/* Penguen karakteri */}
+      <Float 
+        speed={1.5}
+        rotationIntensity={0.2}
+        floatIntensity={0.2}
+        position={position}
+      >
+        <group ref={model} rotation={rotation} scale={[0.8, 0.8, 0.8]}>
+          <primitive object={gltf.scene.clone()} />
+          
+          {/* Avatar efektleri */}
+          <Sparkles 
+            count={10}
+            scale={0.8}
+            size={0.1}
+            speed={0.3}
+            color="#aaddff"
+            position={[0, 0.3, 0]}
+          />
+          
+          {/* Oyuncu vurgusu */}
+          <pointLight
+            position={[0, 0.2, 0]}
+            intensity={0.3}
+            distance={1}
+            color="#66ccff"
+          />
+        </group>
+      </Float>
+    </>
   );
 }
 
