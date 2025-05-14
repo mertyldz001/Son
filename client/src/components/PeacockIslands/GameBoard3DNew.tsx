@@ -12,7 +12,8 @@ import {
   PerspectiveCamera
 } from '@react-three/drei';
 
-import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
+// Performans için efektler kaldırıldı
+// import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
 import * as THREE from 'three';
 import { usePeacockIslandsStore } from '../../lib/stores/usePeacockIslandsStore';
 import { PeacockWarriorModel, HumanSoldierModel } from './3DModels';
@@ -469,16 +470,7 @@ const GameScene = () => {
       {/* Oyuncu karakteri */}
       <PenguinAvatar />
       
-      {/* Görsel Efektler */}
-      <EffectComposer>
-        <Bloom 
-          luminanceThreshold={0.4} 
-          intensity={0.7} 
-          luminanceSmoothing={0.9}
-          height={300}
-        />
-        <Vignette offset={0.5} darkness={0.5} />
-      </EffectComposer>
+      {/* Görsel efektler performans için kaldırıldı */}
     </>
   );
 };
