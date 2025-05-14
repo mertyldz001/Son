@@ -284,6 +284,15 @@ const GameScene = () => {
   const { currentPhase, player } = usePeacockIslandsStore();
   const [zoom, setZoom] = useState(18);
   const [hoveredHex, setHoveredHex] = useState<{q: number, r: number, s: number} | null>(null);
+  const [dragCursor, setDragCursor] = useState<{
+    visible: boolean;
+    type: "warrior" | "soldier" | null;
+    unitId: string | null;
+  }>({
+    visible: false,
+    type: null,
+    unitId: null
+  });
   
   // Yerleştirilmiş birimleri al
   const deployedUnitPositions = useMemo(() => {
@@ -328,6 +337,64 @@ const GameScene = () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [zoom]);
+  
+  // Unit sürükleme takibi için
+  useEffect(() => {
+    // Birim sürükleme başlangıcı
+    const handleDragStart = (e: CustomEvent) => {
+      if (e?.detail?.unit) {
+        const unit = e.detail.unit;
+        setDragCursor({
+          visible: true,
+          type: unit.type,
+          unitId: unit.id
+        });
+        console.log('Birim sürükleme başladı:', unit.type, unit.id);
+      }
+    };
+    
+    // Birim sürükleme bitişi
+    const handleDragEnd = () => {
+      setDragCursor({
+        visible: false,
+        type: null,
+        unitId: null
+      });
+      console.log('Birim sürükleme bitti');
+    };
+    
+    // Hex tıklama olayını dinle
+    const handleHexClick = (e: CustomEvent) => {
+      // Sürükleme aktifse ve tıklanan hex konumu geçerliyse
+      if (dragCursor.visible && dragCursor.unitId && e?.detail?.hexCoords) {
+        const hexCoords = e.detail.hexCoords;
+        const { isPlayerSide, isOccupied } = e.detail;
+        
+        // Sadece oyuncu tarafına ve boş hücrelere yerleştir
+        if (isPlayerSide && !isOccupied) {
+          console.log(`Birim ${dragCursor.unitId} yerleştirildi: q:${hexCoords.q}, r:${hexCoords.r}, s:${hexCoords.s}`);
+          
+          // Sürüklemeyi temizle
+          setDragCursor({
+            visible: false,
+            type: null,
+            unitId: null
+          });
+        }
+      }
+    };
+    
+    // Event dinleyicilerini ekle
+    window.addEventListener('unit-drag-start', handleDragStart as EventListener);
+    window.addEventListener('unit-drag-end', handleDragEnd as EventListener);
+    window.addEventListener('hex-click', handleHexClick as EventListener);
+    
+    return () => {
+      window.removeEventListener('unit-drag-start', handleDragStart as EventListener);
+      window.removeEventListener('unit-drag-end', handleDragEnd as EventListener);
+      window.removeEventListener('hex-click', handleHexClick as EventListener);
+    };
+  }, [dragCursor]);
   
   // Hex üzerine gelme eventi
   const handleHexHover = (coords: {q: number, r: number, s: number}) => {
@@ -382,6 +449,30 @@ const GameScene = () => {
           unitPositions={deployedUnitPositions}
           onTileHover={handleHexHover}
         />
+        
+        {/* Sürüklenen birimin görsel önizlemesi - eğer varsa ve cursor hex üzerindeyse */}
+        {dragCursor.visible && hoveredHex && (
+          <group position={[
+            hoveredHex.q * 0.65 * 1.5, // hex boyutuna göre x pozisyonu
+            0.5, // y pozisyonu (yerden yükseklik)
+            hoveredHex.r * 0.65 * Math.sqrt(3) + hoveredHex.q * 0.65 * 0.75 // hex boyutuna göre z pozisyonu
+          ]}>
+            {dragCursor.type === 'warrior' ? (
+              <PeacockWarriorModel 
+                position={[0, 0, 0]} 
+                rotation={[0, Math.PI, 0]} 
+                scale={0.3} 
+                type="adult" 
+              />
+            ) : (
+              <HumanSoldierModel 
+                position={[0, 0, 0]} 
+                rotation={[0, Math.PI, 0]} 
+                scale={0.3} 
+              />
+            )}
+          </group>
+        )}
       </group>
       
       {/* Dekoratif Bulutlar */}
