@@ -348,94 +348,54 @@ const Battlefield = () => {
   );
 };
 
-// + ve - tuşlarıyla animasyonlu yakınlaşma/uzaklaşma kontrollerine sahip kamera
-const CustomCameraControls = () => {
-  const { camera, gl } = useThree();
-  const controlsRef = useRef<any>(null);
-  const animationRef = useRef<number | null>(null);
+// Çok basit sabit kamera kontrolleri
+const SimpleCameraControls = () => {
+  const { camera } = useThree();
   
-  // Mevcut zoom seviyesi
-  const [targetZoom, setTargetZoom] = useState<number>(18);
-  const [currentZoom, setCurrentZoom] = useState<number>(18);
-  const minZoom = 10; // En yakın mesafe
-  const maxZoom = 30; // En uzak mesafe
-  const zoomSpeed = 2; // Zoom değişim hızı
-  const smoothFactor = 0.1; // Yumuşaklık faktörü - 0.1 demek yavaş ve yumuşak, 1.0 demek anında değişim
+  // İlk pozisyon
+  const defaultZoom = 18;
+  
+  // Klavye ile kontrol için
+  const minZoom = 10;
+  const maxZoom = 30;
+  const zoomStep = 1;
   
   useEffect(() => {
-    // Kamerayı sıfır noktasına baktır
+    // Kamerayı sıfıra baktır
+    camera.position.set(0, defaultZoom, defaultZoom);
     camera.lookAt(0, 0, 0);
     
-    // Kullanıcıya bilgi ver
-    console.log('Gelişmiş kamera kontrolleri aktif:');
+    console.log('Sabit kamera kontrolleri:');
     console.log('+ tuşu: Yakınlaş');
     console.log('- tuşu: Uzaklaş');
-    console.log('Fare tekerleği de desteklenmektedir');
     
-    // Klavye olaylarını dinle
-    const handleKeyDown = (event: KeyboardEvent) => {
-      // + tuşuna basılınca yakınlaş
-      if (event.key === '+' || event.key === '=') {
-        setTargetZoom((prev) => Math.max(minZoom, prev - zoomSpeed));
+    // Tuş kontrollerini ayarla
+    const handleKeyPress = (e: KeyboardEvent) => {
+      // + tuşu - yakınlaştır
+      if (e.key === '+' || e.key === '=') {
+        const newZoom = Math.max(minZoom, camera.position.y - zoomStep);
+        camera.position.set(0, newZoom, newZoom);
+        camera.lookAt(0, 0, 0);
       }
-      // - tuşuna basılınca uzaklaş
-      else if (event.key === '-' || event.key === '_') {
-        setTargetZoom((prev) => Math.min(maxZoom, prev + zoomSpeed));
+      // - tuşu - uzaklaştır
+      else if (e.key === '-' || e.key === '_') {
+        const newZoom = Math.min(maxZoom, camera.position.y + zoomStep);
+        camera.position.set(0, newZoom, newZoom);
+        camera.lookAt(0, 0, 0);
       }
     };
     
-    window.addEventListener('keydown', handleKeyDown);
+    // Event dinleyiciyi ekle
+    window.addEventListener('keydown', handleKeyPress);
     
-    // Temizlik fonksiyonu
+    // Temizlik
     return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
+      window.removeEventListener('keydown', handleKeyPress);
     };
   }, [camera]);
   
-  // Animasyonlu zoom
-  useFrame(() => {
-    // Hedef zoom ile mevcut zoom arasındaki farkı hesapla
-    const zoomDiff = targetZoom - currentZoom;
-    
-    // Eğer fark önemsiz derecede küçükse güncelleme yapma
-    if (Math.abs(zoomDiff) < 0.01) return;
-    
-    // Yumuşak geçiş için mevcut zoom'u güncelle
-    const newZoom = currentZoom + zoomDiff * smoothFactor;
-    setCurrentZoom(newZoom);
-    
-    // Kamera pozisyonunu güncelle
-    camera.position.y = newZoom;
-    camera.position.z = newZoom;
-    camera.lookAt(0, 0, 0);
-  });
-  
-  // Fare tekerleği zoom kontrolü için OrbitControls kullan
-  return (
-    <OrbitControls
-      ref={controlsRef}
-      args={[camera, gl.domElement]}
-      enableDamping={true}
-      dampingFactor={0.2}
-      enableRotate={false}
-      enablePan={false}
-      enableZoom={true}
-      zoomSpeed={0.5}
-      minDistance={minZoom}
-      maxDistance={maxZoom}
-      onChange={() => {
-        // OrbitControls'tan zoom değişikliğini yakala
-        if (controlsRef.current) {
-          const distance = controlsRef.current.getDistance();
-          setTargetZoom(distance);
-          setCurrentZoom(distance);
-        }
-      }}
-    />
-  );
+  // Herhangi bir üç boyutlu öğe döndürmüyoruz, sadece yan etki
+  return null;
 }
 
 // Ana canvas bileşeni
@@ -558,8 +518,8 @@ const GameBoard3D = () => {
           />
         </EffectComposer>
         
-        {/* + ve - tuşlarıyla kontrol edilebilen kamera */}
-        <CustomCameraControls />
+        {/* Basit sabit kamera kontrolleri */}
+        <SimpleCameraControls />
         
         {/* Gelişmiş sis efekti - Fazlara göre değişir */}
         <fog 
