@@ -30,13 +30,10 @@ function HexTile({
   onHover, 
   onUnhover 
 }: HexTileProps) {
-  // Oyuncuya veya düşmana göre farklı renkler - Daha parlak renkler
-  const baseColor = isPlayerSide ? "#1a5c9a" : "#8c1a1a";
-  const hoverColor = isPlayerSide ? "#2a8ad9" : "#d92a2a";
-  const edgeColor = isPlayerSide ? "#0e4e7d" : "#7d0e0e";
-  
-  // Opasiteyi ayarla - daha belirgin görünüm
-  const opacity = isOccupied ? 0.8 : isHovered ? 0.8 : 0.6;
+  // Oyuncuya veya düşmana göre farklı renkler - eski haline döndü
+  const baseColor = isPlayerSide ? "#1a4a7a" : "#701a1a";
+  const hoverColor = isPlayerSide ? "#2a6aa9" : "#a02a2a";
+  const edgeColor = isPlayerSide ? "#0e2e4d" : "#4d0e0e";
   
   return (
     <group position={position}>
@@ -71,12 +68,10 @@ function HexTile({
         <cylinderGeometry args={[size * 0.95, size * 0.95, 0.1, 6]} />
         <meshStandardMaterial 
           color={isHovered ? hoverColor : baseColor} 
-          roughness={0.6}
-          metalness={0.3}
+          roughness={0.7}
+          metalness={0.2}
           transparent={true}
-          opacity={opacity}
-          emissive={isHovered ? hoverColor : baseColor}
-          emissiveIntensity={isHovered ? 0.3 : 0.1}
+          opacity={isOccupied ? 0.7 : 0.9}
         />
       </mesh>
       
@@ -187,19 +182,19 @@ const HexGrid: React.FC<HexGridProps> = ({
     const z = size * Math.sqrt(3) * (r + q/2);
     
     unitElements.push(
-      <group key={`unit-${unit.id}`} position={[x, 0.3, z]}>
+      <group key={`unit-${unit.id}`} position={[x, 0.25, z]}>
         {unit.type === 'warrior' ? (
           <PeacockWarriorModel 
             position={[0, 0, 0]} 
             rotation={[0, Math.PI, 0]} 
-            scale={0.35} 
+            scale={0.3} 
             type="adult" 
           />
         ) : (
           <HumanSoldierModel 
             position={[0, 0, 0]} 
             rotation={[0, Math.PI, 0]} 
-            scale={0.35} 
+            scale={0.3} 
           />
         )}
       </group>
