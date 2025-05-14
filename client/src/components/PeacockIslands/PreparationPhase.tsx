@@ -585,7 +585,10 @@ const PreparationPhase = () => {
                   <div className="bg-gradient-to-b from-slate-800 to-slate-900 p-3 border border-slate-700/50">
                     <div className="bg-slate-800/50 rounded-md p-2 border border-blue-700/30 mb-3 shadow-inner shadow-blue-900/30">
                       <p className="text-xs text-blue-100/80">
-                        Yumurtalarınızı kuluçka yuvalarına yerleştirin ve kalıcı bonuslar elde edin.
+                        Yumurtalardan askerlerinize güçlendirme sağlayan bonuslar elde edin:
+                        <span className="block mt-1 ml-2">• Yeşil: +20 Can tüm askerlere</span>
+                        <span className="block ml-2">• Mavi: +20% Saldırı hızı tüm askerlere</span>
+                        <span className="block ml-2">• Turuncu: +20 Saldırı gücü tüm askerlere</span>
                       </p>
                     
                     </div>
@@ -697,7 +700,11 @@ const PreparationPhase = () => {
                                   }`}
                                   onClick={(e) => {
                                     e.stopPropagation();
+                                    // Yumurtadan asker çıkarmak yerine tüm askerlere bonus uygula
                                     handleActivateEgg(slotId);
+                                    // Bonus uygulandığı için kullanıcıya bilgi ver
+                                    playSuccessSound();
+                                    alert(`${getFeatherColorName(slot.egg?.color || "green")} yumurtadan sağlanan bonus tüm askerlerinize uygulandı!`);
                                   }}
                                 >
                                   <span className="material-icons text-xs mr-1">bolt</span>
