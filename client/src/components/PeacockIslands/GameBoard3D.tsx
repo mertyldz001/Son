@@ -348,20 +348,31 @@ const Battlefield = () => {
   );
 };
 
-// Kamera Kontrolleri Kaldırıldı
-const FixedCameraView = () => {
-  const { camera } = useThree();
+// Basit zoom kontrollerine sahip temel kamera
+const BasicCameraControls = () => {
+  const { camera, gl } = useThree();
   
   useEffect(() => {
     // Kamerayı sıfır noktasına baktır
     camera.lookAt(0, 0, 0);
     
     // Kullanıcıya bilgi ver
-    console.log('Sabit kamera görünümü aktif.');
-    console.log('Kamera kontrolleri devre dışı bırakıldı.');
+    console.log('Basit kamera kontrolleri aktif.');
+    console.log('Fare tekerleği: Yakınlaş/uzaklaş');
   }, [camera]);
   
-  return null;
+  return (
+    <OrbitControls
+      args={[camera, gl.domElement]}
+      enableDamping={false}
+      enableRotate={false}
+      enablePan={false}
+      enableZoom={true}
+      zoomSpeed={0.8}
+      minDistance={10} // En fazla yakınlaşma sınırı
+      maxDistance={30} // En fazla uzaklaşma sınırı
+    />
+  );
 }
 
 // Ana canvas bileşeni
@@ -369,8 +380,8 @@ const GameBoard3D = () => {
   const { currentPhase } = usePeacockIslandsStore();
   const isBattlePhase = currentPhase === "battle";
   
-  // Sabit kamera pozisyonu - en iyi görüntü pozisyonu
-  const cameraPosition: [number, number, number] = [0, 25, 25]; // Kuş bakışı pozisyon
+  // Sabit kamera pozisyonu - daha yakın bir açı
+  const cameraPosition: [number, number, number] = [0, 18, 18]; // Yakınlaştırılmış kuş bakışı pozisyon
   const backgroundColor = isBattlePhase ? "#1a3545" : "#2a4860";
   
   return (
@@ -484,8 +495,8 @@ const GameBoard3D = () => {
           />
         </EffectComposer>
         
-        {/* Sabit kamera pozisyonu */}
-        <FixedCameraView />
+        {/* Basit zoom kontrollü kamera */}
+        <BasicCameraControls />
         
         {/* Gelişmiş sis efekti - Fazlara göre değişir */}
         <fog 
