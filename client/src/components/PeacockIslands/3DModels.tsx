@@ -20,91 +20,30 @@ type GLTFResult = GLTF & {
   };
 };
 
-// Tüy 3D modeli
+// Basitleştirilmiş Tüy 3D modeli
 export function FeatherModel({ color = "green", position = [0, 0, 0], rotation = [0, 0, 0], scale = 1 }: { 
   color?: "green" | "blue" | "orange"; 
   position?: [number, number, number]; 
   rotation?: [number, number, number];
   scale?: number;
 }) {
-  const group = useRef<THREE.Group>(null);
-  const { scene } = useGLTF('/models/peacock_feather.glb') as GLTFResult;
-  
-  // Tüy animasyonu için başlangıç değeri
-  const [rotationOffset] = useState(Math.random() * Math.PI * 2);
-  
-  // useEffect ile animasyon
-  useEffect(() => {
-    let animationFrame: number;
-    
-    const animate = () => {
-      if (group.current) {
-        // Hafif dalgalanma efekti
-        group.current.rotation.z = rotation[2] + Math.sin(Date.now() * 0.001 + rotationOffset) * 0.1;
-        group.current.position.y = position[1] + Math.sin(Date.now() * 0.0015 + rotationOffset) * 0.05;
-      }
-      animationFrame = requestAnimationFrame(animate);
-    };
-    
-    animate();
-    
-    return () => {
-      cancelAnimationFrame(animationFrame);
-    };
-  }, [position, rotation, rotationOffset]);
-  
-  // Tüy rengini ve materyal özelliklerini ayarla
-  scene.traverse((child) => {
-    if (child instanceof THREE.Mesh && child.material instanceof THREE.MeshStandardMaterial) {
-      child.material = child.material.clone();
-      
-      // Rengi değiştir ve renk canlılığını artır
-      if (color === "green") {
-        child.material.color.set(new THREE.Color(0x00ff88));
-        // Yeşil tüyler için metalik yeşil yansıma
-        child.material.emissive = new THREE.Color(0x005522);
-      } else if (color === "blue") {
-        child.material.color.set(new THREE.Color(0x2288ff));
-        // Mavi tüyler için metalik mavi yansıma
-        child.material.emissive = new THREE.Color(0x002255);
-      } else if (color === "orange") {
-        child.material.color.set(new THREE.Color(0xff8800));
-        // Turuncu tüyler için ateş benzeri yansıma
-        child.material.emissive = new THREE.Color(0x551100);
-      }
-      
-      // Gelişmiş materyal özellikleri
-      child.material.emissiveIntensity = 0.2;
-      child.material.metalness = 0.3;
-      child.material.roughness = 0.4;
-      child.material.envMapIntensity = 1.2;
-      
-      // Gölge oluşturma ve alma
-      child.castShadow = true;
-      child.receiveShadow = true;
-    }
-  });
+  // Renkleri belirleme
+  const meshColor = 
+    color === "green" ? "#00ff88" : 
+    color === "blue" ? "#2288ff" : 
+    "#ff8800";
   
   return (
-    <group ref={group} position={position} rotation={rotation} scale={[scale, scale, scale]}>
-      <primitive object={scene.clone()} />
-      
-      {/* Renge göre nokta ışık kaynağı */}
-      <pointLight
-        position={[0, 0.2, 0]}
-        intensity={0.3}
-        distance={1.0}
-        color={
-          color === "green" ? "#00ff88" : 
-          color === "blue" ? "#2288ff" : 
-          "#ff8800"
-        }
-      />
+    <group position={position} rotation={rotation} scale={[scale, scale, scale]}>
+      <mesh>
+        <boxGeometry args={[0.3, 0.8, 0.1]} />
+        <meshStandardMaterial color={meshColor} />
+      </mesh>
     </group>
   );
 }
 
-// Yumurta 3D modeli
+// Basitleştirilmiş Yumurta 3D modeli
 export function EggModel({ color = "green", position = [0, 0, 0], rotation = [0, 0, 0], scale = 1, isActive = false }: { 
   color?: "green" | "blue" | "orange"; 
   position?: [number, number, number]; 
@@ -112,221 +51,129 @@ export function EggModel({ color = "green", position = [0, 0, 0], rotation = [0,
   scale?: number;
   isActive?: boolean;
 }) {
-  const group = useRef<THREE.Group>(null);
-  const { scene } = useGLTF('/models/magic_egg.glb') as GLTFResult;
-  
-  // Animasyon için başlangıç değeri
-  const [rotationOffset] = useState(Math.random() * Math.PI * 2);
-  
-  // useEffect ile animasyon
-  useEffect(() => {
-    let animationFrame: number;
-    
-    const animate = () => {
-      if (group.current) {
-        if (isActive) {
-          // Aktif yumurtalar için titreme animasyonu
-          group.current.rotation.y = rotation[1] + Math.sin(Date.now() * 0.003 + rotationOffset) * 0.1;
-          group.current.rotation.x = rotation[0] + Math.cos(Date.now() * 0.002 + rotationOffset) * 0.05;
-          // Hafif yukarı-aşağı hareketi
-          group.current.position.y = position[1] + Math.sin(Date.now() * 0.002) * 0.05;
-          group.current.scale.set(
-            scale + Math.sin(Date.now() * 0.004) * 0.03, 
-            scale + Math.sin(Date.now() * 0.004) * 0.03, 
-            scale + Math.sin(Date.now() * 0.004) * 0.03
-          );
-        } else {
-          // Aktif olmayan yumurtalar için yavaş dönüş 
-          group.current.rotation.y = rotation[1] + Math.sin(Date.now() * 0.001) * 0.05;
-        }
-      }
-      animationFrame = requestAnimationFrame(animate);
-    };
-    
-    animate();
-    
-    return () => {
-      cancelAnimationFrame(animationFrame);
-    };
-  }, [position, rotation, scale, isActive, rotationOffset]);
-  
-  // Yumurta rengini ve materyal özelliklerini gelişmiş hale getir
-  scene.traverse((child) => {
-    if (child instanceof THREE.Mesh && child.material instanceof THREE.MeshStandardMaterial) {
-      // Rengi ve materyal özelliklerini değiştir
-      child.material = child.material.clone();
-      
-      if (color === "green") {
-        child.material.color.set(new THREE.Color(0x00ff88));
-        child.material.emissive.set(new THREE.Color(0x00aa44)); 
-      } else if (color === "blue") {
-        child.material.color.set(new THREE.Color(0x2288ff));
-        child.material.emissive.set(new THREE.Color(0x0044aa));
-      } else if (color === "orange") {
-        child.material.color.set(new THREE.Color(0xff8800));
-        child.material.emissive.set(new THREE.Color(0xaa4400));
-      }
-      
-      // Gelişmiş materyal özellikleri
-      child.material.metalness = 0.6;
-      child.material.roughness = 0.2;
-      child.material.envMapIntensity = 1.8;
-      
-      // Gölge oluşturma ve alma
-      child.castShadow = true;
-      child.receiveShadow = true;
-      
-      // Aktif yumurtalar daha parlak ve daha metalik
-      if (isActive) {
-        child.material.emissiveIntensity = 1.2;
-        child.material.metalness = 0.8;
-        child.material.roughness = 0.1;
-      } else {
-        child.material.emissiveIntensity = 0.3;
-      }
-    }
-  });
+  // Renkleri belirleme
+  const meshColor = 
+    color === "green" ? "#00ff88" : 
+    color === "blue" ? "#2288ff" : 
+    "#ff8800";
   
   return (
-    <group ref={group} position={position} rotation={rotation} scale={[scale, scale, scale]}>
-      <primitive object={scene.clone()} />
+    <group position={position} rotation={rotation} scale={[scale * 0.6, scale, scale * 0.6]}>
+      <mesh>
+        <sphereGeometry args={[0.5, 16, 16]} />
+        <meshStandardMaterial 
+          color={meshColor} 
+          emissive={isActive ? meshColor : "#000000"} 
+          emissiveIntensity={isActive ? 0.5 : 0}
+          metalness={0.6}
+          roughness={0.2}
+        />
+      </mesh>
       
       {/* Aktif yumurtalar için parlama efekti */}
       {isActive && (
         <pointLight 
           position={[0, 0.5, 0]} 
-          intensity={1} 
-          distance={3}
-          color={
-            color === "green" ? "#00ff88" : 
-            color === "blue" ? "#2288ff" : "#ff8800"
-          }
+          intensity={0.5} 
+          distance={2}
+          color={meshColor}
         />
       )}
     </group>
   );
 }
 
-// Tavus Kuşu Savaşçı modeli
+// Basitleştirilmiş Tavus Kuşu Savaşçı modeli
 export function PeacockWarriorModel({ position = [0, 0, 0], rotation = [0, 0, 0], scale = 1, type = "adult" }: { 
   position?: [number, number, number]; 
   rotation?: [number, number, number];
   scale?: number;
   type?: "chick" | "juvenile" | "adult" | "alpha";
 }) {
-  const group = useRef<THREE.Group>(null);
-  const { scene } = useGLTF('/models/peacock_warrior.glb') as GLTFResult;
-  
   // Düşman türüne göre boyut ve renk ayarla
   let modelScale = scale;
-  let color = new THREE.Color(0xffffff);
+  let color;
   
   switch (type) {
     case "chick":
       modelScale *= 0.5;
-      color.set(0xffcc44);
+      color = "#ffcc44";
       break;
     case "juvenile":
       modelScale *= 0.75;
-      color.set(0xff9944);
+      color = "#ff9944";
       break;
     case "adult":
       modelScale *= 1.0;
-      color.set(0xff6644);
+      color = "#ff6644";
       break;
     case "alpha":
       modelScale *= 1.3;
-      color.set(0xff3333);
+      color = "#ff3333";
       break;
+    default:
+      color = "#ff6644";
   }
   
-  // Modelin rengini ve materyalini gelişmiş hale getir
-  scene.traverse((child) => {
-    if (child instanceof THREE.Mesh && child.material instanceof THREE.MeshStandardMaterial) {
-      child.material = child.material.clone();
-      child.material.color.multiply(color);
-      
-      // Gelişmiş materyal özellikleri
-      child.material.metalness = 0.4;  // Metalik görünüm
-      child.material.roughness = 0.3;  // Daha pürüzsüz yüzey
-      child.material.envMapIntensity = 1.5; // Çevre yansıması
-      
-      // Gölge ve ışık efektleri
-      child.castShadow = true;
-      child.receiveShadow = true;
-      
-      // Emissive (kendi kendine parlayan) özellik ekle
-      if (type === "alpha") {
-        child.material.emissive = new THREE.Color(0xff3300);
-        child.material.emissiveIntensity = 0.3;
-      }
-    }
-  });
-  
   return (
-    <group ref={group} position={position} rotation={rotation} scale={[modelScale, modelScale, modelScale]}>
-      <primitive object={scene.clone()} />
+    <group position={position} rotation={rotation} scale={[modelScale, modelScale, modelScale]}>
+      <mesh>
+        <boxGeometry args={[0.5, 0.8, 0.5]} />
+        <meshStandardMaterial 
+          color={color} 
+          metalness={0.4}
+          roughness={0.3}
+          emissive={type === "alpha" ? "#ff3300" : "#000000"}
+          emissiveIntensity={type === "alpha" ? 0.3 : 0}
+        />
+      </mesh>
+      
+      {/* Kafa kısmı */}
+      <mesh position={[0, 0.6, 0]}>
+        <sphereGeometry args={[0.3, 16, 16]} />
+        <meshStandardMaterial 
+          color={color} 
+          metalness={0.4}
+          roughness={0.3}
+        />
+      </mesh>
     </group>
   );
 }
 
-// Geliştirilmiş insan asker modeli
+// Basitleştirilmiş insan asker modeli
 export function HumanSoldierModel({ position = [0, 0, 0], rotation = [0, 0, 0], scale = 1 }: { 
   position?: [number, number, number]; 
   rotation?: [number, number, number];
   scale?: number;
 }) {
-  const group = useRef<THREE.Group>(null);
-  const { scene } = useGLTF('/models/human_soldier.glb') as GLTFResult;
-  
-  // useEffect ile model animasyonu
-  useEffect(() => {
-    let animationFrame: number;
-    
-    const animate = () => {
-      if (group.current) {
-        // Hafif nefes alma hareketi
-        group.current.position.y = position[1] + Math.sin(Date.now() * 0.002) * 0.03;
-      }
-      animationFrame = requestAnimationFrame(animate);
-    };
-    
-    animate();
-    
-    return () => {
-      cancelAnimationFrame(animationFrame);
-    };
-  }, [position]);
-  
-  // Modeli geliştir
-  scene.traverse((child) => {
-    if (child instanceof THREE.Mesh && child.material instanceof THREE.MeshStandardMaterial) {
-      child.material = child.material.clone();
-      
-      // Metalik zırh parçaları için
-      child.material.metalness = 0.7;
-      child.material.roughness = 0.2;
-      child.material.envMapIntensity = 1.8;
-      
-      // Gölge oluşturma ve alma
-      child.castShadow = true;
-      child.receiveShadow = true;
-      
-      // Hafif parlaklık
-      child.material.emissive = new THREE.Color(0x3366ff);
-      child.material.emissiveIntensity = 0.1;
-    }
-  });
-  
   return (
-    <group ref={group} position={position} rotation={rotation} scale={[scale, scale, scale]}>
-      <primitive object={scene.clone()} />
+    <group position={position} rotation={rotation} scale={[scale, scale, scale]}>
+      {/* Gövde */}
+      <mesh>
+        <boxGeometry args={[0.5, 0.8, 0.3]} />
+        <meshStandardMaterial 
+          color="#999999" 
+          metalness={0.7}
+          roughness={0.2}
+        />
+      </mesh>
       
-      {/* Asker etrafında hafif ışık efekti */}
+      {/* Kafa */}
+      <mesh position={[0, 0.55, 0]}>
+        <sphereGeometry args={[0.2, 16, 16]} />
+        <meshStandardMaterial 
+          color="#ffddbb" 
+          metalness={0.1}
+          roughness={0.8}
+        />
+      </mesh>
+      
+      {/* Hafif mavi ışık efekti */}
       <pointLight 
         position={[0, 0.5, 0]} 
-        intensity={0.4} 
-        distance={1.5} 
+        intensity={0.3} 
+        distance={1} 
         color="#6699ff"
       />
     </group>
