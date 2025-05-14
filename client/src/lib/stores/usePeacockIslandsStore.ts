@@ -533,7 +533,8 @@ export const usePeacockIslandsStore = create<PeacockIslandsStore>((set, get) => 
       const updatedHatchery = [...player.island.hatchery];
       updatedHatchery[hatcherySlotIndex] = {
         ...player.island.hatchery[hatcherySlotIndex],
-        egg
+        egg,
+        status: "incubating"
       };
       
       const updatedPlayer = { 
@@ -564,7 +565,8 @@ export const usePeacockIslandsStore = create<PeacockIslandsStore>((set, get) => 
       const updatedHatchery = [...npc.island.hatchery];
       updatedHatchery[hatcherySlotIndex] = {
         ...npc.island.hatchery[hatcherySlotIndex],
-        egg
+        egg,
+        status: "incubating"
       };
       
       const updatedNpc = { 
