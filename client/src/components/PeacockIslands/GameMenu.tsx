@@ -438,7 +438,11 @@ const GameMenu = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.98 }}
                 className="bg-gradient-to-r from-amber-600 to-amber-800 text-white px-10 py-4 text-xl font-bold rounded-xl hover:from-amber-500 hover:to-amber-700 transition-all duration-300 shadow-lg shadow-amber-900/30 border border-amber-500/30"
-                onClick={handleStartGame}
+                onClick={() => {
+                  // Önce müziği başlatmayı dene, sonra oyunu başlat
+                  handleStartMusic();
+                  startGame();
+                }}
               >
                 <div className="flex items-center justify-center gap-2">
                   <span className="material-icons">play_arrow</span>
