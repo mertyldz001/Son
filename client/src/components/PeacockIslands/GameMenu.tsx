@@ -150,14 +150,74 @@ const GameMenu = () => {
       
       {/* Yükleniyor göstergesi */}
       {loading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/80 z-50">
-          <div className="flex flex-col items-center">
+        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-black to-indigo-950/90 z-50">
+          <div className="flex flex-col items-center relative">
+            {/* Altıgen yükleme animasyonu */}
+            <div className="relative w-40 h-40">
+              {[...Array(6)].map((_, i) => (
+                <motion.div
+                  key={`loading-hex-${i}`}
+                  className="absolute top-0 left-0 w-full h-full"
+                  style={{
+                    transformOrigin: "center",
+                    rotate: `${i * 60}deg`,
+                  }}
+                >
+                  <motion.div
+                    className="absolute top-0 w-2 h-10 bg-gradient-to-b from-blue-400 to-blue-600 rounded-full"
+                    style={{ left: "calc(50% - 1px)" }}
+                    initial={{ scaleY: 0.3, opacity: 0.3 }}
+                    animate={{ 
+                      scaleY: [0.3, 1, 0.3], 
+                      opacity: [0.3, 1, 0.3],
+                    }}
+                    transition={{
+                      duration: 1.5,
+                      repeat: Infinity,
+                      delay: i * 0.2,
+                      ease: "easeInOut"
+                    }}
+                  />
+                </motion.div>
+              ))}
+              
+              {/* Ortadaki logo/amblem */}
+              <motion.div
+                className="absolute inset-0 m-auto w-16 h-16 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center"
+                initial={{ scale: 0.9, opacity: 0.6 }}
+                animate={{ 
+                  scale: [0.9, 1.1, 0.9],
+                  opacity: [0.6, 1, 0.6]
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              >
+                <span className="text-white text-xl font-bold">TKA</span>
+              </motion.div>
+            </div>
+            
+            {/* Yükleniyor metni */}
+            <div className="mt-6 text-xl font-medium text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-300">Yükleniyor...</div>
+            
+            {/* Altındaki mini bar */}
             <motion.div 
-              animate={{ rotate: 360 }}
-              transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-              className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full mb-4"
-            />
-            <div className="text-xl font-medium text-blue-400">Yükleniyor...</div>
+              className="mt-4 h-1 bg-blue-600/30 rounded-full overflow-hidden"
+              style={{ width: "160px" }}
+            >
+              <motion.div
+                className="h-full bg-gradient-to-r from-blue-500 to-indigo-400"
+                initial={{ width: "0%" }}
+                animate={{ width: "100%" }}
+                transition={{ 
+                  duration: 2.5, 
+                  repeat: Infinity,
+                  ease: "easeInOut" 
+                }}
+              />
+            </motion.div>
           </div>
         </div>
       )}
