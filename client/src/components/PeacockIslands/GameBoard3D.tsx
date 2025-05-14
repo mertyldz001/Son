@@ -54,245 +54,6 @@ const AnimatedWater = ({ position = [0, 0, 0], size = 20 }) => {
   );
 };
 
-// Izgara harita oluşturucu yardımcı fonksiyonlar
-const createGridPosition = (row: number, col: number, size: number = 1) => {
-  // 6x7 ızgara için pozisyon hesapla (merkez=0,0,0 olacak şekilde)
-  const gridWidth = 7 * size;
-  const gridHeight = 6 * size;
-  
-  // Ekranın ortasına hizalamak için ofset hesapla
-  const offsetX = -((gridWidth - size) / 2);
-  const offsetZ = -((gridHeight - size) / 2);
-  
-  // Hücre pozisyonunu hesapla
-  const x = offsetX + col * size;
-  const z = offsetZ + row * size;
-  
-  return [x, 0, z];
-};
-
-// Kare şeklinde savaş meydanı hücresi - TFT stilinde
-const BattleCell = ({ position, color, isHighlighted, isPlayerSide, isOccupied = false, cellId = "" }: any) => {
-  const meshRef = useRef<THREE.Mesh>(null);
-  const edgesRef = useRef<THREE.LineSegments>(null);
-  const highlightRef = useRef<THREE.Mesh>(null);
-  const [hovered, setHovered] = useState(false);
-  
-  // Hücre boyutu - biraz daha küçük yaparak aralarında boşluk bırakıyoruz
-  const cellSize = 0.95; 
-  // Hücre yüksekliği
-  const cellHeight = 0.05;
-  
-  // Hover efektini yönet
-  useFrame((_, delta) => {
-    if (!meshRef.current || !edgesRef.current || !highlightRef.current) return;
-    
-    // Hover durumuna göre yükseklik ayarla
-    const targetY = hovered || isHighlighted ? 0.02 : 0;
-    meshRef.current.position.y += (targetY - meshRef.current.position.y) * 5 * delta;
-    edgesRef.current.position.y = meshRef.current.position.y; 
-    highlightRef.current.position.y = meshRef.current.position.y + 0.001;
-    
-    // Renk değişimini yönet
-    const material = meshRef.current.material as THREE.MeshStandardMaterial;
-    const edgeMaterial = edgesRef.current.material as THREE.LineBasicMaterial;
-    const highlightMaterial = highlightRef.current.material as THREE.MeshBasicMaterial;
-    
-    // Hücre rengi - TFT stili
-    const targetColor = new THREE.Color(
-      isHighlighted ? (isPlayerSide ? '#88aaff' : '#ffaa88') : 
-      hovered ? (isPlayerSide ? '#6699ee' : '#ee9966') : 
-      isOccupied ? (isPlayerSide ? '#5588cc' : '#cc8855') : // Eğer dolu ise belirgin renk
-      isPlayerSide ? '#4477aa' : '#aa7744' // Boş ise hafif renkli
-    );
-    material.color.lerp(targetColor, 8 * delta);
-    
-    // Kenar çizgisi görünürlüğü
-    const targetEdgeOpacity = hovered || isHighlighted || isOccupied ? 0.9 : 0.5;
-    edgeMaterial.opacity += (targetEdgeOpacity - edgeMaterial.opacity) * 5 * delta;
-    
-    // Vurgu efekti
-    const targetHighlightOpacity = hovered || isHighlighted ? 0.3 : isOccupied ? 0.15 : 0.0;
-    highlightMaterial.opacity += (targetHighlightOpacity - highlightMaterial.opacity) * 3 * delta;
-    
-    // Şeffaflık ayarı - TFT'deki gibi boş hücreler hafif görünür
-    const targetAlpha = isOccupied ? 0.9 : hovered || isHighlighted ? 0.8 : 0.4;
-    material.opacity += (targetAlpha - material.opacity) * 5 * delta;
-  });
-  
-  // Kare kenarları için geometri oluştur
-  const edgesGeometry = useMemo(() => {
-    const halfSize = cellSize / 2;
-    const points: THREE.Vector3[] = [
-      new THREE.Vector3(-halfSize, 0, -halfSize),
-      new THREE.Vector3(halfSize, 0, -halfSize),
-      new THREE.Vector3(halfSize, 0, halfSize),
-      new THREE.Vector3(-halfSize, 0, halfSize),
-      new THREE.Vector3(-halfSize, 0, -halfSize)
-    ];
-    
-    return new THREE.BufferGeometry().setFromPoints(points);
-  }, [cellSize]);
-  
-  return (
-    <group position={position}>
-      {/* Kare dolgusu - hücre zemini */}
-      <mesh 
-        ref={meshRef}
-        receiveShadow
-        onPointerOver={() => setHovered(true)}
-        onPointerOut={() => setHovered(false)}
-      >
-        <boxGeometry args={[cellSize, cellHeight, cellSize]} />
-        <meshStandardMaterial 
-          color={color} 
-          roughness={0.7}
-          metalness={0.2}
-          transparent={true}
-          opacity={isOccupied ? 0.9 : 0.4}
-        />
-      </mesh>
-      
-      {/* Kenar çizgileri - hücre sınırları */}
-      <lineSegments ref={edgesRef}>
-        <primitive object={edgesGeometry} />
-        <lineBasicMaterial 
-          color={isPlayerSide ? "#99ffaa" : "#ffaa99"} 
-          transparent={true} 
-          opacity={isOccupied ? 1.0 : 0.5}
-          linewidth={2}
-        />
-      </lineSegments>
-      
-      {/* Vurgu efekti - hücre seçildiğinde veya üzerine gelindiğinde */}
-      <mesh 
-        ref={highlightRef}
-        position={[0, 0.001, 0]}
-      >
-        <planeGeometry args={[cellSize * 0.9, cellSize * 0.9]} />
-        <meshBasicMaterial 
-          color={isPlayerSide ? "#88ff99" : "#ff9988"}
-          transparent={true}
-          opacity={0}
-          depthWrite={false}
-        />
-      </mesh>
-      
-      {/* Hücre ID'si (test için) */}
-      {/* Gerçek uygulamada bu kısmı kaldırabilirsiniz */}
-      {/* <Text
-        position={[0, 0.06, 0]}
-        rotation={[-Math.PI / 2, 0, 0]}
-        fontSize={0.15}
-        color="#ffffff"
-        anchorX="center"
-        anchorY="middle"
-        depthTest={false}
-      >
-        {cellId}
-      </Text> */}
-    </group>
-  );
-};
-
-// Birim taşı (karakter)
-const UnitPiece = ({ position, color, power, health, type, size = 0.4 }: any) => {
-  // Karakter pozisyonu - hexin üzerinde biraz yukarıda durmalı
-  const adjustedPosition: [number, number, number] = [
-    position[0], 
-    position[1] + 0.3, 
-    position[2]
-  ];
-  
-  const meshRef = useRef<THREE.Group>(null);
-  
-  // Hafif sallanma animasyonu
-  useFrame((_, delta) => {
-    if (!meshRef.current) return;
-    meshRef.current.position.y = adjustedPosition[1] + Math.sin(Date.now() * 0.003) * 0.05;
-    meshRef.current.rotation.y += delta * 0.3; // Yavaşça dön
-  });
-  
-  // Tavus kuşu düşman birimi mi belirle
-  const isPeacock = type === "chick" || type === "juvenile" || type === "adult" || type === "alpha";
-  
-  // Model ölçeği hesapla
-  let modelScale = size;
-  if (isPeacock) {
-    switch (type) {
-      case "chick": modelScale *= 0.8; break;
-      case "juvenile": modelScale *= 1.0; break;
-      case "adult": modelScale *= 1.2; break;
-      case "alpha": modelScale *= 1.5; break;
-    }
-  }
-  
-  return (
-    <group ref={meshRef} position={adjustedPosition}>
-      <Suspense fallback={
-        <>
-          {/* Fallback basit geometriler */}
-          {isPeacock ? (
-            <group>
-              {/* Tavus kuşu gövdesi */}
-              <mesh castShadow position={[0, 0, 0]}>
-                <sphereGeometry args={[size * 0.8, 16, 16]} />
-                <meshStandardMaterial color={color} roughness={0.5} />
-              </mesh>
-              
-              {/* Tavus kuşu kafası */}
-              <mesh castShadow position={[0, size * 0.4, size * 0.6]}>
-                <sphereGeometry args={[size * 0.4, 16, 16]} />
-                <meshStandardMaterial color={color} roughness={0.5} />
-              </mesh>
-              
-              {/* Tavus kuşu kuyruğu */}
-              <mesh castShadow position={[0, size * 0.5, -size * 0.6]} rotation={[Math.PI * 0.2, 0, 0]}>
-                <coneGeometry args={[size * 0.6, size * 1.2, 8]} />
-                <meshStandardMaterial color={color} roughness={0.5} />
-              </mesh>
-            </group>
-          ) : (
-            // Normal asker birimi
-            <mesh castShadow>
-              <boxGeometry args={[size, size * 1.5, size]} />
-              <meshStandardMaterial color={color} roughness={0.5} />
-            </mesh>
-          )}
-        </>
-      }>
-        {/* 3D modeller */}
-        {isPeacock ? (
-          <PeacockWarriorModel 
-            position={[0, -0.2, 0]} 
-            scale={modelScale * 1.0} 
-            type={type as any}
-          />
-        ) : (
-          <HumanSoldierModel 
-            position={[0, -0.2, 0]} 
-            scale={modelScale * 0.8}
-          />
-        )}
-      </Suspense>
-      
-      {/* Güç göstergesi */}
-      <Text
-        position={[0, size + 0.3, 0]}
-        rotation={[0, 0, 0]}
-        fontSize={0.25}
-        color="white"
-        anchorX="center"
-        anchorY="middle"
-        outlineWidth={0.02}
-        outlineColor="#000000"
-      >
-        {`${power}${health ? `/${health}` : ''}`}
-      </Text>
-    </group>
-  );
-};
-
 // Ada temsili
 const Island = ({ position, isPlayerIsland = false }: any) => {
   // Ada için renkler
@@ -487,345 +248,25 @@ const Island = ({ position, isPlayerIsland = false }: any) => {
   );
 };
 
-// Ana oyun alanı bileşeni
+// Basit savaş meydanı
 const Battlefield = () => {
-  const { player, npc, currentEnemyWave, currentPhase } = usePeacockIslandsStore();
-  
-  // 6x7 ızgara için hücre pozisyonlarını ve birimlerin yerleşimini tut
-  const [gridState, setGridState] = useState<any>({
-    cells: [],
-    playerUnits: [],
-    enemyUnits: []
-  });
-  
-  // Hücre boyutu - tüm hesaplamalarda bu değer kullanılacak
-  const cellSize = 1.0;
-  
-  // Altıgen ızgarayı oluştur
-  for (let q = -grid.radius; q <= grid.radius; q++) {
-    const r1 = Math.max(-grid.radius, -q - grid.radius);
-    const r2 = Math.min(grid.radius, -q + grid.radius);
-    
-    for (let r = r1; r <= r2; r++) {
-      const position = hexToPixel(q, r + grid.centerOffset);
-      
-      // Oyuncu ve düşman alanlarını ayır
-      const isPlayerSide = position[2] < 0;
-      
-      gridPositions.push({
-        position: position as [number, number, number],
-        q, r,
-        s: -q - r, // Üçüncü altıgen koordinatı
-        isPlayerSide,
-        isEnemySide: !isPlayerSide
-      });
-    }
-  }
-  
-  // Birimleri (askerleri) yerleştir
-  const playerUnits: any[] = [];
-  const enemyUnits: any[] = [];
-  
-  // Oyuncu askerlerini rastgele yerleştir
-  if (player) {
-    const playerSquares = gridPositions.filter(square => square.isPlayerSide);
-    const soldierCount = Math.min(player.island.army.soldiers, playerSquares.length);
-    
-    for (let i = 0; i < soldierCount; i++) {
-      const randomIndex = Math.floor(Math.random() * playerSquares.length);
-      const selectedSquare = playerSquares[randomIndex];
-      
-      playerUnits.push({
-        position: selectedSquare.position,
-        power: player.island.army.attackPower + player.island.army.bonuses.attackPower,
-        health: player.island.army.health + player.island.army.bonuses.health
-      });
-      
-      // Kullanılan kareyi kaldır
-      playerSquares.splice(randomIndex, 1);
-    }
-  }
-  
-  // Düşman birimlerini yerleştir
-  if (currentEnemyWave && isBattlePhase) {
-    const enemySquares = gridPositions.filter(square => square.isEnemySide);
-    const enemyCount = Math.min(currentEnemyWave.enemies.length, enemySquares.length);
-    
-    for (let i = 0; i < enemyCount; i++) {
-      const enemy = currentEnemyWave.enemies[i];
-      const randomIndex = Math.floor(Math.random() * enemySquares.length);
-      const selectedSquare = enemySquares[randomIndex];
-      
-      enemyUnits.push({
-        position: selectedSquare.position,
-        power: enemy.attackPower,
-        health: enemy.health,
-        type: enemy.type
-      });
-      
-      // Kullanılan kareyi kaldır
-      enemySquares.splice(randomIndex, 1);
-    }
-  }
-  
-  // Adaları gösterme veya savaş alanını gösterme
-  if (isBattlePhase) {
-    // Savaş alanı (TFT tarzı)
-    return (
-      <group>
-        {/* Arkaplan zemini - Kare şekilli oyun alanı */}
-        <mesh 
-          position={[0, -0.2, 0]} 
-          rotation={[-Math.PI / 2, 0, 0]} 
-          receiveShadow
-        >
-          <planeGeometry args={[20, 20]} />
-          <meshStandardMaterial color="#385048" />
-        </mesh>
-        
-        {/* Oyun alanı sınırı - TFT tarzı */}
-        <mesh 
-          position={[0, -0.15, 0]} 
-          rotation={[-Math.PI / 2, 0, 0]} 
-        >
-          <ringGeometry args={[9, 10, 32]} />
-          <meshStandardMaterial color="#aa6633" />
-        </mesh>
-        
-        {/* Oyun alanı zemin deseni */}
-        <mesh 
-          position={[0, -0.14, 0]} 
-          rotation={[-Math.PI / 2, 0, 0]} 
-        >
-          <circleGeometry args={[9, 32]} />
-          <meshStandardMaterial color="#88aa99" roughness={0.8} />
-        </mesh>
-        
-        {/* Kare ızgara - TFT stilinde savaş alanı */}
-        {gridPositions.map((square, i) => {
-          // Bu kareye birim yerleştirilmiş mi?
-          const playerUnitHere = playerUnits.find(unit => 
-            unit.position[0] === square.position[0] && 
-            unit.position[2] === square.position[2]
-          );
-          
-          const enemyUnitHere = enemyUnits.find(unit => 
-            unit.position[0] === square.position[0] && 
-            unit.position[2] === square.position[2]
-          );
-          
-          const isOccupied = Boolean(playerUnitHere || enemyUnitHere);
-          
-          return (
-            <BattleHex 
-              key={i}
-              position={square.position}
-              color={square.isPlayerSide ? "#77aa88" : "#aa7788"}
-              isHighlighted={false}
-              isPlayerSide={square.isPlayerSide}
-              isOccupied={isOccupied}
-            />
-          );
-        })}
-        
-        {/* Oyuncu askerleri */}
-        {playerUnits.map((unit, i) => (
-          <UnitPiece
-            key={`player-unit-${i}`}
-            position={unit.position}
-            color="#4488ff"
-            power={unit.power}
-            health={unit.health}
-            size={0.4}
-          />
-        ))}
-        
-        {/* Düşman birimleri */}
-        {enemyUnits.map((unit, i) => (
-          <UnitPiece
-            key={`enemy-unit-${i}`}
-            position={unit.position}
-            color={
-              unit.type === "chick" ? "#ffaa44" :
-              unit.type === "juvenile" ? "#ff7744" :
-              unit.type === "adult" ? "#ff4422" :
-              "#ff0000"
-            }
-            power={unit.power}
-            health={unit.health}
-            type={unit.type}
-            size={
-              unit.type === "chick" ? 0.3 :
-              unit.type === "juvenile" ? 0.4 :
-              unit.type === "adult" ? 0.5 :
-              0.6
-            }
-          />
-        ))}
-      </group>
-    );
-  } else {
-    // Ada görünümü (hazırlık aşaması)
-    return (
-      <group>
-        {/* Arkaplan zemini */}
-        <mesh 
-          position={[0, -0.2, 0]} 
-          rotation={[-Math.PI / 2, 0, 0]} 
-          receiveShadow
-        >
-          <planeGeometry args={[30, 30]} />
-          <meshStandardMaterial color="#385048" />
-        </mesh>
-        
-        {/* Gelişmiş Su Efekti - Basit Animasyonlu Versiyon */}
-        <mesh 
-          position={[0, -0.15, 0]} 
-          rotation={[-Math.PI / 2, 0, 0]} 
-        >
-          <planeGeometry args={[28, 28]} />
-          <meshStandardMaterial 
-            color="#4488aa" 
-            transparent 
-            opacity={0.8}
-            roughness={0.1}
-            metalness={0.3}
-          />
-        </mesh>
-        
-        {/* Oyuncu adası */}
-        <Island 
-          position={[0, 0, 0]} 
-          isPlayerIsland={true} 
-        />
-        
-        {/* Düşman adası - Uzakta */}
-        <Island 
-          position={[15, 0, 15]} 
-          isPlayerIsland={false} 
-        />
-      </group>
-    );
-  }
-};
-
-// Kamera kontrolü - Zoom ve rotasyon özellikleri eklenmiş
-const CameraController = () => {
-  const { camera, gl } = useThree();
-  const controls = useRef<any>();
   const { currentPhase } = usePeacockIslandsStore();
   
-  // Fazlara göre kamera pozisyonları
-  const isBattlePhase = currentPhase === "battle";
-  
-  // Zoom limitleri (TFT tarzında yakınlaşıp uzaklaşma)
-  const zoomLimits = {
-    min: isBattlePhase ? 6 : 5,  // Minimum zoom (daha yakın)
-    max: isBattlePhase ? 20 : 15  // Maximum zoom (daha uzak)
-  };
-  
-  useEffect(() => {
-    // Kamera başlangıç pozisyonu - Faza göre değişir
-    if (isBattlePhase) {
-      // Savaş fazı - Üstten bakış (TFT tarzı)
-      camera.position.set(0, 12, 0);
-      camera.lookAt(0, 0, 0);
-    } else {
-      // Hazırlık fazı - Daha çapraz bir bakış
-      camera.position.set(6, 8, 10);
-      camera.lookAt(0, 0, 0);
-    }
-    
-    // Kamera geçişi için animasyon
-    const animateCamera = () => {
-      if (controls.current) {
-        controls.current.update();
-      }
-    };
-    
-    // Kamera animasyonu
-    const timer = setInterval(animateCamera, 16);
-    
-    return () => {
-      clearInterval(timer);
-    };
-  }, [camera, currentPhase, isBattlePhase]);
-
-  // Kullanıcı eylemsizliğini izle ve yönlendir
-  const [inactiveTimer, setInactiveTimer] = useState(0);
-  const [showHint, setShowHint] = useState(false);
-  
-  useEffect(() => {
-    let timer: number;
-    const incrementTimer = () => {
-      setInactiveTimer(prev => {
-        const newValue = prev + 1;
-        if (newValue > 5 && !showHint) { // 5 saniye hareketsiz kalındığında ipucu göster
-          setShowHint(true);
-        }
-        return newValue;
-      });
-    };
-    
-    // Eylemsizlik zamanlayıcısı
-    timer = window.setInterval(incrementTimer, 1000);
-    
-    // Herhangi bir fare hareketi veya tıklaması olduğunda zamanlayıcıyı sıfırla
-    const resetTimer = () => {
-      setInactiveTimer(0);
-      setShowHint(false);
-    };
-    
-    window.addEventListener('mousemove', resetTimer);
-    window.addEventListener('mousedown', resetTimer);
-    window.addEventListener('touchstart', resetTimer);
-    window.addEventListener('keydown', resetTimer);
-    
-    return () => {
-      window.clearInterval(timer);
-      window.removeEventListener('mousemove', resetTimer);
-      window.removeEventListener('mousedown', resetTimer);
-      window.removeEventListener('touchstart', resetTimer);
-      window.removeEventListener('keydown', resetTimer);
-    };
-  }, [showHint]);
-  
   return (
-    <>
-      <OrbitControls
-        ref={controls}
-        args={[camera, gl.domElement]}
-        enableZoom={true}
-        enablePan={false} // Kamera kaydırma kapalı
-        enableRotate={!isBattlePhase} // Savaş fazında rotasyonu engelle
-        minDistance={zoomLimits.min}
-        maxDistance={zoomLimits.max}
-        minPolarAngle={isBattlePhase ? Math.PI / 3 : Math.PI / 6} // Alt açı limiti
-        maxPolarAngle={isBattlePhase ? Math.PI / 2.1 : Math.PI / 2.5} // Üst açı limiti
-        target={[0, 0, 0]}
-        zoomSpeed={1.2} // Zoom hızı arttırıldı
-      />
+    <group>
+      {/* Oyuncu alanı */}
+      <group position={[0, 0, 3]}>
+        <Island isPlayerIsland={true} />
+      </group>
       
-      {/* Kullanıcı ipucu - 5 saniyeden fazla hareketsiz kalınca gösterilir */}
-      {showHint && !isBattlePhase && (
-        <Text
-          position={[0, 5, 0]}
-          color="white"
-          fontSize={0.5}
-          maxWidth={5}
-          textAlign="center"
-          anchorX="center"
-          anchorY="middle"
-          outlineWidth={0.05}
-          outlineColor="#000000"
-        >
-          {currentPhase === "preparation" ? 
-            "Fare tekerleği ile yakınlaşıp uzaklaşabilirsiniz. WASD tuşları ile pengueni hareket ettirebilirsiniz." :
-            "Savaş devam ediyor..."
-          }
-        </Text>
-      )}
-    </>
+      {/* Düşman alanı */}
+      <group position={[0, 0, -3]}>
+        <Island isPlayerIsland={false} />
+      </group>
+      
+      {/* Deniz */}
+      <AnimatedWater position={[0, -0.5, 0]} size={30} />
+    </group>
   );
 };
 
@@ -855,19 +296,8 @@ const GameBoard3D = () => {
       >
         <color attach="background" args={[backgroundColor]} />
         
-        {/* Basitleştirilmiş Gökyüzü */}
-        <Sky
-          distance={300000}
-          sunPosition={isBattlePhase ? [0, 0.1, -1] : [1, 0.25, 0]}
-          inclination={0.5}
-          azimuth={0.25}
-        />
-        
-        {/* Ortam Aydınlatma */}
-        <Environment preset={isBattlePhase ? "night" : "sunset"} />
-        
-        {/* Gelişmiş Işıklandırma Sistemi */}
-        <ambientLight intensity={0.5} color={isBattlePhase ? "#4466aa" : "#b09080"} />
+        {/* Ortam ışığı */}
+        <ambientLight intensity={0.5} />
         
         {/* Ana yönlü ışık - Güneş benzeri */}
         <directionalLight 
@@ -880,24 +310,19 @@ const GameBoard3D = () => {
           shadow-camera-right={10}
           shadow-camera-top={10}
           shadow-camera-bottom={-10}
-          shadow-bias={-0.0005}
-          color={isBattlePhase ? "#aaccff" : "#ffcc88"}
         />
         
-        {/* Yumuşak dolgu ışığı - Gölgeleri yumuşatır */}
-        <directionalLight 
-          position={[-8, 10, -5]} 
-          intensity={0.8} 
-          color={isBattlePhase ? "#5080ff" : "#ffb86c"}
-          castShadow={false}
+        {/* Dramatik arka ışık */}
+        <directionalLight
+          position={[-5, 5, -5]}
+          intensity={0.5}
+          color="#aabbff"
         />
         
-        {/* Alt aydınlatma - Dramatik efekt */}
-        <spotLight
-          position={[0, -5, 0]}
-          angle={Math.PI / 4}
-          penumbra={0.5}
-          intensity={0.3}
+        {/* Dekoratif ışıklar */}
+        <pointLight
+          position={[5, 5, 5]}
+          intensity={0.8}
           color={isBattlePhase ? "#3355cc" : "#cc7733"}
           distance={20}
           castShadow={false}
@@ -917,13 +342,6 @@ const GameBoard3D = () => {
           position={[15, 3, 15]}
           intensity={0.6}
           color={isBattlePhase ? "#66aaff" : "#ff9966"}
-          distance={15}
-          decay={2}
-        />
-        <pointLight
-          position={[-15, 3, -15]}
-          intensity={0.6}
-          color={isBattlePhase ? "#6688ff" : "#ffcc55"}
           distance={15}
           decay={2}
         />
@@ -949,15 +367,23 @@ const GameBoard3D = () => {
           count={20}
           scale={10}
           size={0.4}
-          speed={0.2}
-          opacity={0.15}
-          color={isBattlePhase ? "#5050ff" : "#ffbb33"}
+          speed={0.3}
+          opacity={0.2}
+          position={[0, 5, 0]}
+          noise={1}
         />
         
-        {/* Kamera kontrolleri */}
-        <CameraController />
-        
-        {/* Klavye kontrolleri ve oyuncu karakteri */}
+        {/* Kamera Kontrolü */}
+        <OrbitControls
+          enableZoom={true}
+          enablePan={true}
+          enableRotate={true}
+          minDistance={5}
+          maxDistance={15}
+          maxPolarAngle={Math.PI / 2 - 0.1}
+        />
+
+        {/* Keyboard kontrollerimiz için Context */}
         <KeyboardControls
           map={[
             { name: "KeyW", keys: ["ArrowUp", "KeyW"] },
