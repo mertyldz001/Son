@@ -9,7 +9,8 @@ import {
   Float,
   MeshDistortMaterial,
   PresentationControls,
-  PerspectiveCamera
+  PerspectiveCamera,
+  OrthographicCamera
 } from '@react-three/drei';
 
 // Performans için efektler kaldırıldı
@@ -407,11 +408,11 @@ const GameScene = () => {
   
   return (
     <>
-      {/* Düz görünüm için top-down kamera - grid üzerine düz bak */}
-      <OrthographicCamera 
-        position={[0, 10, 0]} 
-        rotation={[-Math.PI/2, 0, 0]} 
-        zoom={40}
+      {/* Düz görünüm için kamera */}
+      <PerspectiveCamera 
+        position={[0, 0, 15]} 
+        rotation={[0, 0, 0]} 
+        fov={30}
         near={0.1} 
         far={100}
         makeDefault
