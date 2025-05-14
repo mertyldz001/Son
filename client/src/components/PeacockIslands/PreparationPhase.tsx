@@ -135,30 +135,40 @@ const PreparationPhase = () => {
       
       {/* UI Overlays */}
       <div className="absolute inset-0 z-10 p-4 pointer-events-none">
-        {/* Üst panel - Tur bilgileri */}
-        <div className="glass-panel p-4 rounded-lg mb-4 flex justify-between items-center pointer-events-auto">
-          <div className="flex flex-col">
-            <h2 className="text-2xl font-bold text-white flex items-center">
-              <span className="material-icons mr-2 text-amber-400">diamond</span>
-              Hazırlık Fazı
-            </h2>
-            <p className="text-sm text-blue-200">Kaynaklarınızı yönetin ve adanızı geliştirin</p>
+        {/* Üst panel - Tur bilgileri (Daha modern ve küçük) */}
+        <div className="flex justify-between w-full items-center pointer-events-auto">
+          <div className="bg-gradient-to-r from-amber-900/80 to-amber-800/70 px-4 py-2 rounded-lg border border-amber-500/30 shadow-lg backdrop-blur-sm flex items-center space-x-2 transform -translate-y-1">
+            <div className="p-1.5 bg-amber-700/50 rounded-md">
+              <span className="material-icons text-amber-300" style={{ fontSize: '18px' }}>diamond</span>
+            </div>
+            <div>
+              <h2 className="text-base font-medium text-amber-200 flex items-center">
+                Hazırlık Fazı
+              </h2>
+              <p className="text-xs text-amber-200/70 font-light">Kaynaklarınızı yönetin ve adanızı geliştirin</p>
+            </div>
           </div>
           
-          <div className="flex items-center gap-4">
-            <div className="glass-panel px-4 py-2 rounded-md text-white flex items-center bg-blue-900/50 border border-blue-400/30">
-              <span className="material-icons mr-2 text-blue-300">timer</span>
-              <span className="font-bold text-xl">
+          <div className="flex items-center gap-3">
+            <div className="px-3 py-2 rounded-lg text-white flex items-center bg-gradient-to-r from-blue-900/90 to-blue-800/70 border border-blue-500/30 shadow-lg backdrop-blur-sm">
+              <span className="material-icons mr-1.5 text-blue-300" style={{ fontSize: '16px' }}>timer</span>
+              <span className="font-medium">
                 {Math.floor(preparationTimeLeft)}
-                <span className="text-xs ml-1 text-blue-300">sn</span>
+                <span className="text-xs ml-0.5 text-blue-300">sn</span>
               </span>
             </div>
             
-            <div className="glass-panel px-4 py-2 rounded-md text-white flex items-center bg-purple-900/50 border border-purple-400/30">
-              <span className="material-icons mr-2 text-purple-300">emoji_events</span>
-              <span className="font-bold text-xl">
-                Tur {currentTurn}
-              </span>
+            <div className="px-3 py-2 rounded-lg text-white flex items-center bg-gradient-to-r from-indigo-900/90 to-indigo-800/70 border border-indigo-500/30 shadow-lg backdrop-blur-sm">
+              <span className="material-icons mr-1.5 text-indigo-300" style={{ fontSize: '16px' }}>flag</span>
+              <span className="font-medium">Tur {currentTurn}/5</span>
+            </div>
+            
+            {/* NPC Aktivitesi - Sağ tarafta modern tasarım */}
+            <div className="px-3 py-2 rounded-lg text-white flex items-center bg-gradient-to-r from-purple-900/90 to-purple-800/70 border border-purple-500/30 shadow-lg backdrop-blur-sm" 
+                 title="NPC Aktiviteleri (Bilgisayar rakip)">
+              <span className="material-icons mr-1.5 text-purple-300" style={{ fontSize: '16px' }}>bolt</span>
+              <span className="font-medium">NPC</span>
+              <div className="w-2 h-2 ml-1.5 rounded-full bg-purple-400 animate-pulse"></div>
             </div>
           </div>
         </div>
