@@ -42,12 +42,27 @@ function HexTile({
         rotation={[-Math.PI / 2, 0, 0]}
         onPointerOver={onHover}
         onPointerOut={onUnhover}
+        onClick={(e) => {
+          e.stopPropagation();
+          // Özel olay tetikle
+          window.dispatchEvent(
+            new CustomEvent('hex-click', { 
+              detail: { 
+                hexCoords,
+                isPlayerSide,
+                isOccupied 
+              } 
+            })
+          );
+        }}
         userData={{ 
           hexCoords,
           type: "hex-tile",
           q: hexCoords.q,
           r: hexCoords.r,
-          s: hexCoords.s
+          s: hexCoords.s,
+          isPlayerSide,
+          isOccupied
         }}
       >
         <cylinderGeometry args={[size * 0.95, size * 0.95, 0.1, 6]} />

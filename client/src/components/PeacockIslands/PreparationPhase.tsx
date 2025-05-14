@@ -157,6 +157,45 @@ const PreparationPhase = () => {
 
   // NOT: Yukarıda deployedUnits değişkeni zaten tanımlandı
   
+  // Mouse ve hex tıklamalarını takip ederek sürükleme işlemini yönet
+  useEffect(() => {
+    const handleMouseUp = () => {
+      if (draggedUnit) {
+        // Eğer sürükleme aktifse ve boşluğa tıklanırsa, bitir
+        setDraggedUnit(null);
+      }
+    };
+    
+    // Hex tıklamaları için özel olay dinleyici
+    const handleHexClick = (e: CustomEvent) => {
+      if (draggedUnit) {
+        // Güvenlik kontrolü
+        const detail = e.detail as { 
+          hexCoords: { q: number, r: number, s: number },
+          isPlayerSide: boolean,
+          isOccupied: boolean 
+        };
+        
+        // Sadece oyuncu tarafına ve boş hücrelere koy
+        if (detail.isPlayerSide && !detail.isOccupied) {
+          console.log('Hex tıklandı:', detail.hexCoords);
+          deployUnit(player.id, draggedUnit.id, detail.hexCoords);
+          playClick();
+          setDraggedUnit(null);
+        }
+      }
+    };
+    
+    // Olayları dinle
+    window.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener('hex-click', handleHexClick as EventListener);
+    
+    return () => {
+      window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('hex-click', handleHexClick as EventListener);
+    };
+  }, [draggedUnit, player.id, deployUnit, playClick]);
+
   return (
     <div className="w-full h-full relative">
       {/* 3D Game Board as background */}
