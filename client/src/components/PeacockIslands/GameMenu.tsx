@@ -8,44 +8,37 @@ const GameMenu = () => {
   const { backgroundMusic, toggleMute, isMuted, setBackgroundMusic } = useAudio();
   const [loading, setLoading] = useState(true);
   
-  // Yeni müzik dosyasını yükle ve arka plan müziği olarak ayarla
-  useEffect(() => {
-    // Müzik yükleme işlevi
-    const loadMusic = async () => {
-      try {
-        const newMusic = new Audio("/music/medieval-fantasy-rpg.mp3");
-        newMusic.loop = true;
-        newMusic.volume = 0.3;
-        setBackgroundMusic(newMusic);
-        
-        // Autoplay Policy: Kullanıcı etkileşimi gerekiyor
-        const playMusic = () => {
-          if (!isMuted && newMusic) {
-            // Play promise'i yakalayıp hataları ele alalım
-            const playPromise = newMusic.play();
-            
-            if (playPromise !== undefined) {
-              playPromise.then(() => {
-                console.log("Müzik başlatıldı!");
-              }).catch(err => {
-                console.error("Müzik başlatılamadı:", err);
-              });
-            }
-          }
-        };
-        
-        // Kullanıcı etkileşimi olmadan müzik çalamayız, bu yüzden click event dinleyelim
-        document.addEventListener('click', playMusic, { once: true });
-        document.addEventListener('keydown', playMusic, { once: true });
-        
-        setLoading(false);
-      } catch (error) {
-        console.error("Müzik yüklenemedi:", error);
-        setLoading(false);
+  // Kullanıcı bir düğmeye tıkladığında müziği başlatacak işlev
+  const [musicEnabled, setMusicEnabled] = useState(false);
+  const [musicButton, setMusicButton] = useState("Müziği Başlat");
+  
+  const handleStartMusic = () => {
+    try {
+      // Kullanıcı etkileşimi ile müziği başlat
+      const newMusic = new Audio("/music/medieval-fantasy-rpg.mp3");
+      newMusic.loop = true;
+      newMusic.volume = 0.3;
+      
+      // Müziği başlat
+      const playPromise = newMusic.play();
+      if (playPromise !== undefined) {
+        playPromise.then(() => {
+          console.log("Müzik başlatıldı!");
+          setBackgroundMusic(newMusic);
+          setMusicEnabled(true);
+          setMusicButton("Müzik Çalıyor ✓");
+        }).catch(err => {
+          console.error("Müzik başlatılamadı:", err);
+        });
       }
-    };
-    
-    loadMusic();
+    } catch (error) {
+      console.error("Müzik başlatılamadı:", error);
+    }
+  };
+  
+  // Sayfa yüklendiğinde hemen yükleme durumunu kaldır
+  useEffect(() => {
+    setLoading(false);
     
     // Temizlik işlevi
     return () => {
