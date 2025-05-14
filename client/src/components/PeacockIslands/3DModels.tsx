@@ -1,13 +1,22 @@
 import { useRef, useState, useEffect } from "react";
-import { useGLTF, Float, Sparkles } from "@react-three/drei";
+import { useGLTF, Float, Sparkles, useTexture } from "@react-three/drei";
 import { GLTF } from "three-stdlib";
 import * as THREE from "three";
 
+// Hata yakalama fonksiyonu
+function useSafeGLTF(path: string) {
+  const [error, setError] = useState(false);
+  const gltf = useGLTF(path, undefined, undefined, (error) => {
+    console.error(`Error loading model from ${path}:`, error);
+    setError(true);
+  });
+  
+  return { ...gltf, error };
+}
+
 // Modelleri önceden yükle - yüksek kaliteli versiyonlar
-useGLTF.preload('/models/peacock_feather.glb');
-useGLTF.preload('/models/magic_egg.glb');
-useGLTF.preload('/models/peacock_warrior.glb');
-useGLTF.preload('/models/human_soldier.glb');
+// useGLTF.preload kullanımını kaldırdık, hataya sebep olabilir
+// Modeller doğrudan bileşenlerde yüklenecek
 
 // Tip tanımlamaları
 type GLTFResult = GLTF & {
@@ -27,7 +36,31 @@ export function FeatherModel({ color = "green", position = [0, 0, 0], rotation =
   scale?: number;
 }) {
   const group = useRef<THREE.Group>(null);
-  const { scene } = useGLTF('/models/peacock_feather.glb') as GLTFResult;
+  const { scene, error } = useSafeGLTF('/models/peacock_feather.glb') as GLTFResult & { error: boolean };
+  
+  // Model yüklenemezse basit bir alternatif gösteriyoruz
+  if (error) {
+    console.warn("Tüy modeli yüklenemedi, basit alternatif kullanılıyor");
+    const meshColor = 
+      color === "green" ? "#00ff88" : 
+      color === "blue" ? "#2288ff" : 
+      "#ff8800";
+      
+    return (
+      <Float
+        speed={2}
+        rotationIntensity={0.2}
+        floatIntensity={0.2}
+        position={position}
+        rotation={rotation}
+      >
+        <mesh scale={[0.1, 0.5, 0.05]}>
+          <boxGeometry />
+          <meshStandardMaterial color={meshColor} emissive={meshColor} emissiveIntensity={0.2} />
+        </mesh>
+      </Float>
+    );
+  }
   
   // Animasyon için başlangıç değeri
   const [rotationOffset] = useState(Math.random() * Math.PI * 2);
@@ -90,7 +123,7 @@ export function FeatherModel({ color = "green", position = [0, 0, 0], rotation =
       rotation={rotation}
     >
       <group ref={group} scale={[scale * 1.5, scale * 1.5, scale * 1.5]}>
-        <primitive object={scene.clone()} />
+        <primitive object={scene} />
         
         {/* Renge göre nokta ışık kaynağı */}
         <pointLight
@@ -130,7 +163,46 @@ export function EggModel({ color = "green", position = [0, 0, 0], rotation = [0,
   isActive?: boolean;
 }) {
   const group = useRef<THREE.Group>(null);
-  const { scene } = useGLTF('/models/magic_egg.glb') as GLTFResult;
+  const { scene, error } = useSafeGLTF('/models/magic_egg.glb') as GLTFResult & { error: boolean };
+  
+  // Model yüklenemezse basit bir alternatif gösteriyoruz
+  if (error) {
+    console.warn("Yumurta modeli yüklenemedi, basit alternatif kullanılıyor");
+    const meshColor = 
+      color === "green" ? "#00ff88" : 
+      color === "blue" ? "#2288ff" : 
+      "#ff8800";
+    
+    return (
+      <Float 
+        speed={isActive ? 1.5 : 1} 
+        rotationIntensity={isActive ? 0.3 : 0.1} 
+        floatIntensity={isActive ? 0.5 : 0.2}
+        position={position}
+        rotation={rotation}
+      >
+        <mesh scale={[scale * 0.4, scale * 0.6, scale * 0.4]}>
+          <sphereGeometry />
+          <meshStandardMaterial 
+            color={meshColor} 
+            emissive={meshColor} 
+            emissiveIntensity={isActive ? 0.5 : 0.1}
+            metalness={0.6}
+            roughness={0.2}
+          />
+        </mesh>
+        
+        {isActive && (
+          <pointLight
+            position={[0, 0.3, 0]}
+            intensity={0.5}
+            distance={1.5}
+            color={meshColor}
+          />
+        )}
+      </Float>
+    );
+  }
   
   // Animasyon için başlangıç değeri
   const [rotationOffset] = useState(Math.random() * Math.PI * 2);
@@ -217,7 +289,7 @@ export function EggModel({ color = "green", position = [0, 0, 0], rotation = [0,
       rotation={rotation}
     >
       <group ref={group} scale={[scale * 1.3, scale * 1.3, scale * 1.3]}>
-        <primitive object={scene.clone()} />
+        <primitive object={scene} />
         
         {/* Aktif yumurtalar için parlama efekti */}
         {isActive && (
@@ -259,7 +331,68 @@ export function PeacockWarriorModel({ position = [0, 0, 0], rotation = [0, 0, 0]
   type?: "chick" | "juvenile" | "adult" | "alpha";
 }) {
   const group = useRef<THREE.Group>(null);
-  const { scene } = useGLTF('/models/peacock_warrior.glb') as GLTFResult;
+  const { scene, error } = useSafeGLTF('/models/peacock_warrior.glb') as GLTFResult & { error: boolean };
+  
+  // Düşman türüne göre renk belirle
+  const fallbackColor = 
+    type === "chick" ? "#ffcc44" :
+    type === "juvenile" ? "#ff9944" :
+    type === "alpha" ? "#ff3333" :
+    "#ff6644"; // adult
+    
+  const fallbackScale = 
+    type === "chick" ? scale * 0.5 :
+    type === "juvenile" ? scale * 0.75 :
+    type === "alpha" ? scale * 1.3 :
+    scale; // adult
+  
+  // Model yüklenemezse basit bir alternatif gösteriyoruz
+  if (error) {
+    console.warn("Tavus kuşu savaşçı modeli yüklenemedi, basit alternatif kullanılıyor");
+    
+    return (
+      <Float 
+        speed={type === "alpha" ? 1.5 : 1}
+        rotationIntensity={0.1}
+        floatIntensity={type === "alpha" ? 0.3 : 0.1}
+        position={position}
+        rotation={rotation}
+      >
+        <group>
+          {/* Gövde */}
+          <mesh scale={[0.3 * modelScale, 0.7 * modelScale, 0.3 * modelScale]}>
+            <boxGeometry />
+            <meshStandardMaterial 
+              color={modelColor}
+              emissive={type === "alpha" ? "#ff3300" : "#000000"}
+              emissiveIntensity={type === "alpha" ? 0.3 : 0}
+              metalness={0.4}
+              roughness={0.3}
+            />
+          </mesh>
+          
+          {/* Kafa */}
+          <mesh 
+            position={[0, 0.45 * modelScale, 0]} 
+            scale={[0.2 * modelScale, 0.2 * modelScale, 0.2 * modelScale]}
+          >
+            <sphereGeometry />
+            <meshStandardMaterial color={modelColor} />
+          </mesh>
+          
+          {/* Alpha olanlar için ışık efekti */}
+          {type === "alpha" && (
+            <pointLight 
+              position={[0, 0.5, 0]} 
+              intensity={0.5} 
+              distance={1.5} 
+              color="#ff3300" 
+            />
+          )}
+        </group>
+      </Float>
+    );
+  }
   
   // Düşman türüne göre boyut ve renk ayarla
   let modelScale = scale;
@@ -350,7 +483,7 @@ export function PeacockWarriorModel({ position = [0, 0, 0], rotation = [0, 0, 0]
       rotation={rotation}
     >
       <group ref={group} scale={[modelScale * 1.5, modelScale * 1.5, modelScale * 1.5]}>
-        <primitive object={scene.clone()} />
+        <primitive object={scene} />
         
         {/* Alpha düşmanlar için özel efektler */}
         {type === "alpha" && (
@@ -457,7 +590,7 @@ export function HumanSoldierModel({ position = [0, 0, 0], rotation = [0, 0, 0], 
       rotation={rotation}
     >
       <group ref={group} scale={[scale * 1.5, scale * 1.5, scale * 1.5]}>
-        <primitive object={scene.clone()} />
+        <primitive object={scene} />
         
         {/* Asker için mavi ışık efekti */}
         <pointLight 
