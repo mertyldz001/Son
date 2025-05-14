@@ -18,13 +18,27 @@ export function FeatherViewer({ color = "green", rotate = true, scale = 1, class
       >
         <ambientLight intensity={0.8} />
         <directionalLight position={[5, 5, 5]} intensity={1} castShadow />
+        <pointLight position={[0, 0, 2]} intensity={0.6} color={
+          color === "green" ? "#00ff88" : 
+          color === "blue" ? "#2288ff" : 
+          "#ff8800"
+        } />
         
-        <Suspense fallback={null}>
+        <Suspense fallback={
+          <mesh>
+            <sphereGeometry args={[0.5, 16, 16]} />
+            <meshStandardMaterial color={
+              color === "green" ? "#00ff88" : 
+              color === "blue" ? "#2288ff" : 
+              "#ff8800"
+            } />
+          </mesh>
+        }>
           <FeatherModel 
             color={color}
             position={[0, 0, 0]}
             rotation={[0, 0, 0]}
-            scale={scale}
+            scale={scale * 2.5} // Scale up for better visibility
           />
         </Suspense>
         
@@ -50,18 +64,40 @@ export function EggViewer({ color = "green", rotate = true, scale = 1, isActive 
       >
         <ambientLight intensity={0.5} />
         <directionalLight position={[5, 5, 5]} intensity={1} castShadow />
+        <pointLight position={[0, 0, 2]} intensity={isActive ? 1.2 : 0.6} color={
+          color === "green" ? "#00ff88" : 
+          color === "blue" ? "#2288ff" : 
+          "#ff8800"
+        } />
         
-        <Suspense fallback={null}>
+        <Suspense fallback={
+          <mesh>
+            <sphereGeometry args={[0.8, 16, 16]} />
+            <meshStandardMaterial 
+              color={
+                color === "green" ? "#00ff88" : 
+                color === "blue" ? "#2288ff" : 
+                "#ff8800"
+              } 
+              emissive={
+                color === "green" ? "#00aa44" : 
+                color === "blue" ? "#0044aa" : 
+                "#aa4400"
+              }
+              emissiveIntensity={isActive ? 0.8 : 0.3}
+            />
+          </mesh>
+        }>
           <EggModel 
             color={color}
             position={[0, 0, 0]}
             rotation={[0, 0, 0]}
-            scale={scale}
+            scale={scale * 2.5} // Scale up for better visibility
             isActive={isActive}
           />
         </Suspense>
         
-        {rotate && <OrbitControls autoRotate autoRotateSpeed={2} enableZoom={false} enablePan={false} />}
+        {rotate && <OrbitControls autoRotate autoRotateSpeed={isActive ? 3 : 2} enableZoom={false} enablePan={false} />}
       </Canvas>
     </div>
   );
@@ -82,17 +118,48 @@ export function PeacockWarriorViewer({ type = "adult", rotate = true, scale = 1,
       >
         <ambientLight intensity={0.8} />
         <directionalLight position={[5, 5, 5]} intensity={1} castShadow />
+        <pointLight position={[0, 0, 2]} intensity={type === "alpha" ? 1 : 0.6} color={
+          type === "chick" ? "#ffcc44" :
+          type === "juvenile" ? "#ff9944" :
+          type === "alpha" ? "#ff3333" :
+          "#ff6644" // adult
+        } />
         
-        <Suspense fallback={null}>
+        <Suspense fallback={
+          <group>
+            <mesh position={[0, -0.5, 0]} scale={[0.3, 0.7, 0.3]}>
+              <boxGeometry />
+              <meshStandardMaterial 
+                color={
+                  type === "chick" ? "#ffcc44" :
+                  type === "juvenile" ? "#ff9944" :
+                  type === "alpha" ? "#ff3333" :
+                  "#ff6644" // adult
+                }
+                emissive={type === "alpha" ? "#ff3300" : "#000000"}
+                emissiveIntensity={type === "alpha" ? 0.5 : 0}
+              />
+            </mesh>
+            <mesh position={[0, 0, 0]} scale={0.2}>
+              <sphereGeometry />
+              <meshStandardMaterial color={
+                type === "chick" ? "#ffcc44" :
+                type === "juvenile" ? "#ff9944" :
+                type === "alpha" ? "#ff3333" :
+                "#ff6644" // adult
+              } />
+            </mesh>
+          </group>
+        }>
           <PeacockWarriorModel 
             position={[0, -1, 0]}
             rotation={[0, 0, 0]}
-            scale={scale}
+            scale={scale * 2.5} // Scale up for better visibility
             type={type}
           />
         </Suspense>
         
-        {rotate && <OrbitControls autoRotate autoRotateSpeed={2} enableZoom={false} enablePan={false} />}
+        {rotate && <OrbitControls autoRotate autoRotateSpeed={type === "alpha" ? 3 : 2} enableZoom={false} enablePan={false} />}
       </Canvas>
     </div>
   );
@@ -112,12 +179,28 @@ export function HumanSoldierViewer({ rotate = true, scale = 1, className = "" }:
       >
         <ambientLight intensity={0.8} />
         <directionalLight position={[5, 5, 5]} intensity={1} castShadow />
+        <pointLight position={[0, 0, 2]} intensity={0.6} color="#8899ff" />
         
-        <Suspense fallback={null}>
+        <Suspense fallback={
+          <group>
+            <mesh position={[0, -0.5, 0]} scale={[0.3, 0.7, 0.3]}>
+              <boxGeometry />
+              <meshStandardMaterial 
+                color="#5566aa"
+                metalness={0.4}
+                roughness={0.3}
+              />
+            </mesh>
+            <mesh position={[0, 0, 0]} scale={0.2}>
+              <sphereGeometry />
+              <meshStandardMaterial color="#aabadd" />
+            </mesh>
+          </group>
+        }>
           <HumanSoldierModel 
             position={[0, -1, 0]}
             rotation={[0, 0, 0]}
-            scale={scale}
+            scale={scale * 2.5} // Scale up for better visibility
           />
         </Suspense>
         

@@ -14,8 +14,12 @@ function useSafeGLTF(path: string) {
   return { ...gltf, error };
 }
 
-// Modelleri önceden yükle - yüksek kaliteli versiyonlar oluşturdum
-// DİKKAT: useGLTF.preload hataları önlemek için kaldırıldı
+// Modelleri önceden yükle - yeni oluşturduğumuz yüksek kaliteli modeller
+// Bu sayede ilk görüntülenme sırasında takılma olmaz
+useGLTF.preload('/models/peacock_feather.glb');
+useGLTF.preload('/models/magic_egg.glb');
+useGLTF.preload('/models/peacock_warrior.glb');
+useGLTF.preload('/models/human_soldier.glb');
 
 // 3D modelleri işlemede grafik kartı belleğini optimize eden bir sistem
 const modelCache = {
