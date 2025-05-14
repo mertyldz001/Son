@@ -116,7 +116,7 @@ interface HexGridProps {
 
 const HexGrid: React.FC<HexGridProps> = ({ 
   size = 0.7, 
-  gridWidth = 6, 
+  gridWidth = 7, 
   gridHeight = 6,
   unitPositions,
   onTileHover
@@ -126,16 +126,16 @@ const HexGrid: React.FC<HexGridProps> = ({
   // Hexagon grid oluşturma
   const hexagons = [];
   
-  // Düz grid oluşturma - Sütunları dümdüz hizala
+  // TFT tarzı düzgün grid oluşturma - Sütunları tam düz hizala
+  // Her sütun kendi kolonunda olacak şekilde düzenle
   for (let r = 0; r < gridHeight; r++) {
-    const offset = Math.floor(r / 2);
-    
-    for (let q = -offset; q < gridWidth - offset; q++) {
+    // TFT tarzı düzen için ofseti kaldır - sütunlar düz olsun
+    for (let q = 0; q < gridWidth; q++) {
       const s = -q - r;
       const key = `${q},${r},${s}`;
       
-      // Pozisyonlar - dikey sütunlar için, daha düzgün sırala
-      const x = size * 2 * q;  // Daha geniş aralık
+      // Pozisyonlar - tam dikey sütunlar için
+      const x = size * 2 * (q - gridWidth/2 + 0.5);  // Merkezi hizalama için ofset ekle
       const z = size * 2 * r;  // Tam dikey hizalama
       
       // Düzeltilmiş: Oyuncu tarafı - tam ortadan ayrım

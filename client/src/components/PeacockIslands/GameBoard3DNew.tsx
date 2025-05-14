@@ -408,11 +408,11 @@ const GameScene = () => {
   
   return (
     <>
-      {/* Düz görünüm için kamera - basit ve net görüş */}
+      {/* TFT tarzı düz görünüm için kamera ayarı */}
       <PerspectiveCamera 
-        position={[0, 16, 16]} 
+        position={[0, 14, 18]} 
         rotation={[-Math.PI/4, 0, 0]} 
-        fov={30}
+        fov={35}
         near={0.1} 
         far={100}
         makeDefault
@@ -438,7 +438,7 @@ const GameScene = () => {
       <group position={[0, 0.1, 0]} scale={1}>
         <HexGrid 
           size={0.7} 
-          gridWidth={6} 
+          gridWidth={7} 
           gridHeight={6} 
           unitPositions={deployedUnitPositions}
           onTileHover={handleHexHover}
@@ -447,7 +447,7 @@ const GameScene = () => {
         {/* Sürüklenen birimin görsel önizlemesi - eğer varsa ve cursor hex üzerindeyse */}
         {dragCursor.visible && hoveredHex && (
           <group position={[
-            hoveredHex.q * 0.7 * 2, // hex boyutuna göre x pozisyonu - yeni boyuta göre ayarlandı
+            0.7 * 2 * (hoveredHex.q - 3.5 + 0.5), // Merkezi hizalama için düzeltme
             0.5, // y pozisyonu (yerden yükseklik)
             hoveredHex.r * 0.7 * 2 // hex boyutuna göre z pozisyonu - yeni boyuta göre ayarlandı
           ]}>
@@ -488,6 +488,8 @@ const GameBoard3D = () => {
   
   return (
     <div className="absolute inset-0 z-0 flex items-center justify-center">
+      {/* TFT tarzı yeşil zemin eklendi */}
+      <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-green-800 to-green-600 opacity-30 z-0"></div>
       <Canvas
         shadows
         className="w-full max-w-4xl h-full max-h-[85vh] mx-auto my-auto"
