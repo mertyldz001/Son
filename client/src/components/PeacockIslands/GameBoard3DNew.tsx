@@ -435,7 +435,7 @@ const GameScene = () => {
       <color attach="background" args={['#1a1a2e']} />
       
       {/* Hexagonal Savaş Alanı - Ortada */}
-      <group position={[0, 0.1, 0]}>
+      <group position={[0, 0.1, 0]} scale={1.2}>
         <HexGrid 
           size={0.8} 
           gridWidth={6} 
@@ -447,9 +447,9 @@ const GameScene = () => {
         {/* Sürüklenen birimin görsel önizlemesi - eğer varsa ve cursor hex üzerindeyse */}
         {dragCursor.visible && hoveredHex && (
           <group position={[
-            hoveredHex.q * 0.65 * 1.5, // hex boyutuna göre x pozisyonu
+            hoveredHex.q * 0.8 * 2, // hex boyutuna göre x pozisyonu - yeni boyuta göre ayarlandı
             0.5, // y pozisyonu (yerden yükseklik)
-            hoveredHex.r * 0.65 * Math.sqrt(3) + hoveredHex.q * 0.65 * 0.75 // hex boyutuna göre z pozisyonu
+            hoveredHex.r * 0.8 * 2 // hex boyutuna göre z pozisyonu - yeni boyuta göre ayarlandı
           ]}>
             {dragCursor.type === 'warrior' ? (
               <PeacockWarriorModel 

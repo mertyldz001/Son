@@ -65,17 +65,27 @@ function HexTile({
           isOccupied
         }}
       >
-        <boxGeometry args={[size * 1.8, 0.2, size * 1.8]} />
+        <boxGeometry args={[size * 1.8, 0.25, size * 1.8]} />
         <meshStandardMaterial 
           color={isHovered ? hoverColor : baseColor} 
           roughness={0.7}
           metalness={0.2}
           transparent={true}
-          opacity={isOccupied ? 0.7 : 0.9}
+          opacity={isOccupied ? 0.8 : 0.95}
         />
       </mesh>
       
-      {/* Kenar çizgisi performans için kaldırıldı */}
+      {/* Kenar çizgisi - daha kalın ve belirgin */}
+      <mesh 
+        position={[0, 0.03, 0]} 
+        rotation={[-Math.PI / 2, 0, 0]}
+      >
+        <ringGeometry args={[size * 1.6, size * 1.8, 6]} />
+        <meshBasicMaterial 
+          color={isHovered ? "#ffcc00" : "#3a506b"} 
+          side={THREE.DoubleSide} 
+        />
+      </mesh>
       
       {/* Koordinat bilgisi (debug için) */}
       {/*
