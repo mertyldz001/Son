@@ -306,7 +306,6 @@ const Battlefield = () => {
             <meshBasicMaterial 
               color={isPlayerSide ? "#66aaff" : "#ffaa66"} 
               wireframe={true}
-              linewidth={3}
             />
           </mesh>
           
@@ -355,7 +354,7 @@ const GameBoard3D = () => {
   const isBattlePhase = currentPhase === "battle";
   
   // Fazlara göre farklı kamera ve arka plan renkleri
-  const cameraPosition: [number, number, number] = isBattlePhase ? [0, 15, 0] : [8, 10, 12];
+  const cameraPosition: [number, number, number] = isBattlePhase ? [0, 18, 5] : [12, 14, 16];
   const backgroundColor = isBattlePhase ? "#1a3545" : "#2a4860";
   
   return (
@@ -485,6 +484,21 @@ const GameBoard3D = () => {
             luminanceThreshold={0.8}
           />
         </EffectComposer>
+        
+        {/* Kamera kontrolleri - Aktifleştirilmiş ve daha geniş açılı */}
+        <OrbitControls
+          enableDamping
+          dampingFactor={0.1}
+          rotateSpeed={0.8}
+          minDistance={8}
+          maxDistance={30}
+          enableZoom={true}
+          zoomSpeed={1.2}
+          enablePan={true}
+          panSpeed={0.8}
+          enabled={true}
+          maxPolarAngle={Math.PI / 1.5}
+        />
         
         {/* Gelişmiş sis efekti - Fazlara göre değişir */}
         <fog 
