@@ -407,11 +407,11 @@ const GameScene = () => {
   
   return (
     <>
-      {/* Sabit Kuş Bakışı Kamera */}
+      {/* Sabit Kuş Bakışı Kamera - Tam Düz Bakış Açısı */}
       <PerspectiveCamera 
-        position={[0, zoom, 0]} 
-        rotation={[-Math.PI/2, 0, 0]} 
-        fov={25} 
+        position={[0, zoom, -5]} 
+        rotation={[-Math.PI/3, 0, 0]} 
+        fov={30} 
         near={0.1} 
         far={100}
       />
