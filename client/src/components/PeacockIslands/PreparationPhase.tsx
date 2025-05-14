@@ -7,6 +7,7 @@ import GameBoard3D from "./GameBoard3D";
 import { FeatherViewer, EggViewer } from "./ModelViewer";
 import WindowPanel from "../UI/WindowPanel";
 
+// Hazırlık Fazı Bileşeni
 const PreparationPhase = () => {
   const { 
     player, 
@@ -337,389 +338,358 @@ const PreparationPhase = () => {
           </div>
           
           {/* Orta panel - Ada yönetimi ve tüy/yumurta sistemleri */}
-          <div className="flex-1 glass-panel rounded-lg p-4 flex flex-col text-white">
-            <h3 className="text-lg font-bold mb-3 flex items-center border-b border-indigo-500/30 pb-2">
-              <span className="material-icons mr-2 text-amber-400">auto_awesome</span>
-              Tüy ve Yumurta Yönetimi
-            </h3>
-            
-            <div className="flex gap-4 mb-4 flex-wrap">
-              {/* Tüy birleştirme paneli - WindowPanel */}
-              <WindowPanel 
-                title="Tüy Birleştirme" 
-                width="350px" 
-                height="auto"
-                initiallyMinimized={buildingSelected !== "feathers"}
+          <div className="flex-1 relative">
+            {/* Üst düğme çubuğu - TFT stilinde */}
+            <div className="absolute top-5 right-5 flex gap-3 z-10">
+              <button 
+                onClick={() => {
+                  playClick();
+                  setBuildingSelected(buildingSelected === "feathers" ? null : "feathers");
+                }}
+                className={`h-12 w-12 rounded-full flex items-center justify-center ${
+                  buildingSelected === "feathers" 
+                    ? "bg-gradient-to-br from-amber-400 to-amber-600 text-white ring-2 ring-amber-300 shadow-lg shadow-amber-900/50" 
+                    : "bg-gradient-to-br from-slate-700 to-slate-800 text-amber-200 hover:from-slate-600 hover:to-slate-700 shadow-md"
+                } transition-all duration-200 relative overflow-hidden`}
               >
-                <div className="glass-panel bg-slate-900/40 rounded-lg p-3 mb-3 border border-slate-600/20">
-                  <p className="text-xs text-gray-300">
-                    Aynı renkteki 3 tüyü birleştirerek yumurta elde edebilirsiniz.
-                    Her renk farklı bonuslar sağlar.
-                  </p>
+                <span className="material-icons text-xl">auto_awesome</span>
+                {buildingSelected === "feathers" && (
+                  <span className="absolute -bottom-1 left-0 right-0 h-1 bg-white rounded-full shadow-glow-amber animate-pulse"></span>
+                )}
+              </button>
+              
+              <button 
+                onClick={() => {
+                  playClick();
+                  setBuildingSelected(buildingSelected === "eggs" ? null : "eggs");
+                }}
+                className={`h-12 w-12 rounded-full flex items-center justify-center ${
+                  buildingSelected === "eggs" 
+                    ? "bg-gradient-to-br from-blue-400 to-blue-600 text-white ring-2 ring-blue-300 shadow-lg shadow-blue-900/50" 
+                    : "bg-gradient-to-br from-slate-700 to-slate-800 text-blue-200 hover:from-slate-600 hover:to-slate-700 shadow-md"
+                } transition-all duration-200 relative overflow-hidden`}
+              >
+                <span className="material-icons text-xl">egg</span>
+                {buildingSelected === "eggs" && (
+                  <span className="absolute -bottom-1 left-0 right-0 h-1 bg-white rounded-full shadow-glow-blue animate-pulse"></span>
+                )}
+              </button>
+              
+              <div className="h-8 w-0.5 bg-slate-600/30 mx-1 self-center"></div>
+              
+              <button 
+                onClick={() => {
+                  playClick();
+                  handleCollectFeathers();
+                }}
+                className="h-12 w-12 rounded-full bg-gradient-to-br from-green-500 to-emerald-700 text-white hover:from-green-400 hover:to-emerald-600 shadow-md hover:shadow-lg flex items-center justify-center transition-all duration-200"
+              >
+                <span className="material-icons text-xl">eco</span>
+              </button>
+            </div>
+            
+            {/* Bilgisayar göstergesi - Animasyonlu */}
+            <div className="absolute top-5 left-5 flex gap-2 z-10">
+              <div className="glass-panel py-1 px-3 rounded-md bg-gradient-to-r from-indigo-900/40 to-indigo-800/50 border border-indigo-500/30 shadow-lg flex items-center text-white text-xs font-medium">
+                <span className="material-icons mr-1 text-indigo-400 text-xs">computer</span>
+                <span>NPC Aktivite:</span>
+                <div className="ml-2 flex items-center justify-center space-x-0.5">
+                  <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-pulse-delay-1"></div>
+                  <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-pulse-delay-2"></div>
+                  <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-pulse-delay-3"></div>
                 </div>
-                
-                <h5 className="text-sm font-medium text-blue-300 mb-2 flex items-center">
-                  <span className="material-icons mr-1 text-xs">palette</span>
-                  Tüy Renkleri:
-                </h5>
-                <div className="grid grid-cols-3 gap-2 mb-3">
-                  <button
-                    className={`p-3 rounded-lg flex flex-col items-center justify-between ${
-                      featherColorSelected === "green" 
-                        ? "bg-green-950 border-2 border-green-500 shadow-lg shadow-green-900/40" 
-                        : "bg-green-950/40 border border-green-800 hover:bg-green-900/30"
-                    }`}
-                    onClick={() => {
-                      playClick();
-                      setFeatherColorSelected("green");
-                    }}
-                  >
-                    {/* 3D Tüy Modeli */}
-                    <div className="h-20 w-full">
-                      <FeatherViewer 
-                        color="green" 
-                        scale={0.6} 
-                        rotate={featherColorSelected === "green"}
-                      />
-                    </div>
-                    
-                    <div className="mt-auto w-full text-center">
-                      <span className="text-green-400 font-bold">Yeşil</span>
-                      <div className="bonus-badge mt-1 px-2 py-0.5 bg-green-900/60 rounded-full text-xs text-green-300">
-                        +20 Can
-                      </div>
-                    </div>
-                    
-                    <div className="count-badge absolute top-2 right-2 bg-green-700/80 text-white text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center border border-green-500/50">
-                      {player.island.featherInventory.green}
-                    </div>
-                  </button>
+              </div>
+            </div>
+            
+            {/* Tüy birleştirme paneli - TFT Kartları Stili */}
+            {buildingSelected === "feathers" && (
+              <div className="absolute top-20 right-5 z-10">
+                <div className="rounded-lg shadow-2xl w-72 overflow-hidden transform transition-all duration-300">
+                  {/* Başlık şeridi */}
+                  <div className="bg-gradient-to-r from-amber-700 to-amber-900 p-2 border-b border-amber-500/50 flex items-center justify-between">
+                    <h3 className="text-sm font-bold text-amber-100 flex items-center">
+                      <span className="material-icons text-amber-300 mr-2 text-sm">auto_awesome</span>
+                      Tüy Birleştirme
+                    </h3>
+                    <button 
+                      onClick={() => setBuildingSelected(null)} 
+                      className="text-amber-300 hover:text-amber-100"
+                    >
+                      <span className="material-icons text-sm">close</span>
+                    </button>
+                  </div>
                   
-                  <button
-                    className={`p-3 rounded-lg flex flex-col items-center justify-between ${
-                      featherColorSelected === "blue" 
-                        ? "bg-blue-950 border-2 border-blue-500 shadow-lg shadow-blue-900/40" 
-                        : "bg-blue-950/40 border border-blue-800 hover:bg-blue-900/30"
-                    }`}
-                    onClick={() => {
-                      playClick();
-                      setFeatherColorSelected("blue");
-                    }}
-                  >
-                    {/* 3D Tüy Modeli */}
-                    <div className="h-20 w-full">
-                      <FeatherViewer 
-                        color="blue" 
-                        scale={0.6} 
-                        rotate={featherColorSelected === "blue"}
-                      />
+                  {/* Kart içeriği - TFT stilinde */}
+                  <div className="bg-gradient-to-b from-slate-800 to-slate-900 p-3 border border-slate-700/50">
+                    <div className="bg-slate-800/50 rounded-md p-2 border border-amber-700/30 mb-3 shadow-inner shadow-amber-900/30">
+                      <p className="text-xs text-amber-100/80">
+                        Aynı renkteki 3 tüyü birleştirerek yumurta elde edebilirsiniz.
+                        Her renk farklı bonuslar sağlar.
+                      </p>
                     </div>
                     
-                    <div className="mt-auto w-full text-center">
-                      <span className="text-blue-400 font-bold">Mavi</span>
-                      <div className="bonus-badge mt-1 px-2 py-0.5 bg-blue-900/60 rounded-full text-xs text-blue-300">
-                        +20% Hız
-                      </div>
-                    </div>
-                    
-                    <div className="count-badge absolute top-2 right-2 bg-blue-700/80 text-white text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center border border-blue-500/50">
-                      {player.island.featherInventory.blue}
-                    </div>
-                  </button>
-                  
-                  <button
-                    className={`p-3 rounded-lg flex flex-col items-center justify-between ${
-                      featherColorSelected === "orange" 
-                        ? "bg-orange-950 border-2 border-orange-500 shadow-lg shadow-orange-900/40" 
-                        : "bg-orange-950/40 border border-orange-800 hover:bg-orange-900/30"
-                    }`}
-                    onClick={() => {
-                      playClick();
-                      setFeatherColorSelected("orange");
-                    }}
-                  >
-                    {/* 3D Tüy Modeli */}
-                    <div className="h-20 w-full">
-                      <FeatherViewer 
-                        color="orange" 
-                        scale={0.6} 
-                        rotate={featherColorSelected === "orange"}
-                      />
-                    </div>
-                    
-                    <div className="mt-auto w-full text-center">
-                      <span className="text-orange-400 font-bold">Turuncu</span>
-                      <div className="bonus-badge mt-1 px-2 py-0.5 bg-orange-900/60 rounded-full text-xs text-orange-300">
-                        +20 Saldırı
-                      </div>
-                    </div>
-                    
-                    <div className="count-badge absolute top-2 right-2 bg-orange-700/80 text-white text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center border border-orange-500/50">
-                      {player.island.featherInventory.orange}
-                    </div>
-                  </button>
-                </div>
-                
-                {featherColorSelected && (
-                  <div className="mt-3 space-y-3">
-                    <div className="glass-panel bg-slate-900/40 rounded-lg p-4 border border-slate-600/30">
-                      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-3">
-                        <h5 className="text-sm font-semibold text-gray-200 flex items-center">
-                          <span className="material-icons mr-1 text-sm">
-                            {featherColorSelected === "green" ? "emoji_nature" : 
-                             featherColorSelected === "blue" ? "water_drop" : "local_fire_department"}
-                          </span>
-                          <span className={
-                            featherColorSelected === "green" ? "text-green-400" : 
-                            featherColorSelected === "blue" ? "text-blue-400" : "text-orange-400"
-                          }>
-                            {getFeatherColorName(featherColorSelected)}
-                          </span>
-                          <span className="text-gray-300"> Tüy İşlemleri</span>
-                        </h5>
-                        
-                        <div className={`feather-count px-3 py-1 rounded-full text-xs border flex items-center mt-2 sm:mt-0 ${
+                    <h5 className="text-sm font-medium text-blue-300 mb-2 flex items-center">
+                      <span className="material-icons mr-1 text-xs">palette</span>
+                      Tüy Renkleri:
+                    </h5>
+                    <div className="grid grid-cols-3 gap-2 mb-3">
+                      <button
+                        className={`overflow-hidden rounded-lg flex flex-col items-center justify-between ${
                           featherColorSelected === "green" 
-                            ? "bg-green-900/40 text-green-300 border-green-700/50" 
-                            : featherColorSelected === "blue"
-                            ? "bg-blue-900/40 text-blue-300 border-blue-700/50"
-                            : "bg-orange-900/40 text-orange-300 border-orange-700/50"
-                        }`}>
-                          <span className="material-icons text-xs mr-1">inventory_2</span>
-                          Mevcut: <span className="font-bold ml-1">{player.island.featherInventory[featherColorSelected]}</span> adet
+                            ? "ring-2 ring-green-400 shadow-lg shadow-green-900/40 scale-105 transform" 
+                            : "hover:ring-1 hover:ring-green-400/50"
+                        } transition-all duration-200`}
+                        onClick={() => {
+                          playClick();
+                          setFeatherColorSelected("green");
+                        }}
+                      >
+                        <div className="h-16 w-full bg-gradient-to-b from-green-600/20 to-green-900/60 p-2 flex items-center justify-center relative">
+                          <FeatherViewer 
+                            color="green" 
+                            scale={0.5} 
+                            rotate={true}
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-green-900/90 to-transparent"></div>
+                          <div className="absolute bottom-1 right-1 bg-green-800/80 text-green-200 px-1.5 py-0.5 rounded-sm text-[10px] font-bold border border-green-600/60 shadow-sm">{player.island.featherInventory.green}</div>
                         </div>
-                      </div>
+                        <div className="bg-green-900 w-full py-1 text-[10px] text-green-100 font-medium text-center">CAN</div>
+                      </button>
                       
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <button
+                        className={`overflow-hidden rounded-lg flex flex-col items-center justify-between ${
+                          featherColorSelected === "blue" 
+                            ? "ring-2 ring-blue-400 shadow-lg shadow-blue-900/40 scale-105 transform" 
+                            : "hover:ring-1 hover:ring-blue-400/50"
+                        } transition-all duration-200`}
+                        onClick={() => {
+                          playClick();
+                          setFeatherColorSelected("blue");
+                        }}
+                      >
+                        <div className="h-16 w-full bg-gradient-to-b from-blue-600/20 to-blue-900/60 p-2 flex items-center justify-center relative">
+                          <FeatherViewer 
+                            color="blue" 
+                            scale={0.5} 
+                            rotate={true}
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-blue-900/90 to-transparent"></div>
+                          <div className="absolute bottom-1 right-1 bg-blue-800/80 text-blue-200 px-1.5 py-0.5 rounded-sm text-[10px] font-bold border border-blue-600/60 shadow-sm">{player.island.featherInventory.blue}</div>
+                        </div>
+                        <div className="bg-blue-900 w-full py-1 text-[10px] text-blue-100 font-medium text-center">HIZ</div>
+                      </button>
+                      
+                      <button
+                        className={`overflow-hidden rounded-lg flex flex-col items-center justify-between ${
+                          featherColorSelected === "orange" 
+                            ? "ring-2 ring-orange-400 shadow-lg shadow-orange-900/40 scale-105 transform" 
+                            : "hover:ring-1 hover:ring-orange-400/50"
+                        } transition-all duration-200`}
+                        onClick={() => {
+                          playClick();
+                          setFeatherColorSelected("orange");
+                        }}
+                      >
+                        <div className="h-16 w-full bg-gradient-to-b from-orange-600/20 to-orange-900/60 p-2 flex items-center justify-center relative">
+                          <FeatherViewer 
+                            color="orange" 
+                            scale={0.5} 
+                            rotate={true}
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-orange-900/90 to-transparent"></div>
+                          <div className="absolute bottom-1 right-1 bg-orange-800/80 text-orange-200 px-1.5 py-0.5 rounded-sm text-[10px] font-bold border border-orange-600/60 shadow-sm">{player.island.featherInventory.orange}</div>
+                        </div>
+                        <div className="bg-orange-900 w-full py-1 text-[10px] text-orange-100 font-medium text-center">SALDIRI</div>
+                      </button>
+                    </div>
+                    
+                    {/* TFT Stil Birleştirme Butonu */}
+                    <div className="mt-2 relative">
+                      {featherColorSelected ? (
                         <button
-                          className={`flex items-center justify-center gap-2 py-2 px-4 rounded-lg text-sm shadow-md transition-all duration-300 ${
-                            featherColorSelected === "green" 
-                              ? "bg-gradient-to-r from-green-700 to-green-800 hover:from-green-600 hover:to-green-700 text-white border border-green-600/50" 
-                              : featherColorSelected === "blue"
-                              ? "bg-gradient-to-r from-blue-700 to-blue-800 hover:from-blue-600 hover:to-blue-700 text-white border border-blue-600/50"
-                              : "bg-gradient-to-r from-orange-700 to-orange-800 hover:from-orange-600 hover:to-orange-700 text-white border border-orange-600/50"
-                          }`}
-                          onClick={() => handleCollectFeathers(featherColorSelected)}
-                        >
-                          <span className="material-icons text-sm">eco</span>
-                          Tüy Topla
-                        </button>
-                        
-                        <button
-                          className={`flex items-center justify-center gap-2 py-2 px-4 rounded-lg text-sm shadow-md transition-all duration-300 ${
+                          className={`w-full py-2 rounded-md font-bold text-sm flex items-center justify-center ${
                             player.island.featherInventory[featherColorSelected] >= 3
-                              ? (featherColorSelected === "green" 
-                                  ? "bg-gradient-to-r from-green-700 to-green-800 hover:from-green-600 hover:to-green-700 text-white border border-green-600/50" 
-                                  : featherColorSelected === "blue"
-                                  ? "bg-gradient-to-r from-blue-700 to-blue-800 hover:from-blue-600 hover:to-blue-700 text-white border border-blue-600/50"
-                                  : "bg-gradient-to-r from-orange-700 to-orange-800 hover:from-orange-600 hover:to-orange-700 text-white border border-orange-600/50")
-                              : "bg-gray-800/70 text-gray-400 cursor-not-allowed border border-gray-700/30"
-                          }`}
+                              ? "bg-gradient-to-r from-amber-600 to-amber-800 hover:from-amber-500 hover:to-amber-700 text-white shadow-md transform hover:scale-105 transition-all duration-200"
+                              : "bg-gray-800/70 text-gray-500 cursor-not-allowed"
+                          } overflow-hidden`}
                           onClick={() => {
                             if (player.island.featherInventory[featherColorSelected] >= 3) {
                               handleCombineFeathers(featherColorSelected);
                             }
                           }}
-                          disabled={player.island.featherInventory[featherColorSelected] < 3}
                         >
-                          <span className="material-icons text-sm">merge_type</span>
-                          3 Tüyü Birleştir
+                          <div className="absolute inset-0 overflow-hidden">
+                            <div className="absolute inset-0 opacity-20 bg-[url(https://i.imgur.com/m9dKmPQ.png)] bg-cover"></div>
+                          </div>
+                          <div className="z-10 flex items-center">
+                            <span className="material-icons mr-2 text-sm">auto_awesome</span>
+                            <span>3 Tüyü Birleştir</span>
+                          </div>
+                          {player.island.featherInventory[featherColorSelected] >= 3 && (
+                            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-amber-300 to-yellow-500 animate-pulse"></div>
+                          )}
                         </button>
+                      ) : (
+                        <div className="text-center text-gray-400 text-xs italic border border-gray-700/50 rounded-md py-2">
+                          Birleştirmek için bir tüy rengi seçin
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {/* Yumurta yönetimi paneli - TFT Tarzı */}
+            {buildingSelected === "eggs" && (
+              <div className="absolute top-20 right-5 z-10">
+                <div className="rounded-lg shadow-2xl w-72 overflow-hidden transform transition-all duration-300">
+                  {/* Başlık şeridi */}
+                  <div className="bg-gradient-to-r from-blue-700 to-blue-900 p-2 border-b border-blue-500/50 flex items-center justify-between">
+                    <h3 className="text-sm font-bold text-blue-100 flex items-center">
+                      <span className="material-icons text-blue-300 mr-2 text-sm">egg</span>
+                      Yumurta Yönetimi
+                    </h3>
+                    <button 
+                      onClick={() => setBuildingSelected(null)} 
+                      className="text-blue-300 hover:text-blue-100"
+                    >
+                      <span className="material-icons text-sm">close</span>
+                    </button>
+                  </div>
+                  
+                  {/* Kart içeriği - TFT stilinde */}
+                  <div className="bg-gradient-to-b from-slate-800 to-slate-900 p-3 border border-slate-700/50">
+                    <div className="bg-slate-800/50 rounded-md p-2 border border-blue-700/30 mb-3 shadow-inner shadow-blue-900/30">
+                      <p className="text-xs text-blue-100/80">
+                        Yumurtalarınızı kuluçka yuvalarına yerleştirin ve kalıcı bonuslar elde edin.
+                      </p>
+                    
+                    </div>
+
+                    {/* Yumurta Oluşturma Butonu - TFT Stili */}
+                    {player.island.resources.eggs > 0 && featherColorSelected && (
+                      <div className="mb-3 mt-4">
+                        <button
+                          className="relative w-full py-2 rounded-md overflow-hidden group"
+                          onClick={() => handleHatchEgg(featherColorSelected)}
+                        >
+                          <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-800 group-hover:from-blue-500 group-hover:to-blue-700 transition-all duration-300"></div>
+                          <div className="absolute inset-0 opacity-10 bg-[url(https://i.imgur.com/W4M5qMW.png)] bg-cover"></div>
+                          <div className="relative flex items-center justify-center text-white font-bold text-sm">
+                            <span className="material-icons text-sm mr-2">egg</span>
+                            <span>{getFeatherColorName(featherColorSelected)} Yumurta Oluştur</span>
+                          </div>
+                          <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-300 to-indigo-500 animate-pulse"></div>
+                        </button>
+                      </div>
+                    )}
+                    
+                    {/* Yumurta Sayısı Göstergesi */}
+                    <div className="flex items-center justify-between mb-4 bg-blue-900/30 rounded-md px-3 py-2 border border-blue-800/40">
+                      <div className="flex items-center">
+                        <span className="material-icons text-blue-400 mr-2">inventory_2</span>
+                        <span className="text-sm text-blue-200">Mevcut Yumurtalar:</span>
+                      </div>
+                      <div className="bg-blue-800/70 px-2 py-1 rounded-md text-white font-bold border border-blue-700/70">
+                        {player.island.resources.eggs}
                       </div>
                     </div>
                     
-                    {player.island.featherInventory[featherColorSelected] >= 3 && (
-                      <div className="combine-preview bg-gray-900/70 p-3 rounded-lg overflow-hidden">
-                        <h6 className="text-sm font-medium text-gray-300 mb-2 text-center">Tüyleri Birleştir</h6>
-                        
-                        <div className="grid grid-cols-5 gap-2">
-                          {/* Sol: Tüyler */}
-                          <div className="col-span-2 flex flex-col items-center">
-                            <div className="h-16 w-full">
-                              <FeatherViewer 
-                                color={featherColorSelected} 
-                                scale={0.4} 
-                                rotate={false}
-                              />
-                            </div>
-                            <div className="flex items-center mt-2">
-                              <span className="flex items-center justify-center px-2 py-1 rounded-lg bg-gray-800/80">
-                                <span className="font-bold text-white">x3</span>
-                                <span className="text-xs ml-1 text-gray-300">tüy</span>
-                              </span>
-                            </div>
-                          </div>
-                          
-                          {/* Orta: Ok */}
-                          <div className="flex items-center justify-center">
-                            <div className="arrow w-8 h-8 bg-gray-800/80 rounded-full flex items-center justify-center">
-                              <span className="material-icons transform scale-125 text-gray-300">
-                                arrow_forward
-                              </span>
-                            </div>
-                          </div>
-                          
-                          {/* Sağ: Yumurta */}
-                          <div className="col-span-2 flex flex-col items-center">
-                            <div className="h-16 w-full">
+                    <div className="space-y-3">
+                      {Object.entries(player.island.hatchery).map(([slotId, slot]) => (
+                        <div 
+                          key={slotId}
+                          className={`p-2 border rounded-lg flex flex-col items-center ${
+                            slot.status === "empty"
+                              ? "border-gray-600/30 bg-gray-800/20"
+                              : slot.status === "incubating"
+                                ? "border-blue-600/30 bg-blue-900/20"
+                                : "border-green-600/30 bg-green-900/20"
+                          } cursor-pointer relative`}
+                          onClick={() => setSelectedHatcherySlot(slot)}
+                        >
+                          <div className="h-16 w-full">
+                            {slot.status !== "empty" && slot.egg ? (
                               <EggViewer 
-                                color={featherColorSelected} 
-                                scale={0.7} 
+                                color={slot.egg?.color} 
+                                scale={0.6} 
                                 rotate={true}
+                                isActive={slot.status === "ready"}
                               />
-                            </div>
-                            <div className="flex items-center mt-2">
-                              <span className={`flex items-center justify-center px-2 py-1 rounded-lg ${
-                                featherColorSelected === "green" ? "bg-green-900/70" :
-                                featherColorSelected === "blue" ? "bg-blue-900/70" :
-                                "bg-orange-900/70"
-                              }`}>
-                                <span className="material-icons text-xs mr-1">
-                                  {featherColorSelected === "green" ? "favorite" :
-                                    featherColorSelected === "blue" ? "speed" :
-                                    "bolt"}
+                            ) : (
+                              <div className="flex items-center justify-center h-full">
+                                <span className="material-icons text-gray-500 text-3xl">egg</span>
+                              </div>
+                            )}
+                          </div>
+                          
+                          <div className="mt-2 w-full text-center">
+                            {slot.status === "empty" ? (
+                              <span className="text-gray-400 text-xs">Boş Yuva</span>
+                            ) : slot.status === "incubating" && slot.egg ? (
+                              <div>
+                                <span className={`text-xs font-medium ${
+                                  slot.egg?.color === "green" ? "text-green-400" : 
+                                  slot.egg?.color === "blue" ? "text-blue-400" : 
+                                  "text-orange-400"
+                                }`}>
+                                  Kuluçkada
                                 </span>
-                                <span className="text-xs">
-                                  {featherColorSelected === "green" ? "+20 Can" :
-                                   featherColorSelected === "blue" ? "+20% Hız" :
-                                   "+20 Saldırı"}
+                                <div className={`mt-1 px-2 py-0.5 rounded-full text-xs flex items-center justify-center ${
+                                  slot.egg?.color === "green" 
+                                    ? "bg-green-900/50 text-green-300" : 
+                                  slot.egg?.color === "blue" 
+                                    ? "bg-blue-900/50 text-blue-300" : 
+                                  "bg-orange-900/50 text-orange-300"
+                                }`}>
+                                  <span className="material-icons text-xs mr-1">
+                                    {slot.egg?.color === "green" ? "favorite" :
+                                     slot.egg?.color === "blue" ? "speed" :
+                                     "bolt"}
+                                  </span>
+                                  <span className="flex-1">
+                                    {slot.egg?.color === "green" ? "+20 Can" :
+                                     slot.egg?.color === "blue" ? "+20% Hız" :
+                                     "+20 Saldırı"}
+                                  </span>
+                                </div>
+                              </div>
+                            ) : slot.status === "ready" && slot.egg ? (
+                              <div>
+                                <span className={`text-xs font-medium ${
+                                  slot.egg?.color === "green" ? "text-green-400" : 
+                                  slot.egg?.color === "blue" ? "text-blue-400" : 
+                                  "text-orange-400"
+                                }`}>
+                                  Hazır!
                                 </span>
-                              </span>
-                            </div>
+                                <button 
+                                  className={`mt-1 px-3 py-1 rounded-lg text-xs w-full flex items-center justify-center ${
+                                    slot.egg?.color === "green" 
+                                      ? "bg-green-700 hover:bg-green-600 text-white" : 
+                                    slot.egg?.color === "blue" 
+                                      ? "bg-blue-700 hover:bg-blue-600 text-white" : 
+                                    "bg-orange-700 hover:bg-orange-600 text-white"
+                                  }`}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleActivateEgg(slotId);
+                                  }}
+                                >
+                                  <span className="material-icons text-xs mr-1">bolt</span>
+                                  Aktifleştir
+                                </button>
+                              </div>
+                            ) : null}
                           </div>
                         </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </WindowPanel>
-              
-              {/* Yumurta yönetimi - WindowPanel */}
-              <WindowPanel 
-                title="Yumurta Yönetimi" 
-                width="350px" 
-                height="auto"
-                initiallyMinimized={buildingSelected !== "eggs"}
-              >
-                <p className="text-xs text-gray-300 mb-3">
-                  Yumurtalarınızı kuluçka yuvalarına yerleştirin ve kalıcı bonuslar elde edin.
-                </p>
-                
-                {player.island.resources.eggs > 0 && featherColorSelected && (
-                  <div className="mb-3">
-                    <button
-                      className="bg-green-600 hover:bg-green-700 text-white py-1 px-3 rounded text-sm w-full"
-                      onClick={() => handleHatchEgg(featherColorSelected)}
-                    >
-                      {getFeatherColorName(featherColorSelected)} Yumurta Oluştur ve Kuluçkaya Koy
-                    </button>
-                  </div>
-                )}
-                
-                <h5 className="text-sm font-medium text-blue-300 mb-2 flex items-center">
-                  <span className="material-icons text-xs mr-1">egg</span>
-                  Kuluçka Yuvaları
-                </h5>
-                
-                <div className="grid grid-cols-3 gap-2">
-                  {Object.entries(player.island.hatchery).map(([slotId, slot]) => (
-                    <div 
-                      key={slotId} 
-                      className={`p-3 rounded-lg flex flex-col items-center justify-between ${
-                        selectedHatcherySlot === slot
-                          ? "bg-indigo-900/80 border-2 border-indigo-500/80"
-                          : "bg-gray-800/40 border border-gray-600/40 hover:bg-gray-700/40"
-                      } ${
-                        slot.status !== "empty" && slot.egg ? (
-                          slot.egg.color === "green" 
-                            ? "bg-gradient-to-br from-green-900/40 to-emerald-900/20 border-green-600/30" 
-                            : slot.egg.color === "blue"
-                            ? "bg-gradient-to-br from-blue-900/40 to-cyan-900/20 border-blue-600/30"
-                            : "bg-gradient-to-br from-orange-900/40 to-amber-900/20 border-orange-600/30"
-                        ) : ""
-                      } cursor-pointer relative`}
-                      onClick={() => setSelectedHatcherySlot(slot)}
-                    >
-                      {/* Yumurta Görüntüsü */}
-                      <div className="h-24 w-full">
-                        {slot.status !== "empty" && slot.egg ? (
-                          <EggViewer 
-                            color={slot.egg.color} 
-                            scale={0.7} 
-                            rotate={true}
-                            isActive={slot.status === "ready"}
-                          />
-                        ) : (
-                          <div className="flex items-center justify-center h-full">
-                            <span className="material-icons text-gray-500 text-4xl">egg</span>
-                          </div>
-                        )}
-                      </div>
-                      
-                      <div className="mt-2 w-full text-center">
-                        {slot.status === "empty" ? (
-                          <span className="text-gray-400 text-xs">Boş Yuva</span>
-                        ) : slot.status === "incubating" ? (
-                          <div>
-                            <span className={`text-xs font-medium ${
-                              slot.egg.color === "green" ? "text-green-400" : 
-                              slot.egg.color === "blue" ? "text-blue-400" : 
-                              "text-orange-400"
-                            }`}>
-                              Kuluçkada
-                            </span>
-                            <div className={`mt-1 px-2 py-0.5 rounded-full text-xs flex items-center justify-center ${
-                              slot.egg.color === "green" 
-                                ? "bg-green-900/50 text-green-300" : 
-                              slot.egg.color === "blue" 
-                                ? "bg-blue-900/50 text-blue-300" : 
-                              "bg-orange-900/50 text-orange-300"
-                            }`}>
-                              <span className="material-icons text-xs mr-1">
-                                {slot.egg.color === "green" ? "favorite" :
-                                 slot.egg.color === "blue" ? "speed" :
-                                 "bolt"}
-                              </span>
-                              <span className="flex-1">
-                                {slot.egg.color === "green" ? "+20 Can" :
-                                 slot.egg.color === "blue" ? "+20% Hız" :
-                                 "+20 Saldırı"}
-                              </span>
-                            </div>
-                          </div>
-                        ) : (
-                          <div>
-                            <span className={`text-xs font-medium ${
-                              slot.egg.color === "green" ? "text-green-400" : 
-                              slot.egg.color === "blue" ? "text-blue-400" : 
-                              "text-orange-400"
-                            }`}>
-                              Hazır!
-                            </span>
-                            <button 
-                              className={`mt-1 px-3 py-1 rounded-lg text-xs w-full flex items-center justify-center ${
-                                slot.egg.color === "green" 
-                                  ? "bg-green-700 hover:bg-green-600 text-white" : 
-                                slot.egg.color === "blue" 
-                                  ? "bg-blue-700 hover:bg-blue-600 text-white" : 
-                                "bg-orange-700 hover:bg-orange-600 text-white"
-                              }`}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleActivateEgg(slotId);
-                              }}
-                            >
-                              <span className="material-icons text-xs mr-1">bolt</span>
-                              Aktifleştir
-                            </button>
-                          </div>
-                        )}
-                      </div>
+                      ))}
                     </div>
-                  ))}
+                  </div>
                 </div>
-              </WindowPanel>
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
