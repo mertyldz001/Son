@@ -54,37 +54,51 @@ const AnimatedWater = ({ position = [0, 0, 0], size = 20 }) => {
   );
 };
 
-// Hex harita oluşturucu yardımcı fonksiyonlar
-const createHexPosition = (q: number, r: number, size: number = 1) => {
-  // Hex koordinatlarını 3D koordinatlara dönüştür
-  const x = size * (3/2 * q);
-  const z = size * (Math.sqrt(3)/2 * q + Math.sqrt(3) * r);
+// Izgara harita oluşturucu yardımcı fonksiyonlar
+const createGridPosition = (row: number, col: number, size: number = 1) => {
+  // 6x7 ızgara için pozisyon hesapla (merkez=0,0,0 olacak şekilde)
+  const gridWidth = 7 * size;
+  const gridHeight = 6 * size;
+  
+  // Ekranın ortasına hizalamak için ofset hesapla
+  const offsetX = -((gridWidth - size) / 2);
+  const offsetZ = -((gridHeight - size) / 2);
+  
+  // Hücre pozisyonunu hesapla
+  const x = offsetX + col * size;
+  const z = offsetZ + row * size;
+  
   return [x, 0, z];
 };
 
-// Altıgen savaş meydanı hücresi - TFT stilinde
-const BattleHex = ({ position, color, isHighlighted, isPlayerSide, isOccupied = false }: any) => {
+// Kare şeklinde savaş meydanı hücresi - TFT stilinde
+const BattleCell = ({ position, color, isHighlighted, isPlayerSide, isOccupied = false, cellId = "" }: any) => {
   const meshRef = useRef<THREE.Mesh>(null);
-  const lineRef = useRef<THREE.LineSegments>(null);
-  const glowRef = useRef<THREE.Mesh>(null);
+  const edgesRef = useRef<THREE.LineSegments>(null);
+  const highlightRef = useRef<THREE.Mesh>(null);
   const [hovered, setHovered] = useState(false);
+  
+  // Hücre boyutu - biraz daha küçük yaparak aralarında boşluk bırakıyoruz
+  const cellSize = 0.95; 
+  // Hücre yüksekliği
+  const cellHeight = 0.05;
   
   // Hover efektini yönet
   useFrame((_, delta) => {
-    if (!meshRef.current || !lineRef.current || !glowRef.current) return;
+    if (!meshRef.current || !edgesRef.current || !highlightRef.current) return;
     
     // Hover durumuna göre yükseklik ayarla
-    const targetY = hovered || isHighlighted ? 0.03 : 0;
+    const targetY = hovered || isHighlighted ? 0.02 : 0;
     meshRef.current.position.y += (targetY - meshRef.current.position.y) * 5 * delta;
-    lineRef.current.position.y = meshRef.current.position.y + 0.005; // Çizgileri yukarıda tut
-    glowRef.current.position.y = meshRef.current.position.y + 0.005; // Parlamayı yukarıda tut
+    edgesRef.current.position.y = meshRef.current.position.y; 
+    highlightRef.current.position.y = meshRef.current.position.y + 0.001;
     
     // Renk değişimini yönet
     const material = meshRef.current.material as THREE.MeshStandardMaterial;
-    const lineMaterial = lineRef.current.material as THREE.LineBasicMaterial;
-    const glowMaterial = glowRef.current.material as THREE.MeshBasicMaterial;
+    const edgeMaterial = edgesRef.current.material as THREE.LineBasicMaterial;
+    const highlightMaterial = highlightRef.current.material as THREE.MeshBasicMaterial;
     
-    // Altıgen rengi - TFT stili
+    // Hücre rengi - TFT stili
     const targetColor = new THREE.Color(
       isHighlighted ? (isPlayerSide ? '#88aaff' : '#ffaa88') : 
       hovered ? (isPlayerSide ? '#6699ee' : '#ee9966') : 
@@ -94,104 +108,89 @@ const BattleHex = ({ position, color, isHighlighted, isPlayerSide, isOccupied = 
     material.color.lerp(targetColor, 8 * delta);
     
     // Kenar çizgisi görünürlüğü
-    const targetOpacity = hovered || isHighlighted || isOccupied ? 0.8 : 0.3;
-    lineMaterial.opacity += (targetOpacity - lineMaterial.opacity) * 5 * delta;
+    const targetEdgeOpacity = hovered || isHighlighted || isOccupied ? 0.9 : 0.5;
+    edgeMaterial.opacity += (targetEdgeOpacity - edgeMaterial.opacity) * 5 * delta;
     
-    // Parlaklık efekti
-    const glowOpacity = hovered || isHighlighted ? 
-                         0.4 : 
-                         isOccupied ? 0.2 : 0.0;
-    glowMaterial.opacity += (glowOpacity - glowMaterial.opacity) * 3 * delta;
+    // Vurgu efekti
+    const targetHighlightOpacity = hovered || isHighlighted ? 0.3 : isOccupied ? 0.15 : 0.0;
+    highlightMaterial.opacity += (targetHighlightOpacity - highlightMaterial.opacity) * 3 * delta;
     
-    // Şeffaflık ayarı - TFT'deki gibi boş altıgenler hafif görünür
-    const targetAlpha = isOccupied ? 0.85 : hovered || isHighlighted ? 0.7 : 0.35;
+    // Şeffaflık ayarı - TFT'deki gibi boş hücreler hafif görünür
+    const targetAlpha = isOccupied ? 0.9 : hovered || isHighlighted ? 0.8 : 0.4;
     material.opacity += (targetAlpha - material.opacity) * 5 * delta;
-    
-    // Rotation animation for glow
-    if (glowRef.current && (hovered || isHighlighted || isOccupied)) {
-      glowRef.current.rotation.z += delta * 0.5;
-    }
   });
   
-  // Altıgen şeklini oluştur
-  const hexShape = useMemo(() => {
-    const shape = new THREE.Shape();
-    const size = 0.5; // Altıgen boyutu
+  // Kare kenarları için geometri oluştur
+  const edgesGeometry = useMemo(() => {
+    const halfSize = cellSize / 2;
+    const points: THREE.Vector3[] = [
+      new THREE.Vector3(-halfSize, 0, -halfSize),
+      new THREE.Vector3(halfSize, 0, -halfSize),
+      new THREE.Vector3(halfSize, 0, halfSize),
+      new THREE.Vector3(-halfSize, 0, halfSize),
+      new THREE.Vector3(-halfSize, 0, -halfSize)
+    ];
     
-    // Altıgen şekli oluştur
-    for (let i = 0; i < 6; i++) {
-      const angle = (Math.PI / 3) * i;
-      const x = size * Math.cos(angle);
-      const y = size * Math.sin(angle);
-      if (i === 0) {
-        shape.moveTo(x, y);
-      } else {
-        shape.lineTo(x, y);
-      }
-    }
-    shape.closePath();
-    
-    return shape;
-  }, []);
-  
-  // Altıgen kenarları için geometri oluştur
-  const hexEdges = useMemo(() => {
-    const points: THREE.Vector3[] = [];
-    const size = 0.5;
-    
-    // Altıgen kenar noktalarını oluştur
-    for (let i = 0; i <= 6; i++) {
-      const angle = (Math.PI / 3) * (i % 6);
-      const x = size * Math.cos(angle);
-      const z = size * Math.sin(angle);
-      points.push(new THREE.Vector3(x, 0, z));
-    }
-    
-    const geometry = new THREE.BufferGeometry().setFromPoints(points);
-    return geometry;
-  }, []);
+    return new THREE.BufferGeometry().setFromPoints(points);
+  }, [cellSize]);
   
   return (
     <group position={position}>
-      {/* Altıgen dolgusu */}
+      {/* Kare dolgusu - hücre zemini */}
       <mesh 
         ref={meshRef}
         receiveShadow
-        rotation={[-Math.PI / 2, 0, 0]} // Yatay pozisyonda
         onPointerOver={() => setHovered(true)}
         onPointerOut={() => setHovered(false)}
       >
-        <extrudeGeometry 
-          args={[
-            hexShape,
-            {
-              depth: 0.08,
-              bevelEnabled: true,
-              bevelSegments: 1,
-              bevelSize: 0.01,
-              bevelThickness: 0.01
-            }
-          ]} 
-        />
+        <boxGeometry args={[cellSize, cellHeight, cellSize]} />
         <meshStandardMaterial 
           color={color} 
           roughness={0.7}
           metalness={0.2}
           transparent={true}
-          opacity={isOccupied ? 0.9 : 0.15}
+          opacity={isOccupied ? 0.9 : 0.4}
         />
       </mesh>
       
-      {/* Altıgen kenar çizgileri */}
-      <lineSegments ref={lineRef}>
-        <primitive object={hexEdges} />
+      {/* Kenar çizgileri - hücre sınırları */}
+      <lineSegments ref={edgesRef}>
+        <primitive object={edgesGeometry} />
         <lineBasicMaterial 
           color={isPlayerSide ? "#99ffaa" : "#ffaa99"} 
           transparent={true} 
-          opacity={isOccupied ? 1.0 : 0.3}
+          opacity={isOccupied ? 1.0 : 0.5}
           linewidth={2}
         />
       </lineSegments>
+      
+      {/* Vurgu efekti - hücre seçildiğinde veya üzerine gelindiğinde */}
+      <mesh 
+        ref={highlightRef}
+        position={[0, 0.001, 0]}
+      >
+        <planeGeometry args={[cellSize * 0.9, cellSize * 0.9]} />
+        <meshBasicMaterial 
+          color={isPlayerSide ? "#88ff99" : "#ff9988"}
+          transparent={true}
+          opacity={0}
+          depthWrite={false}
+        />
+      </mesh>
+      
+      {/* Hücre ID'si (test için) */}
+      {/* Gerçek uygulamada bu kısmı kaldırabilirsiniz */}
+      {/* <Text
+        position={[0, 0.06, 0]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        fontSize={0.15}
+        color="#ffffff"
+        anchorX="center"
+        anchorY="middle"
+        depthTest={false}
+      >
+        {cellId}
+      </Text> */}
     </group>
   );
 };
@@ -492,23 +491,15 @@ const Island = ({ position, isPlayerIsland = false }: any) => {
 const Battlefield = () => {
   const { player, npc, currentEnemyWave, currentPhase } = usePeacockIslandsStore();
   
-  // Savaş alanının altıgen düzeni
-  const isBattlePhase = currentPhase === "battle";
+  // 6x7 ızgara için hücre pozisyonlarını ve birimlerin yerleşimini tut
+  const [gridState, setGridState] = useState<any>({
+    cells: [],
+    playerUnits: [],
+    enemyUnits: []
+  });
   
-  // Altıgen ızgara: Yaklaşık 40 altıgen - TFT tarzında
-  const grid = { 
-    radius: 3,  // Merkez noktadan radius kadar altıgen
-    centerOffset: -0.5 // Z-ekseninde merkez kaydırma (kullanıcı tarafının biraz daha geniş olması için)
-  };
-  const hexSize = 0.9;
-  const gridPositions: any[] = [];
-  
-  // Altıgen koordinatlarını dönüştürme fonksiyonları
-  const hexToPixel = (q: number, r: number) => {
-    const x = hexSize * 1.5 * q;
-    const z = hexSize * Math.sqrt(3) * (r + q/2);
-    return [x, 0.05, z];
-  };
+  // Hücre boyutu - tüm hesaplamalarda bu değer kullanılacak
+  const cellSize = 1.0;
   
   // Altıgen ızgarayı oluştur
   for (let q = -grid.radius; q <= grid.radius; q++) {

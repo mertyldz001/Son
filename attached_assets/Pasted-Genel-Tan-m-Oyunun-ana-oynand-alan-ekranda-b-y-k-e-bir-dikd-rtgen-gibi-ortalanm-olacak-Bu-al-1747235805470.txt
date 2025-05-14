@@ -1,0 +1,50 @@
+Genel Tanım:
+Oyunun ana oynandığı alan, ekranda büyükçe bir dikdörtgen gibi ortalanmış olacak. Bu alan, 6 satır ve 7 sütun olacak şekilde kutulara (hücrelere) bölünecek. Her bir kutu, bir karakterin yerleştirileceği yerdir. Bu kutular, düzenli bir şekilde sıralanmış olacak, yani tam bir ızgara görünümünde.
+
+🔢 Boyut ve Yerleşim:
+Toplamda 6 satır olacak. (Yukarıdan aşağıya doğru sıralanacak)
+
+Her satırda 7 kutu olacak. (Soldan sağa)
+
+Böylece toplamda 6 x 7 = 42 kutu olacak.
+
+Bu kutular eşit boyutta olacak ve ekranın ortasında hizalanmış şekilde duracak.
+
+🎨 Görsel Düşünce (Şematik Gösterim):
+diff
+Kopyala
+Düzenle
++---+---+---+---+---+---+---+   ← 1. Satır
+|   |   |   |   |   |   |   |
++---+---+---+---+---+---+---+   ← 2. Satır
+|   |   |   |   |   |   |   |
++---+---+---+---+---+---+---+   ← 3. Satır
+|   |   |   |   |   |   |   |
++---+---+---+---+---+---+---+   ← 4. Satır
+|   |   |   |   |   |   |   |
++---+---+---+---+---+---+---+   ← 5. Satır
+|   |   |   |   |   |   |   |
++---+---+---+---+---+---+---+   ← 6. Satır
+|   |   |   |   |   |   |   |
++---+---+---+---+---+---+---+
+Her bir kutu kare şeklinde olacak.
+
+Kutular arasında biraz boşluk olacak ki görsel olarak rahat bir yapı oluşsun.
+
+Tahtanın tamamı ortalanmış olacak, ekrana düzgün yerleşecek.
+
+🧱 Kutuların Özellikleri
+Boş kutular olarak başlasın (içinde karakter yok).
+
+Görünür kenarlıklar olsun. Böylece her kutunun sınırı net görülsün.
+
+Sonradan karakter eklenebilmesi için kutuların içine nesne koymaya uygun yapı oluşturulsun.
+
+Her kutuya benzersiz bir "yer" gözüyle bakılmalı (örneğin: kutu_1, kutu_2 … kutu_42 gibi düşünülebilir).
+
+🧲 İleriye Dönük Düşünce (Şimdiden Hazırlık):
+Bu kutulara daha sonra karakterler sürüklenip bırakılacağı için, her biri karakter kabul edebilecek şekilde düşünülmeli.
+
+Her kutunun içine karakter yerleştiğinde, kutunun içi değişmeli (boş görünüm yerine karakter resmi).
+
+İstersen her satırı ikiye ayırarak "oyuncu tarafı" ve "rakip tarafı" da oluşturulabilir (örn. üst 3 sıra: rakip; alt 3 sıra: oyuncu).
