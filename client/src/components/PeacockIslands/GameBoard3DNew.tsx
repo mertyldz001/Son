@@ -407,13 +407,14 @@ const GameScene = () => {
   
   return (
     <>
-      {/* Tamamen Düz Bakış Açılı Kamera */}
-      <PerspectiveCamera 
-        position={[0, 4, -16]} 
-        rotation={[0, 0, 0]} 
-        fov={35} 
+      {/* Düz görünüm için top-down kamera - grid üzerine düz bak */}
+      <OrthographicCamera 
+        position={[0, 10, 0]} 
+        rotation={[-Math.PI/2, 0, 0]} 
+        zoom={40}
         near={0.1} 
         far={100}
+        makeDefault
       />
       
       {/* Işıklandırma - eski hali */}
