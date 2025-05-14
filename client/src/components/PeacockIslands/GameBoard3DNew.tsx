@@ -294,6 +294,11 @@ const GameScene = () => {
     unitId: null
   });
   
+  // Kamera açısını doğru ayarla
+  useEffect(() => {
+    console.log("Kamera açısı düzeltildi");
+  }, []);
+  
   // Yerleştirilmiş birimleri al
   const deployedUnitPositions = useMemo(() => {
     return getDeployedUnitPositionsMap(player.island.units);
@@ -405,18 +410,22 @@ const GameScene = () => {
     <>
       {/* Sabit Kuş Bakışı Kamera */}
       <PerspectiveCamera 
-        position={[0, zoom, 0]} 
-        rotation={[-Math.PI/2, 0, 0]} 
-        fov={25} 
+        position={[0, zoom, 15]} 
+        rotation={[-Math.PI/4, 0, 0]} 
+        fov={35} 
         near={0.1} 
-        far={100}
+        far={1000}
+        makeDefault
       />
       
-      {/* Işıklandırma */}
-      <ambientLight intensity={0.3} />
+      {/* Geliştirilmiş Işıklandırma */}
+      <ambientLight intensity={0.4} color="#b9d2ff" />
+      
+      {/* Ana yönlü ışık - Güneş benzeri */}
       <directionalLight 
-        position={[5, 12, 8]} 
-        intensity={1.5} 
+        position={[10, 15, 8]} 
+        intensity={1.8} 
+        color="#fff8e6"
         castShadow 
         shadow-mapSize={[2048, 2048]} 
         shadow-camera-left={-10}
@@ -424,6 +433,10 @@ const GameScene = () => {
         shadow-camera-top={10}
         shadow-camera-bottom={-10}
       />
+      
+      {/* Yardımcı ışıklar */}
+      <pointLight position={[0, 10, 0]} intensity={0.6} color="#80a0ff" distance={30} />
+      <pointLight position={[-10, 5, -5]} intensity={0.4} color="#ffb280" distance={20} />
       
       {/* Gökyüzü */}
       <Sky 
@@ -436,14 +449,14 @@ const GameScene = () => {
       {/* Deniz */}
       <AnimatedWater position={[0, -0.3, 0]} size={60} />
       
-      {/* Ana adalar - konumları güncellendi */}
-      <PlayerIsland position={[0, 0, 4]} /> {/* Oyuncu adası önde */}
-      <EnemyIsland position={[0, 0, -4]} /> {/* Düşman adası arkada */}
+      {/* Ana adalar - konumları düzeltildi */}
+      <PlayerIsland position={[0, 0, 8]} /> {/* Oyuncu adası daha belirgin */}
+      <EnemyIsland position={[0, 0, -8]} /> {/* Düşman adası daha uzakta */}
       
-      {/* Hexagonal Savaş Alanı - Ortada */}
-      <group position={[0, 0.1, 0]}>
+      {/* Hexagonal Savaş Alanı - Ortada ve daha görünür */}
+      <group position={[0, 0.3, 0]}>
         <HexGrid 
-          size={0.65} 
+          size={0.75} 
           gridWidth={6} 
           gridHeight={6} 
           unitPositions={deployedUnitPositions}
@@ -453,9 +466,9 @@ const GameScene = () => {
         {/* Sürüklenen birimin görsel önizlemesi - eğer varsa ve cursor hex üzerindeyse */}
         {dragCursor.visible && hoveredHex && (
           <group position={[
-            hoveredHex.q * 0.65 * 1.5, // hex boyutuna göre x pozisyonu
+            hoveredHex.q * 0.75 * 1.5, // Güncellenmiş hex boyutuna göre x pozisyonu
             0.5, // y pozisyonu (yerden yükseklik)
-            hoveredHex.r * 0.65 * Math.sqrt(3) + hoveredHex.q * 0.65 * 0.75 // hex boyutuna göre z pozisyonu
+            hoveredHex.r * 0.75 * Math.sqrt(3) + hoveredHex.q * 0.75 * 0.75 // Güncellenmiş hex boyutuna göre z pozisyonu
           ]}>
             {dragCursor.type === 'warrior' ? (
               <PeacockWarriorModel 

@@ -30,10 +30,13 @@ function HexTile({
   onHover, 
   onUnhover 
 }: HexTileProps) {
-  // Oyuncuya veya düşmana göre farklı renkler
-  const baseColor = isPlayerSide ? "#1a4a7a" : "#701a1a";
-  const hoverColor = isPlayerSide ? "#2a6aa9" : "#a02a2a";
-  const edgeColor = isPlayerSide ? "#0e2e4d" : "#4d0e0e";
+  // Oyuncuya veya düşmana göre farklı renkler - Daha parlak renkler
+  const baseColor = isPlayerSide ? "#1a5c9a" : "#8c1a1a";
+  const hoverColor = isPlayerSide ? "#2a8ad9" : "#d92a2a";
+  const edgeColor = isPlayerSide ? "#0e4e7d" : "#7d0e0e";
+  
+  // Opasiteyi ayarla - daha belirgin görünüm
+  const opacity = isOccupied ? 0.8 : isHovered ? 0.8 : 0.6;
   
   return (
     <group position={position}>
@@ -68,10 +71,12 @@ function HexTile({
         <cylinderGeometry args={[size * 0.95, size * 0.95, 0.1, 6]} />
         <meshStandardMaterial 
           color={isHovered ? hoverColor : baseColor} 
-          roughness={0.7}
-          metalness={0.2}
+          roughness={0.6}
+          metalness={0.3}
           transparent={true}
-          opacity={isOccupied ? 0.7 : 0.9}
+          opacity={opacity}
+          emissive={isHovered ? hoverColor : baseColor}
+          emissiveIntensity={isHovered ? 0.3 : 0.1}
         />
       </mesh>
       
@@ -124,7 +129,7 @@ const HexGrid: React.FC<HexGridProps> = ({
   // Hexagon grid oluşturma
   const hexagons = [];
   
-  // Hexagonal grid oluşturma
+  // Hexagonal grid oluşturma - 6x6 düzenli hex grid
   for (let r = 0; r < gridHeight; r++) {
     const offset = Math.floor(r / 2);
     
@@ -132,11 +137,11 @@ const HexGrid: React.FC<HexGridProps> = ({
       const s = -q - r;
       const key = `${q},${r},${s}`;
       
-      // Hesaplanan pozisyonlar
+      // Hesaplanan pozisyonlar - daha düzenli bir ızgara için
       const x = size * (3/2) * q;
       const z = size * Math.sqrt(3) * (r + q/2);
       
-      // Orta noktayı belirle
+      // Düzeltilmiş: Oyuncu tarafı - tam ortadan ayrım
       const isPlayerSide = r >= gridHeight / 2;
       
       // Koordinat stringi (işgal durumunu kontrol etmek için)
@@ -182,19 +187,19 @@ const HexGrid: React.FC<HexGridProps> = ({
     const z = size * Math.sqrt(3) * (r + q/2);
     
     unitElements.push(
-      <group key={`unit-${unit.id}`} position={[x, 0.25, z]}>
+      <group key={`unit-${unit.id}`} position={[x, 0.3, z]}>
         {unit.type === 'warrior' ? (
           <PeacockWarriorModel 
             position={[0, 0, 0]} 
             rotation={[0, Math.PI, 0]} 
-            scale={0.3} 
+            scale={0.35} 
             type="adult" 
           />
         ) : (
           <HumanSoldierModel 
             position={[0, 0, 0]} 
             rotation={[0, Math.PI, 0]} 
-            scale={0.3} 
+            scale={0.35} 
           />
         )}
       </group>
