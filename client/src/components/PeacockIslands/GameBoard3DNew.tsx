@@ -282,7 +282,7 @@ const EnemyIsland = ({ position = [0, 0, 0] }) => {
 // Ana oyun alanı
 const GameScene = () => {
   const { currentPhase, player } = usePeacockIslandsStore();
-  const [zoom, setZoom] = useState(25);
+  const [zoom, setZoom] = useState(30);
   const [hoveredHex, setHoveredHex] = useState<{q: number, r: number, s: number} | null>(null);
   const [dragCursor, setDragCursor] = useState<{
     visible: boolean;
@@ -408,11 +408,11 @@ const GameScene = () => {
   
   return (
     <>
-      {/* Düz görünüm için kamera - daha yüksekten bakma */}
+      {/* Düz görünüm için kamera - daha uzaktan bakma */}
       <PerspectiveCamera 
-        position={[0, 15, 5]} 
-        rotation={[-Math.PI/3, 0, 0]} 
-        fov={30}
+        position={[0, 15, 25]} 
+        rotation={[-Math.PI/4, 0, 0]} 
+        fov={25}
         near={0.1} 
         far={100}
         makeDefault
