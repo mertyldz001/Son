@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect } from "react";
-import { useGLTF, Float, Sparkles, useTexture, useFrame } from "@react-three/drei";
+import { useGLTF, Float, Sparkles, useTexture } from "@react-three/drei";
+import { useFrame } from "@react-three/fiber";
 import { GLTF } from "three-stdlib";
 import * as THREE from "three";
 
