@@ -31,10 +31,11 @@ function HexTile({
   onHover, 
   onUnhover 
 }: HexTileProps) {
-  // Neon modern cam efekti - canlı renkler (TFT stili)
-  const baseColor = isPlayerSide ? "#4f9bff" : "#ff5252"; // Çok daha parlak neon mavi ve kırmızı
-  const hoverColor = isPlayerSide ? "#64bdff" : "#ff7070"; // Ultra parlak vurgu renkleri
-  const edgeColor = isPlayerSide ? "#0088ff" : "#ff2222";
+  // TFT tarzı renkler - ekran görüntüsündeki gibi
+  const baseColor = isPlayerSide ? "#4f9bff" : "#ff4040"; // Ana karo renkleri
+  const hoverColor = isPlayerSide ? "#64bdff" : "#ff6060"; // Vurgu renkleri
+  // Kenar çizgisi rengi içerideki renkle uyumlu (TFT stilinde)
+  const edgeColor = isPlayerSide ? "#60a5ff" : "#ff6060";
   
   // TFT stili hover animasyonu - yumuşak geçişli
   const hoverScale = useRef(new THREE.Vector3(1, 1, 1));
@@ -86,7 +87,7 @@ function HexTile({
         }}
       >
         {/* TFT stili hexagonal geometri yerine kareden */}
-        <cylinderGeometry args={[size * 1.0, size * 1.0, 0.3, 6, 1, false]} />
+        <cylinderGeometry args={[size * 1.2, size * 1.2, 0.25, 6, 1, false]} />
         <meshPhysicalMaterial 
           color={isHovered ? hoverColor : baseColor} 
           roughness={0.15} // Çok parlak
@@ -103,18 +104,33 @@ function HexTile({
         />
       </mesh>
       
-      {/* TFT stili parlak kenar çizgisi */}
+      {/* TFT stili kenar çizgisi - içerideki renkle uyumlu */}
+      <mesh 
+        position={[0, 0.03, 0]} 
+        rotation={[-Math.PI / 2, 0, 0]}
+        scale={hoverScale.current}
+      >
+        <ringGeometry args={[size * 1.18, size * 1.24, 6]} />
+        <meshBasicMaterial 
+          color={isHovered ? "#ffffff" : edgeColor} 
+          side={THREE.DoubleSide} 
+          transparent={true}
+          opacity={isHovered ? 1.0 : 0.95}
+        />
+      </mesh>
+      
+      {/* TFT stili ince kenar çizgisi - ekstra detay */}
       <mesh 
         position={[0, 0.035, 0]} 
         rotation={[-Math.PI / 2, 0, 0]}
         scale={hoverScale.current}
       >
-        <ringGeometry args={[size * 1.05, size * 1.1, 6]} />
+        <ringGeometry args={[size * 1.25, size * 1.27, 6]} />
         <meshBasicMaterial 
           color={isHovered ? "#ffffff" : edgeColor} 
           side={THREE.DoubleSide} 
           transparent={true}
-          opacity={isHovered ? 1.0 : 0.9}
+          opacity={isHovered ? 0.9 : 0.6}
         />
       </mesh>
       
@@ -124,7 +140,7 @@ function HexTile({
         rotation={[-Math.PI / 2, 0, 0]}
         scale={hoverScale.current}
       >
-        <ringGeometry args={[size * 0.95, size * 1.0, 6]} />
+        <ringGeometry args={[size * 1.15, size * 1.17, 6]} />
         <meshStandardMaterial 
           color={isHovered ? "#ffffff" : baseColor} 
           side={THREE.DoubleSide} 
@@ -132,21 +148,6 @@ function HexTile({
           opacity={isHovered ? 0.9 : 0.7}
           emissive={isHovered ? "#ffffff" : baseColor}
           emissiveIntensity={glowIntensity.current}
-        />
-      </mesh>
-      
-      {/* TFT stili iç dolgu efekti */}
-      <mesh
-        position={[0, 0.01, 0]}
-        rotation={[-Math.PI / 2, 0, 0]}
-        scale={hoverScale.current}
-      >
-        <circleGeometry args={[size * 0.9, 6]} />
-        <meshBasicMaterial
-          color={isPlayerSide ? "#1a4a9f" : "#9f1a1a"}
-          transparent={true}
-          opacity={0.3}
-          side={THREE.DoubleSide}
         />
       </mesh>
       
@@ -195,9 +196,9 @@ const HexGrid: React.FC<HexGridProps> = ({
       const s = -q - r;
       const key = `${q},${r},${s}`;
       
-      // Pozisyonlar - sütunlar arasında çok daha fazla boşluk bırak
-      const x = size * 3.0 * (q - gridWidth/2 + 0.5);  // Yatay olarak çok daha fazla boşluk
-      const z = size * 3.0 * r;  // Dikey olarak da çok daha fazla boşluk
+      // Pozisyonlar - sütunlar TFT tarzında daha yakın
+      const x = size * 2.0 * (q - gridWidth/2 + 0.5);  // Yatay olarak optimal boşluk
+      const z = size * 2.0 * r;  // Dikey olarak optimal boşluk
       
       // TFT tarzı: Oyuncu ve rakip tarafı - net ayrım
       const isPlayerSide = r < gridHeight / 2;
