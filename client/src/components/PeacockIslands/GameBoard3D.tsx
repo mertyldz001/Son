@@ -348,29 +348,67 @@ const Battlefield = () => {
   );
 };
 
-// Basit zoom kontrollerine sahip temel kamera
-const BasicCameraControls = () => {
+// + ve - tuşlarıyla yakınlaşma/uzaklaşma kontrollerine sahip kamera
+const CustomCameraControls = () => {
   const { camera, gl } = useThree();
+  const controlsRef = useRef<any>(null);
+  
+  // Mevcut zoom seviyesi
+  const [zoomLevel, setZoomLevel] = useState<number>(18);
+  const minZoom = 10; // En yakın mesafe
+  const maxZoom = 30; // En uzak mesafe
+  const zoomSpeed = 2; // Zoom hızı
   
   useEffect(() => {
     // Kamerayı sıfır noktasına baktır
     camera.lookAt(0, 0, 0);
     
     // Kullanıcıya bilgi ver
-    console.log('Basit kamera kontrolleri aktif.');
-    console.log('Fare tekerleği: Yakınlaş/uzaklaş');
+    console.log('Kamera kontrolleri aktif:');
+    console.log('+ tuşu: Yakınlaş');
+    console.log('- tuşu: Uzaklaş');
+    console.log('Fare tekerleği de desteklenmektedir');
+    
+    // Klavye olaylarını dinle
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // + tuşu yakınlaştırır
+      if (event.key === '+' || event.key === '=') {
+        setZoomLevel((prev) => Math.max(minZoom, prev - zoomSpeed));
+      }
+      // - tuşu uzaklaştırır
+      else if (event.key === '-' || event.key === '_') {
+        setZoomLevel((prev) => Math.min(maxZoom, prev + zoomSpeed));
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    
+    // Temizlik fonksiyonu
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
   }, [camera]);
+  
+  // Zoom seviyesini güncelle
+  useEffect(() => {
+    if (camera.position.y !== zoomLevel) {
+      camera.position.y = zoomLevel;
+      camera.position.z = zoomLevel;
+      camera.lookAt(0, 0, 0);
+    }
+  }, [camera, zoomLevel]);
   
   return (
     <OrbitControls
+      ref={controlsRef}
       args={[camera, gl.domElement]}
       enableDamping={false}
       enableRotate={false}
       enablePan={false}
       enableZoom={true}
       zoomSpeed={0.8}
-      minDistance={10} // En fazla yakınlaşma sınırı
-      maxDistance={30} // En fazla uzaklaşma sınırı
+      minDistance={minZoom}
+      maxDistance={maxZoom}
     />
   );
 }
@@ -495,8 +533,8 @@ const GameBoard3D = () => {
           />
         </EffectComposer>
         
-        {/* Basit zoom kontrollü kamera */}
-        <BasicCameraControls />
+        {/* + ve - tuşlarıyla kontrol edilebilen kamera */}
+        <CustomCameraControls />
         
         {/* Gelişmiş sis efekti - Fazlara göre değişir */}
         <fog 
