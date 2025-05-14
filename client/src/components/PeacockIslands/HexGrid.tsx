@@ -103,7 +103,7 @@ interface HexGridProps {
 }
 
 const HexGrid: React.FC<HexGridProps> = ({ 
-  size = 0.5, 
+  size = 0.8, 
   gridWidth = 6, 
   gridHeight = 6,
   unitPositions,

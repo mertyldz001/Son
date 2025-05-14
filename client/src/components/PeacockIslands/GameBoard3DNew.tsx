@@ -410,8 +410,8 @@ const GameScene = () => {
     <>
       {/* Düz görünüm için kamera - daha uzaktan bakma */}
       <PerspectiveCamera 
-        position={[0, 15, 25]} 
-        rotation={[-Math.PI/4, 0, 0]} 
+        position={[0, 20, 20]} 
+        rotation={[-Math.PI/3, 0, 0]} 
         fov={25}
         near={0.1} 
         far={100}
@@ -437,7 +437,7 @@ const GameScene = () => {
       {/* Hexagonal Savaş Alanı - Ortada */}
       <group position={[0, 0.1, 0]}>
         <HexGrid 
-          size={0.65} 
+          size={0.8} 
           gridWidth={6} 
           gridHeight={6} 
           unitPositions={deployedUnitPositions}
@@ -487,9 +487,10 @@ const GameBoard3D = () => {
   const backgroundColor = isBattlePhase ? "#1a3545" : "#2a4860";
   
   return (
-    <div className="absolute inset-0 z-0">
+    <div className="absolute inset-0 z-0 flex items-center justify-center">
       <Canvas
         shadows
+        className="w-full max-w-6xl h-full max-h-[80vh] mx-auto my-auto"
         camera={{
           position: [cameraPosition[0], cameraPosition[1], cameraPosition[2]],
           fov: 50,
