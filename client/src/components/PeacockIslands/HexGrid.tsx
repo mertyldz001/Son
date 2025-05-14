@@ -42,11 +42,13 @@ function HexTile({
         rotation={[-Math.PI / 2, 0, 0]}
         onPointerOver={onHover}
         onPointerOut={onUnhover}
-        className="hex-tile"
-        userData={{ hexCoords }}
-        data-q={hexCoords.q}
-        data-r={hexCoords.r}
-        data-s={hexCoords.s}
+        userData={{ 
+          hexCoords,
+          type: "hex-tile",
+          q: hexCoords.q,
+          r: hexCoords.r,
+          s: hexCoords.s
+        }}
       >
         <cylinderGeometry args={[size * 0.95, size * 0.95, 0.1, 6]} />
         <meshStandardMaterial 
@@ -154,7 +156,10 @@ const HexGrid: React.FC<HexGridProps> = ({
   // Birimleri göster
   const unitElements = [];
   
-  for (const [coordString, unit] of unitPositions.entries()) {
+  // Map'i diziyi çevirerek üzerinde işlem yapalım
+  const unitPositionsArray = Array.from(unitPositions);
+  
+  for (const [coordString, unit] of unitPositionsArray) {
     const [q, r, s] = coordString.split(',').map(Number);
     
     // Hesaplanan pozisyonlar

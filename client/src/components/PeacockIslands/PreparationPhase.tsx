@@ -5,6 +5,9 @@ import { FeatherColor, HatcherySlot, Egg, Unit } from "../../lib/game/peacockIsl
 import { getFeatherColorName, getBonusTypeName } from "../../lib/game/peacockIslands/battle";
 import GameBoard3D from "./GameBoard3D";
 import { FeatherViewer, EggViewer } from "./ModelViewer";
+import UnitCard from "./UnitCard";
+import DragDrop from "./DragDrop";
+import { getDeployedUnitPositionsMap } from "../../lib/game/peacockIslands/unitSystem";
 import WindowPanel from "../UI/WindowPanel";
 
 // Hazırlık Fazı Bileşeni
@@ -20,8 +23,15 @@ const PreparationPhase = () => {
     performNpcActions,
     combineFeathers,
     hatchEgg,
-    activateEgg
+    activateEgg,
+    deployUnit,
+    undeployUnit
   } = usePeacockIslandsStore();
+  
+  // Birim ve UI durum değişkenleri
+  const [showUnitCards, setShowUnitCards] = useState(false);
+  const peacockWarriors = player.island.units.filter((unit: Unit) => unit.type === "warrior");
+  const humanSoldiers = player.island.units.filter((unit: Unit) => unit.type === "soldier");
   const { playClick, playCollect, playBuild } = useAudio();
   
   const [lastTime, setLastTime] = useState(Date.now());
@@ -757,6 +767,17 @@ const PreparationPhase = () => {
                     Saha: {player.island.units.filter((u: Unit) => u.type === "soldier" && u.isDeployed).length} / {player.island.units.filter((u: Unit) => u.type === "soldier").length}
                   </div>
                 </div>
+                
+                {/* Asker Kartları Açma Butonu */}
+                <button
+                  onClick={() => setShowUnitCards(!showUnitCards)}
+                  className="px-3 py-2 bg-gradient-to-b from-indigo-700 to-indigo-900 border border-indigo-500/50 rounded-md text-sm text-indigo-200 font-medium flex items-center transition hover:bg-gradient-to-b hover:from-indigo-600 hover:to-indigo-800"
+                >
+                  <span className="material-icons text-sm mr-1">
+                    {showUnitCards ? "visibility_off" : "visibility"}
+                  </span>
+                  {showUnitCards ? "Kartları Gizle" : "Askerleri Göster"}
+                </button>
               </div>
               
               {/* Hazırlık Ipuçları */}
@@ -766,8 +787,8 @@ const PreparationPhase = () => {
                   İPUCU
                 </h4>
                 <p className="text-xs text-slate-300/80 mt-1">
-                  Askerlerinizi savaş alanına yerleştirmek için, önce karakteriniz (penguen) ile askerlerinizin yanına gidin, 
-                  sonra onları haritaya taşıyın.
+                  Askerlerinizi savaş alanına yerleştirmek için, önce "Askerleri Göster" butonuna tıklayın, 
+                  sonra onları haritadaki mavi alanlara sürükleyin.
                 </p>
               </div>
               
@@ -777,7 +798,7 @@ const PreparationPhase = () => {
                   onClick={() => {
                     playClick();
                     trainSoldiers(player.id, 1);
-                    setActionLog(prev => [...prev, "Yeni insan askeri eğitildi!"]);
+                    setActionLog(prev => [...prev, "Yeni asker eğitildi!"]);
                   }}
                   disabled={player.island.gold < 5}
                   className={`px-3 py-2 bg-gradient-to-b from-amber-800 to-amber-900 border border-amber-600/50 rounded-md text-sm text-amber-200 font-medium flex items-center transition hover:bg-gradient-to-b hover:from-amber-700 hover:to-amber-800 ${player.island.gold < 5 ? 'opacity-50 cursor-not-allowed' : ''}`}
@@ -801,6 +822,80 @@ const PreparationPhase = () => {
             </div>
           </div>
         </div>
+        
+        {/* Asker Kartları Paneli */}
+        {showUnitCards && (
+          <div className="fixed top-1/2 left-4 transform -translate-y-1/2 w-52 max-h-[70vh] overflow-y-auto pointer-events-auto">
+            <div className="bg-slate-900/95 backdrop-blur-sm border border-slate-700/50 rounded-lg shadow-xl p-3">
+              <h3 className="text-white font-bold text-lg mb-3 flex items-center">
+                <span className="material-icons text-amber-400 mr-2">military_tech</span>
+                Askerleriniz
+              </h3>
+              
+              {player.island.units.length === 0 ? (
+                <p className="text-slate-400 text-sm mb-2">Henüz askeriniz yok. "Asker Eğit" butonuna tıklayarak asker alabilirsiniz.</p>
+              ) : (
+                <div className="space-y-4">
+                  {/* Tavuskuşu Askerleri */}
+                  {peacockWarriors.length > 0 && (
+                    <div>
+                      <h4 className="text-blue-300 text-sm font-medium mb-2">Tavuskuşu Askerleri</h4>
+                      <div className="space-y-2">
+                        {peacockWarriors.map((unit: Unit) => (
+                          <div key={unit.id} className="transition-transform transform hover:scale-[1.02]">
+                            <DragDrop 
+                              unit={unit} 
+                              onDrop={(unit, hexCoords) => {
+                                deployUnit(player.id, unit.id, hexCoords);
+                                playClick();
+                              }}
+                            >
+                              <UnitCard 
+                                unit={unit} 
+                                isDragging={false} 
+                                onDragStart={() => {}} 
+                                onDragEnd={() => {}} 
+                                isDeployed={unit.isDeployed}
+                              />
+                            </DragDrop>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* İnsan Askerleri */}
+                  {humanSoldiers.length > 0 && (
+                    <div>
+                      <h4 className="text-amber-300 text-sm font-medium mb-2">İnsan Askerleri</h4>
+                      <div className="space-y-2">
+                        {humanSoldiers.map((unit: Unit) => (
+                          <div key={unit.id} className="transition-transform transform hover:scale-[1.02]">
+                            <DragDrop 
+                              unit={unit} 
+                              onDrop={(unit, hexCoords) => {
+                                deployUnit(player.id, unit.id, hexCoords);
+                                playClick();
+                              }}
+                            >
+                              <UnitCard 
+                                unit={unit} 
+                                isDragging={false} 
+                                onDragStart={() => {}} 
+                                onDragEnd={() => {}} 
+                                isDeployed={unit.isDeployed}
+                              />
+                            </DragDrop>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

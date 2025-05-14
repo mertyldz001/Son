@@ -27,6 +27,7 @@ export interface Island {
 export interface Unit {
   id: string;
   type: UnitType;
+  playerId: string; // Birime sahip olan oyuncu ID'si
   health: number;
   attackPower: number;
   attackSpeed: number;
