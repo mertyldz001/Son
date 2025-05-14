@@ -734,61 +734,185 @@ const GameBoard3D = () => {
         {/* Ortam Aydınlatma */}
         <Environment preset={isBattlePhase ? "night" : "sunset"} />
         
-        {/* Temel Işıklandırma */}
-        <ambientLight intensity={0.6} />
+        {/* Gelişmiş Işıklandırma Sistemi */}
+        <ambientLight intensity={0.5} color={isBattlePhase ? "#4466aa" : "#b09080"} />
+        
+        {/* Ana yönlü ışık - Güneş benzeri */}
         <directionalLight 
-          position={[10, 10, 5]} 
-          intensity={1.5} 
+          position={[10, 15, 5]} 
+          intensity={1.8} 
           castShadow 
           shadow-mapSize={[2048, 2048]} 
-          shadow-bias={-0.001}
+          shadow-camera-far={30}
+          shadow-camera-left={-10}
+          shadow-camera-right={10}
+          shadow-camera-top={10}
+          shadow-camera-bottom={-10}
+          shadow-bias={-0.0005}
+          color={isBattlePhase ? "#aaccff" : "#ffcc88"}
         />
         
-        {/* İkincil ışık - daha yumuşak gölgeler için */}
+        {/* Yumuşak dolgu ışığı - Gölgeleri yumuşatır */}
         <directionalLight 
-          position={[-8, 8, -5]} 
-          intensity={0.7} 
+          position={[-8, 10, -5]} 
+          intensity={0.8} 
           color={isBattlePhase ? "#5080ff" : "#ffb86c"}
           castShadow={false}
         />
         
-        {/* Ortam Işığı - Aydınlık efekti */}
+        {/* Alt aydınlatma - Dramatik efekt */}
+        <spotLight
+          position={[0, -5, 0]}
+          angle={Math.PI / 4}
+          penumbra={0.5}
+          intensity={0.3}
+          color={isBattlePhase ? "#3355cc" : "#cc7733"}
+          distance={20}
+          castShadow={false}
+        />
+        
+        {/* Ortam Işığı - Adayı aydınlatır */}
         <pointLight
           position={[0, 8, 0]}
-          intensity={0.8}
-          color={isBattlePhase ? "#3366cc" : "#ffcc66"}
-          distance={25}
+          intensity={1.0}
+          color={isBattlePhase ? "#3366dd" : "#ffcc66"}
+          distance={30}
           decay={2}
         />
         
-        {/* Atmosferik Efektler */}
+        {/* Kenar vurgu ışıkları */}
+        <pointLight
+          position={[15, 3, 15]}
+          intensity={0.6}
+          color={isBattlePhase ? "#66aaff" : "#ff9966"}
+          distance={15}
+          decay={2}
+        />
+        <pointLight
+          position={[-15, 3, -15]}
+          intensity={0.6}
+          color={isBattlePhase ? "#6688ff" : "#ffcc55"}
+          distance={15}
+          decay={2}
+        />
+        
+        {/* Gelişmiş Atmosferik Efektler */}
         {!isBattlePhase && (
           <>
-            {/* Bulutları geçici olarak kaldırdık, THREE.js uyumluluk sorunu vardı */}
-            <group position={[15, 15, -10]}>
-              <mesh>
-                <sphereGeometry args={[2, 16, 16]} />
-                <meshStandardMaterial color="#ffffff" transparent opacity={0.5} />
-              </mesh>
-            </group>
-            <group position={[-15, 12, -5]}>
-              <mesh>
-                <sphereGeometry args={[1.8, 16, 16]} />
-                <meshStandardMaterial color="#ffffff" transparent opacity={0.4} />
-              </mesh>
-            </group>
+            {/* Üç Boyutlu Bulutlar */}
+            <Float speed={0.5} rotationIntensity={0.2} floatIntensity={0.5}>
+              <group position={[15, 15, -10]}>
+                <mesh>
+                  <sphereGeometry args={[2, 16, 16]} />
+                  <meshStandardMaterial 
+                    color="#ffffff" 
+                    transparent 
+                    opacity={0.5} 
+                    roughness={0.9}
+                    envMapIntensity={0.7}
+                  />
+                </mesh>
+                <mesh position={[1, -0.5, 1]}>
+                  <sphereGeometry args={[1.5, 16, 16]} />
+                  <meshStandardMaterial 
+                    color="#ffffff" 
+                    transparent 
+                    opacity={0.6} 
+                    roughness={0.9}
+                  />
+                </mesh>
+                <mesh position={[-1, -0.2, -0.5]}>
+                  <sphereGeometry args={[1.7, 16, 16]} />
+                  <meshStandardMaterial 
+                    color="#ffffff" 
+                    transparent 
+                    opacity={0.55} 
+                    roughness={0.9}
+                  />
+                </mesh>
+              </group>
+            </Float>
+            
+            <Float speed={0.3} rotationIntensity={0.1} floatIntensity={0.3}>
+              <group position={[-15, 12, -5]}>
+                <mesh>
+                  <sphereGeometry args={[1.8, 16, 16]} />
+                  <meshStandardMaterial 
+                    color="#ffffff" 
+                    transparent 
+                    opacity={0.4} 
+                    roughness={0.9}
+                  />
+                </mesh>
+                <mesh position={[0.8, 0.2, 0.8]}>
+                  <sphereGeometry args={[1.4, 16, 16]} />
+                  <meshStandardMaterial 
+                    color="#ffffff" 
+                    transparent 
+                    opacity={0.45} 
+                    roughness={0.9}
+                  />
+                </mesh>
+              </group>
+            </Float>
           </>
         )}
         
-        {/* Parçacık Efektleri - Basitleştirilmiş versiyon */}
+        {/* Savaş aşamasında dramatik atmosfer */}
+        {isBattlePhase && (
+          <>
+            <Float speed={0.2} rotationIntensity={0.1} floatIntensity={0.2}>
+              <group position={[0, 20, 0]}>
+                <mesh>
+                  <sphereGeometry args={[3, 16, 16]} />
+                  <meshStandardMaterial 
+                    color="#334466" 
+                    transparent 
+                    opacity={0.3} 
+                    roughness={0.7}
+                    metalness={0.3}
+                  />
+                </mesh>
+              </group>
+            </Float>
+          </>
+        )}
+        
+        {/* Gelişmiş Parçacık Efektleri */}
+        {/* Genel parlak parçacıklar */}
         <Sparkles
-          count={50}
-          scale={10}
+          count={isBattlePhase ? 80 : 60}
+          scale={12}
           size={0.4}
           speed={0.2}
-          opacity={0.15}
+          opacity={0.2}
           color={isBattlePhase ? "#5050ff" : "#ffbb33"}
         />
+        
+        {/* Savaş fazında ekstra mavi parçacıklar */}
+        {isBattlePhase && (
+          <Sparkles
+            count={40}
+            scale={8}
+            size={0.5}
+            speed={0.3}
+            opacity={0.25}
+            color="#6699ff"
+          />
+        )}
+        
+        {/* Hazırlık fazında güneş ışığı parçacıkları */}
+        {!isBattlePhase && (
+          <Sparkles
+            count={30}
+            scale={6}
+            size={0.6}
+            speed={0.1}
+            opacity={0.3}
+            color="#ffdd99"
+            position={[5, 8, 5]}
+          />
+        )}
         
         {/* Kamera kontrolleri */}
         <CameraController />
@@ -796,22 +920,32 @@ const GameBoard3D = () => {
         {/* Oyun alanı */}
         <Battlefield />
         
-        {/* Post-processing Efektleri - Performans için basitleştirildi */}
-        {/* <EffectComposer>
+        {/* Gelişmiş Post-processing Efektleri */}
+        <EffectComposer>
+          {/* Bloom efekti - Parlak kısımları vurgular */}
           <Bloom
-            intensity={0.2}
-            luminanceThreshold={0.8}
+            intensity={0.35}
+            luminanceThreshold={0.6}
             luminanceSmoothing={0.9}
+            radius={0.6}
           />
+          {/* Vignette efekti - Kenarları karartır, görsel odak oluşturur */}
           <Vignette
             offset={0.3}
-            darkness={0.5}
+            darkness={0.7}
             eskil={false}
           />
-        </EffectComposer> */}
+        </EffectComposer>
         
-        {/* Hafif sis efekti */}
-        <fog attach="fog" args={[backgroundColor, 25, 50]} />
+        {/* Gelişmiş sis efekti - Fazlara göre değişir */}
+        <fog 
+          attach="fog" 
+          args={[
+            isBattlePhase ? "#1a3040" : "#2a4860", 
+            isBattlePhase ? 20 : 25, 
+            isBattlePhase ? 40 : 50
+          ]} 
+        />
       </Canvas>
     </div>
   );
