@@ -348,8 +348,8 @@ const Battlefield = () => {
   );
 };
 
-// Çok basit sabit kamera kontrolleri
-const SimpleCameraControls = () => {
+// Geliştirilmiş kamera kontrolleri (debug modunda log'lar ile)
+const EnhancedCameraControls = () => {
   const { camera } = useThree();
   
   // İlk pozisyon
@@ -358,39 +358,49 @@ const SimpleCameraControls = () => {
   // Klavye ile kontrol için
   const minZoom = 10;
   const maxZoom = 30;
-  const zoomStep = 1;
+  const zoomStep = 1.5;
   
   useEffect(() => {
     // Kamerayı sıfıra baktır
     camera.position.set(0, defaultZoom, defaultZoom);
     camera.lookAt(0, 0, 0);
     
-    console.log('Sabit kamera kontrolleri:');
-    console.log('+ tuşu: Yakınlaş');
-    console.log('- tuşu: Uzaklaş');
+    console.log('⚙️ KAMERA KONTROL SİSTEMİ HAZIR:');
+    console.log('✓ + tuşu: Yakınlaş');
+    console.log('✓ - tuşu: Uzaklaş');
     
-    // Tuş kontrollerini ayarla
-    const handleKeyPress = (e: KeyboardEvent) => {
-      // + tuşu - yakınlaştır
+    // Tuş kontrollerini ayarla - direkt DOM API'yi kullan
+    function handleKeyPress(e: KeyboardEvent) {
+      console.log('Tuş basıldı:', e.key); // Debug log
+      
+      // + tuşu - yakınlaştır (= işareti de + olarak çalışır)
       if (e.key === '+' || e.key === '=') {
+        console.log('Yakınlaşma komutu alındı'); // Debug log
         const newZoom = Math.max(minZoom, camera.position.y - zoomStep);
         camera.position.set(0, newZoom, newZoom);
         camera.lookAt(0, 0, 0);
+        console.log('Yeni zoom seviyesi:', newZoom); // Debug log
       }
-      // - tuşu - uzaklaştır
+      // - tuşu - uzaklaştır (_ işareti de - olarak çalışır)
       else if (e.key === '-' || e.key === '_') {
+        console.log('Uzaklaşma komutu alındı'); // Debug log
         const newZoom = Math.min(maxZoom, camera.position.y + zoomStep);
         camera.position.set(0, newZoom, newZoom);
         camera.lookAt(0, 0, 0);
+        console.log('Yeni zoom seviyesi:', newZoom); // Debug log
       }
-    };
+    }
     
-    // Event dinleyiciyi ekle
-    window.addEventListener('keydown', handleKeyPress);
+    // Global document'a event listener ekle
+    document.addEventListener('keydown', handleKeyPress);
+    
+    // Çalıştığından emin olmak için test log
+    console.log('Kamera kontrol fonksiyonu aktif edildi');
     
     // Temizlik
     return () => {
-      window.removeEventListener('keydown', handleKeyPress);
+      document.removeEventListener('keydown', handleKeyPress);
+      console.log('Kamera kontrolleri temizlendi');
     };
   }, [camera]);
   
@@ -518,8 +528,8 @@ const GameBoard3D = () => {
           />
         </EffectComposer>
         
-        {/* Basit sabit kamera kontrolleri */}
-        <SimpleCameraControls />
+        {/* Gelişmiş kamera kontrolleri (+ ve - tuşları ile zoom) */}
+        <EnhancedCameraControls />
         
         {/* Gelişmiş sis efekti - Fazlara göre değişir */}
         <fog 

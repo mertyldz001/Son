@@ -305,7 +305,7 @@ const GameMenu = () => {
               
               {/* Üst kısım - Başlık */}
               <div className="absolute top-4 left-0 right-0 text-center">
-                <div className="font-semibold text-blue-300/90 uppercase tracking-wider text-sm">Tavus Savaşçısı</div>
+                <div className="font-semibold text-blue-300/90 uppercase tracking-wider text-sm">Adacı Savaşçı</div>
                 <div className="w-16 h-0.5 bg-blue-500/30 mx-auto mt-1"></div>
               </div>
               
@@ -400,7 +400,7 @@ const GameMenu = () => {
               <div className="absolute inset-0 bg-gradient-to-br from-amber-500/20 to-amber-600/10 rounded-xl rotate-45 backdrop-blur-sm border border-amber-500/20" />
               <div className="absolute inset-2 border border-amber-500/10 rounded-lg rotate-45" />
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-2xl font-bold text-amber-400/90 rotate-[-45deg]">TKA</div>
+                <div className="text-2xl font-bold text-amber-400/90 rotate-[-45deg]">FI</div>
               </div>
               
               {/* Işık efekti */}
@@ -419,7 +419,7 @@ const GameMenu = () => {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="text-6xl font-extrabold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-500 drop-shadow-[0_2px_5px_rgba(255,175,0,0.5)]"
             >
-              Tavus Kuşu Adaları
+              Feather Island
             </motion.h1>
             
             <motion.div
