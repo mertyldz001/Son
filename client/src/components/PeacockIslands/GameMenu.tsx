@@ -505,7 +505,7 @@ const GameMenu = () => {
               transition={{ duration: 0.8, delay: 0.9 }}
               className="mt-10 text-xs text-amber-200/40 italic"
             >
-              Tavuskuşu Adaları v1.0 — Hazırlayan: Replit
+              Feather Island v1.0 — Hazırlayan: Replit
             </motion.div>
           </div>
         </motion.div>

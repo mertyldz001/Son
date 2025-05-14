@@ -703,7 +703,6 @@ const PreparationPhase = () => {
                                     // Yumurtadan asker çıkarmak yerine tüm askerlere bonus uygula
                                     handleActivateEgg(slotId);
                                     // Bonus uygulandığı için kullanıcıya bilgi ver
-                                    playSuccessSound();
                                     alert(`${getFeatherColorName(slot.egg?.color || "green")} yumurtadan sağlanan bonus tüm askerlerinize uygulandı!`);
                                   }}
                                 >
