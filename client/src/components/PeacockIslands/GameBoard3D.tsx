@@ -349,59 +349,132 @@ const Battlefield = () => {
   );
 };
 
-// Animasyonlu Kamera Kontrol Bileşeni
+// Klavye Kontrollü Kamera Bileşeni
 const CameraControls = () => {
-  const { camera, gl, invalidate } = useThree();
-  const controlsRef = useRef<ThreeOrbitControls | null>(null);
+  const { camera } = useThree();
+  const camPos = useRef(camera.position.clone()); // Kamera başlangıç pozisyonu
+  const targetRef = useRef(new THREE.Vector3(0, 0, 0)); // Kamera hedef noktası
   
+  // Başlangıç ayarları
   useEffect(() => {
-    // Kontrolleri oluştur
-    const controls = new ThreeOrbitControls(camera, gl.domElement);
-    
-    // Referansı sakla
-    controlsRef.current = controls;
-    
-    // Kamera ayarlarını yapılandır
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.1;
-    controls.enableZoom = true;
-    controls.enablePan = true;
-    controls.enableRotate = true;
-    controls.rotateSpeed = 1.0;
-    controls.zoomSpeed = 1.2;
-    controls.panSpeed = 0.8;
-    controls.minDistance = 5;
-    controls.maxDistance = 30;
-    controls.maxPolarAngle = Math.PI / 1.5;
-    
-    // Kontrol hareketlerini manuel olarak kontrol et
-    gl.domElement.addEventListener('mousedown', () => {
-      console.log('Fare tıklaması algılandı');
-      if (!controls.enabled) controls.enabled = true;
-    });
-    
-    // Kamera pozisyonu değişince render'ı güncelleme
-    controls.addEventListener('change', () => invalidate());
-    
-    console.log('Gelişmiş kamera kontrolleri aktifleştirildi');
-    
-    // Temizlik fonksiyonu
-    return () => {
-      controls.removeEventListener('change', invalidate);
-      gl.domElement.removeEventListener('mousedown', () => {});
-      controls.dispose();
-    };
-  }, [camera, gl, invalidate]);
+    console.log('Klavye kamera kontrolleri aktifleştirildi');
+    console.log('Kamera kontrol tuşları:');
+    console.log('I, K: Kamerayı yukarı/aşağı taşı');
+    console.log('J, L: Kamerayı sola/sağa taşı');
+    console.log('O, U: Kamerayı ileri/geri taşı');
+    console.log('R: Kamerayı sıfırla');
+    console.log('+ (=), -: Yakınlaş/Uzaklaş');
+    console.log('1, 3: Kamerayı saat yönünde/tersine döndür');
+    console.log('2, 8: Kamerayı yukarı/aşağı açı ile döndür');
+  }, []);
   
-  // Her kare güncellemesi yap
   useFrame(() => {
-    if (controlsRef.current) {
-      controlsRef.current.update();
+    // Key event handling için getKeyboardState oluşturulacak
+    const keyState = {
+      up: keyboard.pressed('I'),
+      down: keyboard.pressed('K'),
+      left: keyboard.pressed('J'),
+      right: keyboard.pressed('L'),
+      in: keyboard.pressed('O'),
+      out: keyboard.pressed('U'),
+      reset: keyboard.justPressed('R'),
+      zoomIn: keyboard.pressed('=') || keyboard.pressed('+'),
+      zoomOut: keyboard.pressed('-'),
+      rotateLeft: keyboard.pressed('1'),
+      rotateRight: keyboard.pressed('3'),
+      rotateUp: keyboard.pressed('2'),
+      rotateDown: keyboard.pressed('8')
+    };
+    
+    // Kamera hareketi
+    if (keyState.up) camera.position.y += 0.2;
+    if (keyState.down) camera.position.y -= 0.2;
+    if (keyState.left) camera.position.x -= 0.2;
+    if (keyState.right) camera.position.x += 0.2;
+    if (keyState.in) {
+      // İleri hareket - baktığı yöne doğru
+      const direction = new THREE.Vector3();
+      camera.getWorldDirection(direction);
+      camera.position.addScaledVector(direction, 0.5);
+    }
+    if (keyState.out) {
+      // Geri hareket - baktığı yönün tersine
+      const direction = new THREE.Vector3();
+      camera.getWorldDirection(direction);
+      camera.position.addScaledVector(direction, -0.5);
+    }
+    
+    // Zoom
+    if (keyState.zoomIn) {
+      const direction = new THREE.Vector3();
+      camera.getWorldDirection(direction);
+      camera.position.addScaledVector(direction, 0.5);
+    }
+    if (keyState.zoomOut) {
+      const direction = new THREE.Vector3();
+      camera.getWorldDirection(direction);
+      camera.position.addScaledVector(direction, -0.5);
+    }
+    
+    // Döndürme
+    const rotationSpeed = 0.02;
+    if (keyState.rotateLeft) {
+      camera.rotateY(rotationSpeed);
+    }
+    if (keyState.rotateRight) {
+      camera.rotateY(-rotationSpeed);
+    }
+    if (keyState.rotateUp) {
+      // Üst tarafa doğru döndür (dikey eksen)
+      camera.rotateX(rotationSpeed);
+    }
+    if (keyState.rotateDown) {
+      // Alt tarafa doğru döndür (dikey eksen)
+      camera.rotateX(-rotationSpeed);
+    }
+    
+    // Kamera sıfırlama
+    if (keyState.reset) {
+      camera.position.copy(camPos.current);
+      camera.lookAt(targetRef.current);
     }
   });
   
   return null;
 };
+
+// Basit klavye durumu kontrolü için yardımcı sınıf
+const keyboard = {
+  _pressed: {},
+  _justPressed: {},
+  
+  pressed: function(keyCode) {
+    return this._pressed[keyCode] === true;
+  },
+  
+  justPressed: function(keyCode) {
+    const wasPressed = this._justPressed[keyCode] === true;
+    this._justPressed[keyCode] = false;
+    return wasPressed;
+  },
+  
+  keydown: function(event) {
+    this._pressed[event.key] = true;
+    if (!this._pressed[event.key]) {
+      this._justPressed[event.key] = true;
+    }
+  },
+  
+  keyup: function(event) {
+    this._pressed[event.key] = false;
+  }
+};
+
+// Global event listener'ları ekleyelim
+if (typeof window !== 'undefined') {
+  window.addEventListener('keydown', (e) => keyboard.keydown(e));
+  window.addEventListener('keyup', (e) => keyboard.keyup(e));
+}
 
 // Ana canvas bileşeni
 const GameBoard3D = () => {
