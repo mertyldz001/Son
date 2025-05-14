@@ -656,8 +656,8 @@ const GameBoard3D = () => {
   const isBattlePhase = currentPhase === "battle";
   
   // Fazlara göre farklı kamera ve arka plan renkleri
-  const cameraPosition: [number, number, number] = isBattlePhase ? [0, 12, 0] : [6, 8, 10];
-  const backgroundColor = isBattlePhase ? "#345564" : "#4a6880";
+  const cameraPosition: [number, number, number] = isBattlePhase ? [0, 15, 0] : [8, 10, 12];
+  const backgroundColor = isBattlePhase ? "#1a3545" : "#2a4860";
   
   return (
     <div className="absolute inset-0 z-0">

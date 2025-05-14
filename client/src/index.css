@@ -2,6 +2,66 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Oyun genel stilleri */
+body {
+  background-color: #0a1a2a;
+  background-image: 
+    radial-gradient(circle at 10% 20%, rgba(20, 60, 120, 0.2) 0%, transparent 50%),
+    radial-gradient(circle at 90% 80%, rgba(30, 90, 120, 0.15) 0%, transparent 60%);
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+/* 3D Modellerle ilgili stillemeler */
+.model-container {
+  transition: transform 0.3s ease;
+}
+
+.model-container:hover {
+  transform: scale(1.05);
+}
+
+/* Yanıp sönen efektler - aktif yumurtalar için */
+@keyframes glow {
+  0% { filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.7)); }
+  50% { filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.9)); }
+  100% { filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.7)); }
+}
+
+.glowing {
+  animation: glow 2s infinite;
+}
+
+/* Tavus Kuşu Tüyü Renkleri */
+.feather-green {
+  background: linear-gradient(135deg, #2ecc71, #27ae60);
+}
+
+.feather-blue {
+  background: linear-gradient(135deg, #3498db, #2980b9);
+}
+
+.feather-orange {
+  background: linear-gradient(135deg, #e67e22, #d35400);
+}
+
+/* Cam efektleri */
+.glass-panel {
+  background: rgba(20, 40, 80, 0.3);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Card hover efektleri */
+.card-hover {
+  transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
 @layer base {
   * {
     @apply border-border;

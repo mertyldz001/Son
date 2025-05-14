@@ -114,21 +114,29 @@ const PreparationPhase = () => {
       {/* UI Overlays */}
       <div className="absolute inset-0 z-10 p-4 pointer-events-none">
         {/* Üst panel - Tur bilgileri */}
-        <div className="bg-gray-800/90 p-4 rounded-lg mb-4 flex justify-between items-center pointer-events-auto">
+        <div className="glass-panel p-4 rounded-lg mb-4 flex justify-between items-center pointer-events-auto">
           <div className="flex flex-col">
-            <h2 className="text-xl font-bold text-white">Hazırlık Fazı</h2>
-            <p className="text-sm text-gray-300">Kaynaklarınızı yönetin ve adanızı geliştirin</p>
+            <h2 className="text-2xl font-bold text-white flex items-center">
+              <span className="material-icons mr-2 text-amber-400">diamond</span>
+              Hazırlık Fazı
+            </h2>
+            <p className="text-sm text-blue-200">Kaynaklarınızı yönetin ve adanızı geliştirin</p>
           </div>
           
           <div className="flex items-center gap-4">
-            <div className="bg-blue-900/90 px-4 py-2 rounded-md text-white flex items-center">
-              <span className="material-icons mr-2">timer</span>
-              <span className="font-bold">{Math.floor(preparationTimeLeft)}</span>
+            <div className="glass-panel px-4 py-2 rounded-md text-white flex items-center bg-blue-900/50 border border-blue-400/30">
+              <span className="material-icons mr-2 text-blue-300">timer</span>
+              <span className="font-bold text-xl">
+                {Math.floor(preparationTimeLeft)}
+                <span className="text-xs ml-1 text-blue-300">sn</span>
+              </span>
             </div>
             
-            <div className="bg-purple-900/90 px-4 py-2 rounded-md text-white flex items-center">
-              <span className="material-icons mr-2">emoji_events</span>
-              <span className="font-bold">Tur {currentTurn}</span>
+            <div className="glass-panel px-4 py-2 rounded-md text-white flex items-center bg-purple-900/50 border border-purple-400/30">
+              <span className="material-icons mr-2 text-purple-300">emoji_events</span>
+              <span className="font-bold text-xl">
+                Tur {currentTurn}
+              </span>
             </div>
           </div>
         </div>
@@ -136,112 +144,197 @@ const PreparationPhase = () => {
         {/* Ana içerik */}
         <div className="flex gap-4 h-3/4 pointer-events-auto">
           {/* Sol panel - Oyuncu bilgileri */}
-          <div className="w-1/4 bg-gray-800/90 rounded-lg p-4 flex flex-col text-white">
-            <h3 className="text-lg font-bold mb-2">{player.island.name}</h3>
+          <div className="w-1/4 glass-panel rounded-lg p-4 flex flex-col text-white">
+            <div className="flex items-center mb-4">
+              <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center mr-3 border-2 border-blue-400">
+                <span className="material-icons">person</span>
+              </div>
+              <div>
+                <h3 className="text-lg font-bold">{player.island.name}</h3>
+                <p className="text-xs text-blue-300">Ada Komutanı</p>
+              </div>
+            </div>
             
-            <div className="bg-gray-700/90 rounded-md p-3 mb-4">
-              <h4 className="text-md font-semibold mb-2">Kaynaklar</h4>
-              <div className="grid grid-cols-2 gap-2">
-                <div className="bg-yellow-900/60 p-2 rounded text-center">
-                  <div className="text-yellow-400 font-bold">{player.island.resources.gold}</div>
-                  <div className="text-xs">Altın</div>
+            <div className="glass-panel bg-indigo-900/20 rounded-md p-3 mb-4 border border-indigo-500/20">
+              <h4 className="text-md font-semibold mb-2 flex items-center">
+                <span className="material-icons mr-1 text-yellow-400">monetization_on</span>
+                Kaynaklar
+              </h4>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-gradient-to-br from-yellow-900/60 to-amber-800/40 p-3 rounded-lg text-center card-hover border border-yellow-600/30">
+                  <div className="text-yellow-300 font-bold text-xl">{player.island.resources.gold}</div>
+                  <div className="text-xs flex items-center justify-center mt-1">
+                    <span className="material-icons text-xs mr-1">paid</span>
+                    <span>Altın</span>
+                  </div>
                 </div>
-                <div className="bg-green-900/60 p-2 rounded text-center">
-                  <div className="text-green-400 font-bold">{player.island.resources.eggs}</div>
-                  <div className="text-xs">Yumurta</div>
+                <div className="bg-gradient-to-br from-green-900/60 to-emerald-800/40 p-3 rounded-lg text-center card-hover border border-green-600/30">
+                  <div className="text-green-300 font-bold text-xl">{player.island.resources.eggs}</div>
+                  <div className="text-xs flex items-center justify-center mt-1">
+                    <span className="material-icons text-xs mr-1">egg</span>
+                    <span>Yumurta</span>
+                  </div>
                 </div>
               </div>
             </div>
             
-            <div className="bg-gray-700/90 rounded-md p-3 mb-4">
-              <h4 className="text-md font-semibold mb-2">Tüy Envanteri</h4>
-              <div className="grid grid-cols-3 gap-2">
-                <div className="bg-green-900/60 p-2 rounded text-center flex flex-col items-center">
-                  <div className="h-16 w-full">
+            <div className="glass-panel bg-indigo-900/20 rounded-md p-3 mb-4 border border-indigo-500/20">
+              <h4 className="text-md font-semibold mb-2 flex items-center">
+                <span className="material-icons mr-1 text-teal-400">flutter_dash</span>
+                Tüy Envanteri
+              </h4>
+              <div className="grid grid-cols-3 gap-3">
+                <div className="bg-gradient-to-br from-green-900/70 to-emerald-900/40 p-2 rounded-lg text-center flex flex-col items-center card-hover border border-green-600/30">
+                  <div className="h-16 w-full model-container">
                     <FeatherViewer color="green" scale={0.5} />
                   </div>
-                  <div className="text-green-400 font-bold text-xl mt-1">{player.island.featherInventory.green}</div>
-                  <div className="text-xs">Yeşil</div>
-                  <div className="text-xs text-green-300/70 mt-1">+20 Can</div>
+                  <div className="text-green-300 font-bold text-xl mt-1">{player.island.featherInventory.green}</div>
+                  <div className="text-xs font-medium text-green-200">Yeşil</div>
+                  <div className="bg-green-800/40 text-green-300 text-xs mt-1 px-2 py-0.5 rounded-full border border-green-700/30 flex items-center">
+                    <span className="material-icons text-xs mr-1">favorite</span>
+                    <span>+20 Can</span>
+                  </div>
                 </div>
-                <div className="bg-blue-900/60 p-2 rounded text-center flex flex-col items-center">
-                  <div className="h-16 w-full">
+                <div className="bg-gradient-to-br from-blue-900/70 to-sky-900/40 p-2 rounded-lg text-center flex flex-col items-center card-hover border border-blue-600/30">
+                  <div className="h-16 w-full model-container">
                     <FeatherViewer color="blue" scale={0.5} />
                   </div>
-                  <div className="text-blue-400 font-bold text-xl mt-1">{player.island.featherInventory.blue}</div>
-                  <div className="text-xs">Mavi</div>
-                  <div className="text-xs text-blue-300/70 mt-1">+20% Hız</div>
+                  <div className="text-blue-300 font-bold text-xl mt-1">{player.island.featherInventory.blue}</div>
+                  <div className="text-xs font-medium text-blue-200">Mavi</div>
+                  <div className="bg-blue-800/40 text-blue-300 text-xs mt-1 px-2 py-0.5 rounded-full border border-blue-700/30 flex items-center">
+                    <span className="material-icons text-xs mr-1">speed</span>
+                    <span>+20% Hız</span>
+                  </div>
                 </div>
-                <div className="bg-orange-900/60 p-2 rounded text-center flex flex-col items-center">
-                  <div className="h-16 w-full">
+                <div className="bg-gradient-to-br from-orange-900/70 to-amber-900/40 p-2 rounded-lg text-center flex flex-col items-center card-hover border border-orange-600/30">
+                  <div className="h-16 w-full model-container">
                     <FeatherViewer color="orange" scale={0.5} />
                   </div>
-                  <div className="text-orange-400 font-bold text-xl mt-1">{player.island.featherInventory.orange}</div>
-                  <div className="text-xs">Turuncu</div>
-                  <div className="text-xs text-orange-300/70 mt-1">+20 Saldırı</div>
+                  <div className="text-orange-300 font-bold text-xl mt-1">{player.island.featherInventory.orange}</div>
+                  <div className="text-xs font-medium text-orange-200">Turuncu</div>
+                  <div className="bg-orange-800/40 text-orange-300 text-xs mt-1 px-2 py-0.5 rounded-full border border-orange-700/30 flex items-center">
+                    <span className="material-icons text-xs mr-1">bolt</span>
+                    <span>+20 Saldırı</span>
+                  </div>
                 </div>
               </div>
             </div>
             
-            <div className="bg-gray-700/90 rounded-md p-3 mb-4">
-              <h4 className="text-md font-semibold mb-2">Ordu</h4>
-              <div className="grid grid-cols-2 gap-2">
-                <div className="bg-red-900/60 p-2 rounded text-center">
-                  <div className="text-red-400 font-bold">{player.island.army.soldiers}</div>
-                  <div className="text-xs">Asker</div>
+            <div className="glass-panel bg-indigo-900/20 rounded-md p-3 mb-4 border border-indigo-500/20">
+              <h4 className="text-md font-semibold mb-2 flex items-center">
+                <span className="material-icons mr-1 text-red-400">military_tech</span>
+                Ordu
+              </h4>
+              <div className="grid grid-cols-3 gap-3">
+                <div className="bg-gradient-to-br from-red-900/70 to-rose-900/40 p-3 rounded-lg text-center card-hover border border-red-600/30 col-span-2">
+                  <div className="text-red-300 font-bold text-2xl">{player.island.army.soldiers}</div>
+                  <div className="flex items-center justify-center text-xs mt-1">
+                    <span className="material-icons text-xs mr-1">shield</span>
+                    <span>Asker</span>
+                  </div>
                 </div>
-                <div className="bg-purple-900/60 p-2 rounded text-center">
-                  <div className="text-purple-400 font-bold">
+                <div className="bg-gradient-to-br from-purple-900/70 to-fuchsia-900/40 p-3 rounded-lg text-center card-hover border border-purple-600/30">
+                  <div className="text-purple-300 font-bold text-2xl">
                     {player.island.army.attackPower + player.island.army.bonuses.attackPower}
                   </div>
-                  <div className="text-xs">Saldırı</div>
+                  <div className="flex items-center justify-center text-xs mt-1">
+                    <span className="material-icons text-xs mr-1">bolt</span>
+                    <span>Saldırı</span>
+                  </div>
                 </div>
+              </div>
+
+              {/* Bonus göstergeleri */}
+              {(player.island.army.bonuses.health > 0 || 
+                player.island.army.bonuses.attackPower > 0 || 
+                player.island.army.bonuses.attackSpeed > 0) && (
+                <div className="mt-2 flex flex-wrap gap-1">
+                  {player.island.army.bonuses.health > 0 && (
+                    <span className="bg-green-800/50 text-green-300 text-xs px-2 py-0.5 rounded-full border border-green-700/30 flex items-center">
+                      <span className="material-icons text-xs mr-1">favorite</span>
+                      <span>+{player.island.army.bonuses.health}</span>
+                    </span>
+                  )}
+                  {player.island.army.bonuses.attackPower > 0 && (
+                    <span className="bg-orange-800/50 text-orange-300 text-xs px-2 py-0.5 rounded-full border border-orange-700/30 flex items-center">
+                      <span className="material-icons text-xs mr-1">bolt</span>
+                      <span>+{player.island.army.bonuses.attackPower}</span>
+                    </span>
+                  )}
+                  {player.island.army.bonuses.attackSpeed > 0 && (
+                    <span className="bg-blue-800/50 text-blue-300 text-xs px-2 py-0.5 rounded-full border border-blue-700/30 flex items-center">
+                      <span className="material-icons text-xs mr-1">speed</span>
+                      <span>+{player.island.army.bonuses.attackSpeed}%</span>
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
+            
+            <div className="glass-panel bg-indigo-900/20 rounded-md p-3 mb-4 border border-indigo-500/20">
+              <h4 className="text-md font-semibold mb-3 flex items-center">
+                <span className="material-icons mr-1 text-cyan-400">sports</span>
+                Aktiviteler
+              </h4>
+              
+              <div className="grid grid-cols-1 gap-2">
+                <button 
+                  className="bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-500 hover:to-blue-700 text-white font-bold py-3 px-4 rounded-lg w-full mb-1 flex items-center justify-center transition-all duration-300 border border-blue-500/50 shadow-md hover:shadow-lg"
+                  onClick={() => handleCollectFeathers()}
+                >
+                  <span className="material-icons mr-2">eco</span>
+                  Tüy Topla
+                </button>
+                
+                <button 
+                  className="bg-gradient-to-r from-red-600 to-red-800 hover:from-red-500 hover:to-red-700 text-white font-bold py-3 px-4 rounded-lg w-full flex items-center justify-center transition-all duration-300 border border-red-500/50 shadow-md hover:shadow-lg"
+                  onClick={() => handleTrainSoldiers(1)}
+                >
+                  <div className="flex items-center">
+                    <span className="material-icons mr-2">military_tech</span>
+                    <span>Asker Eğit</span>
+                  </div>
+                  <div className="ml-auto flex items-center bg-red-900/80 px-2 py-1 rounded-full text-xs border border-red-600/50">
+                    <span className="material-icons text-xs mr-1">paid</span>
+                    <span>5</span>
+                  </div>
+                </button>
               </div>
             </div>
             
-            <div className="mt-4">
-              <h4 className="text-md font-semibold mb-2">Aktiviteler</h4>
-              <button 
-                className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full mb-2 flex items-center justify-center"
-                onClick={() => handleCollectFeathers()}
-              >
-                <span className="material-icons mr-2">eco</span>
-                Tüy Topla
-              </button>
-              
-              <button 
-                className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded w-full mb-2 flex items-center justify-center"
-                onClick={() => handleTrainSoldiers(1)}
-              >
-                <span className="material-icons mr-2">military_tech</span>
-                Asker Eğit (5 Altın)
-              </button>
-            </div>
-            
-            <div className="mt-auto bg-gray-900/50 rounded-md p-3 h-1/4 overflow-y-auto">
-              <h4 className="text-xs font-semibold mb-1">Aktivite Logu</h4>
-              <div className="space-y-1">
+            <div className="mt-auto glass-panel bg-slate-900/30 rounded-lg p-3 h-1/4 overflow-y-auto border border-slate-600/20">
+              <h4 className="text-xs font-semibold mb-2 flex items-center text-blue-300">
+                <span className="material-icons text-xs mr-1">history</span>
+                Aktivite Logu
+              </h4>
+              <div className="space-y-2">
                 {actionLog.map((log, index) => (
-                  <div key={index} className="text-xs text-gray-300 flex items-center">
-                    <span className="material-icons text-xs mr-1">check_circle</span>
-                    {log}
+                  <div key={index} className="text-xs text-gray-300 flex items-start bg-slate-800/30 p-2 rounded border border-slate-700/30">
+                    <span className="material-icons text-xs mr-2 text-green-400 mt-0.5">check_circle</span>
+                    <span>{log}</span>
                   </div>
-                ))}
+                )).slice(-5)}
               </div>
             </div>
           </div>
           
           {/* Orta panel - Ada yönetimi ve tüy/yumurta sistemleri */}
-          <div className="flex-1 bg-gray-800/90 rounded-lg p-4 flex flex-col text-white">
-            <h3 className="text-lg font-bold mb-2">Tüy ve Yumurta Yönetimi</h3>
+          <div className="flex-1 glass-panel rounded-lg p-4 flex flex-col text-white">
+            <h3 className="text-lg font-bold mb-3 flex items-center border-b border-indigo-500/30 pb-2">
+              <span className="material-icons mr-2 text-amber-400">auto_awesome</span>
+              Tüy ve Yumurta Yönetimi
+            </h3>
             
             <div className="grid grid-cols-2 gap-4 mb-4">
               {/* Tüy birleştirme paneli - Açılır panel */}
-              <div className="bg-gray-700/90 rounded-md p-3 relative">
+              <div className="glass-panel bg-indigo-900/20 rounded-lg p-3 relative border border-indigo-500/20">
                 <div className="flex justify-between items-center mb-2">
-                  <h4 className="text-md font-semibold">Tüy Birleştirme</h4>
+                  <h4 className="text-md font-semibold flex items-center">
+                    <span className="material-icons mr-2 text-teal-400">merge_type</span>
+                    Tüy Birleştirme
+                  </h4>
                   <button 
-                    className="text-gray-300 hover:text-white"
+                    className="text-gray-300 hover:text-white bg-slate-800/50 rounded-full p-1 hover:bg-slate-700/70"
                     onClick={() => setBuildingSelected(buildingSelected === "feathers" ? null : "feathers")}
                   >
                     <span className="material-icons">
@@ -252,12 +345,17 @@ const PreparationPhase = () => {
                 
                 {buildingSelected === "feathers" ? (
                   <div>
-                    <p className="text-xs text-gray-300 mb-3">
-                      Aynı renkteki 3 tüyü birleştirerek yumurta elde edebilirsiniz.
-                      Her renk farklı bonuslar sağlar.
-                    </p>
+                    <div className="glass-panel bg-slate-900/40 rounded-lg p-3 mb-3 border border-slate-600/20">
+                      <p className="text-xs text-gray-300">
+                        Aynı renkteki 3 tüyü birleştirerek yumurta elde edebilirsiniz.
+                        Her renk farklı bonuslar sağlar.
+                      </p>
+                    </div>
                     
-                    <h5 className="text-sm font-medium text-gray-300 mb-2">Tüy Renkleri:</h5>
+                    <h5 className="text-sm font-medium text-blue-300 mb-2 flex items-center">
+                      <span className="material-icons mr-1 text-xs">palette</span>
+                      Tüy Renkleri:
+                    </h5>
                     <div className="grid grid-cols-3 gap-2 mb-3">
                       <button
                         className={`p-3 rounded-lg flex flex-col items-center justify-between ${
