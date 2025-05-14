@@ -183,51 +183,95 @@ const BattlePhase = () => {
           <div className="w-1/4 bg-gray-800/90 rounded-lg p-4 flex flex-col text-white">
             <h3 className="text-lg font-bold mb-2">{player.island.name}</h3>
             
+            {/* Ordu Gücü - Açılır panel */}
             <div className="bg-gray-700/90 rounded-md p-3 mb-4">
-              <h4 className="text-md font-semibold mb-2">Ordu Gücü</h4>
-              <div className="grid grid-cols-2 gap-2">
-                <div className="bg-red-900/60 p-2 rounded text-center">
-                  <div className="text-red-400 font-bold">{player.island.army.soldiers}</div>
-                  <div className="text-xs">Asker</div>
-                </div>
-                <div className="bg-purple-900/60 p-2 rounded text-center">
-                  <div className="text-purple-400 font-bold">
-                    {player.island.army.attackPower + player.island.army.bonuses.attackPower}
-                  </div>
-                  <div className="text-xs">Saldırı</div>
-                </div>
+              <div className="flex justify-between items-center mb-2">
+                <h4 className="text-md font-semibold">Ordu Gücü</h4>
+                <button 
+                  className="text-gray-300 hover:text-white"
+                  onClick={() => setBattleEffects(prev => 
+                    prev.includes("showArmy") ? 
+                    prev.filter(e => e !== "showArmy") : 
+                    [...prev, "showArmy"])
+                  }
+                >
+                  <span className="material-icons">
+                    {battleEffects.includes("showArmy") ? "expand_less" : "expand_more"}
+                  </span>
+                </button>
               </div>
+              
+              {battleEffects.includes("showArmy") ? (
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="bg-red-900/60 p-2 rounded text-center">
+                    <div className="text-red-400 font-bold">{player.island.army.soldiers}</div>
+                    <div className="text-xs">Asker</div>
+                  </div>
+                  <div className="bg-purple-900/60 p-2 rounded text-center">
+                    <div className="text-purple-400 font-bold">
+                      {player.island.army.attackPower + player.island.army.bonuses.attackPower}
+                    </div>
+                    <div className="text-xs">Saldırı</div>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-xs text-gray-300">
+                  Ordunuzun asker sayısı ve gücünü gösterir. Detaylar için tıklayın.
+                </div>
+              )}
             </div>
             
+            {/* Bonuslar - Açılır panel */}
             <div className="bg-gray-700/90 rounded-md p-3 mb-4">
-              <h4 className="text-md font-semibold mb-2">Bonuslar</h4>
-              <div className="grid grid-cols-1 gap-2">
-                {player.island.army.bonuses.health > 0 && (
-                  <div className="bg-green-900/60 p-2 rounded text-center">
-                    <div className="text-green-400 font-bold">+{player.island.army.bonuses.health}</div>
-                    <div className="text-xs">Can</div>
-                  </div>
-                )}
-                {player.island.army.bonuses.attackPower > 0 && (
-                  <div className="bg-red-900/60 p-2 rounded text-center">
-                    <div className="text-red-400 font-bold">+{player.island.army.bonuses.attackPower}</div>
-                    <div className="text-xs">Saldırı Gücü</div>
-                  </div>
-                )}
-                {player.island.army.bonuses.attackSpeed > 0 && (
-                  <div className="bg-blue-900/60 p-2 rounded text-center">
-                    <div className="text-blue-400 font-bold">+{player.island.army.bonuses.attackSpeed}%</div>
-                    <div className="text-xs">Saldırı Hızı</div>
-                  </div>
-                )}
-                {player.island.army.bonuses.health === 0 && 
-                 player.island.army.bonuses.attackPower === 0 && 
-                 player.island.army.bonuses.attackSpeed === 0 && (
-                  <div className="p-2 rounded text-center text-gray-400">
-                    Henüz bonus yok
-                  </div>
-                )}
+              <div className="flex justify-between items-center mb-2">
+                <h4 className="text-md font-semibold">Bonuslar</h4>
+                <button 
+                  className="text-gray-300 hover:text-white"
+                  onClick={() => setBattleEffects(prev => 
+                    prev.includes("showBonuses") ? 
+                    prev.filter(e => e !== "showBonuses") : 
+                    [...prev, "showBonuses"])
+                  }
+                >
+                  <span className="material-icons">
+                    {battleEffects.includes("showBonuses") ? "expand_less" : "expand_more"}
+                  </span>
+                </button>
               </div>
+              
+              {battleEffects.includes("showBonuses") ? (
+                <div className="grid grid-cols-1 gap-2">
+                  {player.island.army.bonuses.health > 0 && (
+                    <div className="bg-green-900/60 p-2 rounded text-center">
+                      <div className="text-green-400 font-bold">+{player.island.army.bonuses.health}</div>
+                      <div className="text-xs">Can</div>
+                    </div>
+                  )}
+                  {player.island.army.bonuses.attackPower > 0 && (
+                    <div className="bg-red-900/60 p-2 rounded text-center">
+                      <div className="text-red-400 font-bold">+{player.island.army.bonuses.attackPower}</div>
+                      <div className="text-xs">Saldırı Gücü</div>
+                    </div>
+                  )}
+                  {player.island.army.bonuses.attackSpeed > 0 && (
+                    <div className="bg-blue-900/60 p-2 rounded text-center">
+                      <div className="text-blue-400 font-bold">+{player.island.army.bonuses.attackSpeed}%</div>
+                      <div className="text-xs">Saldırı Hızı</div>
+                    </div>
+                  )}
+                  {player.island.army.bonuses.health === 0 && 
+                   player.island.army.bonuses.attackPower === 0 && 
+                   player.island.army.bonuses.attackSpeed === 0 && (
+                    <div className="p-2 rounded text-center text-gray-400">
+                      Henüz bonus yok
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="text-xs text-gray-300">
+                  Yumurtalardan kazandığınız kalıcı bonuslar. Detaylar için tıklayın.
+                </div>
+              )}
             </div>
             
             {/* Savaş efektleri */}
@@ -337,55 +381,99 @@ const BattlePhase = () => {
           <div className="w-1/4 bg-gray-800/90 rounded-lg p-4 flex flex-col text-white">
             <h3 className="text-lg font-bold mb-2">Düşman Dalgası</h3>
             
+            {/* Saldırı Gücü - Açılır panel */}
             <div className="bg-gray-700/90 rounded-md p-3 mb-4">
-              <h4 className="text-md font-semibold mb-2">Saldırı Gücü</h4>
-              <div className="grid grid-cols-2 gap-2">
-                <div className="bg-red-900/60 p-2 rounded text-center">
-                  <div className="text-red-400 font-bold">
-                    {currentEnemyWave ? currentEnemyWave.enemies.length : "?"}
-                  </div>
-                  <div className="text-xs">Düşman</div>
-                </div>
-                <div className="bg-purple-900/60 p-2 rounded text-center">
-                  <div className="text-purple-400 font-bold">
-                    {currentEnemyWave ? currentEnemyWave.totalAttackPower : "?"}
-                  </div>
-                  <div className="text-xs">Saldırı</div>
-                </div>
+              <div className="flex justify-between items-center mb-2">
+                <h4 className="text-md font-semibold">Saldırı Gücü</h4>
+                <button 
+                  className="text-gray-300 hover:text-white"
+                  onClick={() => setBattleEffects(prev => 
+                    prev.includes("showEnemyPower") ? 
+                    prev.filter(e => e !== "showEnemyPower") : 
+                    [...prev, "showEnemyPower"])
+                  }
+                >
+                  <span className="material-icons">
+                    {battleEffects.includes("showEnemyPower") ? "expand_less" : "expand_more"}
+                  </span>
+                </button>
               </div>
+              
+              {battleEffects.includes("showEnemyPower") ? (
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="bg-red-900/60 p-2 rounded text-center">
+                    <div className="text-red-400 font-bold">
+                      {currentEnemyWave ? currentEnemyWave.enemies.length : "?"}
+                    </div>
+                    <div className="text-xs">Düşman</div>
+                  </div>
+                  <div className="bg-purple-900/60 p-2 rounded text-center">
+                    <div className="text-purple-400 font-bold">
+                      {currentEnemyWave ? currentEnemyWave.totalAttackPower : "?"}
+                    </div>
+                    <div className="text-xs">Saldırı</div>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-xs text-gray-300">
+                  Düşmanların toplam sayısı ve saldırı gücü. Detaylar için tıklayın.
+                </div>
+              )}
             </div>
             
+            {/* Düşman birlikleri - Açılır panel */}
             <div className="bg-gray-700/90 rounded-md p-3 mb-4 flex-1 overflow-auto">
-              <h4 className="text-md font-semibold mb-2">Düşman Birlikleri</h4>
-              <div className="space-y-2">
-                {currentEnemyWave && currentEnemyWave.enemies.map((enemy, index) => {
-                  const isDefeated = defeatedEnemies.some(e => e.id === enemy.id);
-                  return (
-                    <div 
-                      key={enemy.id} 
-                      className={`bg-gray-800/90 p-2 rounded ${isDefeated ? 'opacity-50' : ''}`}
-                    >
-                      <div className="font-medium flex justify-between">
-                        <span>{getEnemyTypeName(enemy.type)}</span>
-                        <span className={isDefeated ? "line-through text-red-400" : "text-yellow-400"}>
-                          {isDefeated ? "Yenildi" : "Savaşıyor"}
-                        </span>
-                      </div>
-                      <div className="grid grid-cols-2 gap-1 mt-1">
-                        <div className="bg-red-900/40 p-1 rounded text-xs text-center">
-                          HP: {enemy.health}
-                        </div>
-                        <div className="bg-purple-900/40 p-1 rounded text-xs text-center">
-                          Güç: {enemy.attackPower}
-                        </div>
-                      </div>
-                      <div className="text-xs text-gray-400 mt-1">
-                        {getEnemyTypeDescription(enemy.type)}
-                      </div>
-                    </div>
-                  );
-                })}
+              <div className="flex justify-between items-center mb-2">
+                <h4 className="text-md font-semibold">Düşman Birlikleri</h4>
+                <button 
+                  className="text-gray-300 hover:text-white"
+                  onClick={() => setBattleEffects(prev => 
+                    prev.includes("showEnemyUnits") ? 
+                    prev.filter(e => e !== "showEnemyUnits") : 
+                    [...prev, "showEnemyUnits"])
+                  }
+                >
+                  <span className="material-icons">
+                    {battleEffects.includes("showEnemyUnits") ? "expand_less" : "expand_more"}
+                  </span>
+                </button>
               </div>
+              
+              {battleEffects.includes("showEnemyUnits") ? (
+                <div className="space-y-2">
+                  {currentEnemyWave && currentEnemyWave.enemies.map((enemy, index) => {
+                    const isDefeated = defeatedEnemies.some(e => e.id === enemy.id);
+                    return (
+                      <div 
+                        key={enemy.id} 
+                        className={`bg-gray-800/90 p-2 rounded ${isDefeated ? 'opacity-50' : ''}`}
+                      >
+                        <div className="font-medium flex justify-between">
+                          <span>{getEnemyTypeName(enemy.type)}</span>
+                          <span className={isDefeated ? "line-through text-red-400" : "text-yellow-400"}>
+                            {isDefeated ? "Yenildi" : "Savaşıyor"}
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-2 gap-1 mt-1">
+                          <div className="bg-red-900/40 p-1 rounded text-xs text-center">
+                            HP: {enemy.health}
+                          </div>
+                          <div className="bg-purple-900/40 p-1 rounded text-xs text-center">
+                            Güç: {enemy.attackPower}
+                          </div>
+                        </div>
+                        <div className="text-xs text-gray-400 mt-1">
+                          {getEnemyTypeDescription(enemy.type)}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="text-xs text-gray-300">
+                  Adanıza saldıran düşman tavus kuşlarının detayları. Tıklayın.
+                </div>
+              )}
             </div>
             
             {/* Düşman efektleri */}
