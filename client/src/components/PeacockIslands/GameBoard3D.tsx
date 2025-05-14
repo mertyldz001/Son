@@ -14,6 +14,7 @@ import {
   KeyboardControls,
   Line
 } from '@react-three/drei';
+import { OrbitControls as ThreeOrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
 import * as THREE from 'three';
 import { usePeacockIslandsStore } from '../../lib/stores/usePeacockIslandsStore';
@@ -348,6 +349,38 @@ const Battlefield = () => {
   );
 };
 
+// Kullanıcı Kamera Kontrol Bileşeni
+const CameraControls = () => {
+  const { camera, gl } = useThree();
+  
+  useEffect(() => {
+    // Üçüncü parti kütüphanelerle çalışırken DOM'u manuel oluştur
+    const controls = new ThreeOrbitControls(camera, gl.domElement);
+    
+    // Kamera ayarlarını yapılandır
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.1;
+    controls.enableZoom = true;
+    controls.enablePan = true;
+    controls.enableRotate = true;
+    controls.rotateSpeed = 1.0;
+    controls.zoomSpeed = 1.2;
+    controls.panSpeed = 0.8;
+    controls.minDistance = 5;
+    controls.maxDistance = 30;
+    controls.maxPolarAngle = Math.PI / 1.5;
+    
+    console.log('Kamera kontrolleri aktifleştirildi');
+    
+    // Temizlik fonksiyonu - bileşen unmount olduğunda çalışır
+    return () => {
+      controls.dispose();
+    };
+  }, [camera, gl]);
+  
+  return null;
+};
+
 // Ana canvas bileşeni
 const GameBoard3D = () => {
   const { currentPhase } = usePeacockIslandsStore();
@@ -477,22 +510,8 @@ const GameBoard3D = () => {
           />
         </EffectComposer>
         
-        {/* Kamera kontrolleri - Aktifleştirilmiş ve daha geniş açılı */}
-        <OrbitControls
-          makeDefault
-          enableDamping
-          dampingFactor={0.1}
-          rotateSpeed={1.2}
-          minDistance={5}
-          maxDistance={40}
-          enableZoom={true}
-          zoomSpeed={1.5}
-          enablePan={true}
-          panSpeed={1.0}
-          enabled={true}
-          maxPolarAngle={Math.PI / 1.2}
-          target={[0, 0, 0]}
-        />
+        {/* Kullanıcı tanımlı kamera kontrollerimiz */}
+        <CameraControls />
         
         {/* Gelişmiş sis efekti - Fazlara göre değişir */}
         <fog 
