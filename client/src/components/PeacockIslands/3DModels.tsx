@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useGLTF } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { GLTF } from "three-stdlib";
@@ -31,16 +31,27 @@ export function FeatherModel({ color = "green", position = [0, 0, 0], rotation =
   const { scene } = useGLTF('/models/peacock_feather.glb') as GLTFResult;
   
   // Tüy animasyonu için başlangıç değeri
-  const [rotationOffset, setRotationOffset] = useState(Math.random() * Math.PI * 2);
+  const [rotationOffset] = useState(Math.random() * Math.PI * 2);
   
-  // Animasyon için useFrame hook'u
-  useFrame((_: any, delta: number) => {
-    if (group.current) {
-      // Hafif dalgalanma efekti
-      group.current.rotation.z = rotation[2] + Math.sin(Date.now() * 0.001 + rotationOffset) * 0.1;
-      group.current.position.y = position[1] + Math.sin(Date.now() * 0.0015 + rotationOffset) * 0.05;
-    }
-  });
+  // useEffect ile animasyon
+  useEffect(() => {
+    let animationFrame: number;
+    
+    const animate = () => {
+      if (group.current) {
+        // Hafif dalgalanma efekti
+        group.current.rotation.z = rotation[2] + Math.sin(Date.now() * 0.001 + rotationOffset) * 0.1;
+        group.current.position.y = position[1] + Math.sin(Date.now() * 0.0015 + rotationOffset) * 0.05;
+      }
+      animationFrame = requestAnimationFrame(animate);
+    };
+    
+    animate();
+    
+    return () => {
+      cancelAnimationFrame(animationFrame);
+    };
+  }, [position, rotation, rotationOffset]);
   
   // Tüy rengini ve materyal özelliklerini ayarla
   scene.traverse((child) => {
@@ -107,26 +118,37 @@ export function EggModel({ color = "green", position = [0, 0, 0], rotation = [0,
   // Animasyon için başlangıç değeri
   const [rotationOffset] = useState(Math.random() * Math.PI * 2);
   
-  // Animasyon için useFrame hook'u
-  useFrame((_: any, delta: number) => {
-    if (group.current) {
-      if (isActive) {
-        // Aktif yumurtalar için titreme animasyonu
-        group.current.rotation.y = rotation[1] + Math.sin(Date.now() * 0.003 + rotationOffset) * 0.1;
-        group.current.rotation.x = rotation[0] + Math.cos(Date.now() * 0.002 + rotationOffset) * 0.05;
-        // Hafif yukarı-aşağı hareketi
-        group.current.position.y = position[1] + Math.sin(Date.now() * 0.002) * 0.05;
-        group.current.scale.set(
-          scale + Math.sin(Date.now() * 0.004) * 0.03, 
-          scale + Math.sin(Date.now() * 0.004) * 0.03, 
-          scale + Math.sin(Date.now() * 0.004) * 0.03
-        );
-      } else {
-        // Aktif olmayan yumurtalar için yavaş dönüş 
-        group.current.rotation.y = rotation[1] + Math.sin(Date.now() * 0.001) * 0.05;
+  // useEffect ile animasyon
+  useEffect(() => {
+    let animationFrame: number;
+    
+    const animate = () => {
+      if (group.current) {
+        if (isActive) {
+          // Aktif yumurtalar için titreme animasyonu
+          group.current.rotation.y = rotation[1] + Math.sin(Date.now() * 0.003 + rotationOffset) * 0.1;
+          group.current.rotation.x = rotation[0] + Math.cos(Date.now() * 0.002 + rotationOffset) * 0.05;
+          // Hafif yukarı-aşağı hareketi
+          group.current.position.y = position[1] + Math.sin(Date.now() * 0.002) * 0.05;
+          group.current.scale.set(
+            scale + Math.sin(Date.now() * 0.004) * 0.03, 
+            scale + Math.sin(Date.now() * 0.004) * 0.03, 
+            scale + Math.sin(Date.now() * 0.004) * 0.03
+          );
+        } else {
+          // Aktif olmayan yumurtalar için yavaş dönüş 
+          group.current.rotation.y = rotation[1] + Math.sin(Date.now() * 0.001) * 0.05;
+        }
       }
-    }
-  });
+      animationFrame = requestAnimationFrame(animate);
+    };
+    
+    animate();
+    
+    return () => {
+      cancelAnimationFrame(animationFrame);
+    };
+  }, [position, rotation, scale, isActive, rotationOffset]);
   
   // Yumurta rengini ve materyal özelliklerini gelişmiş hale getir
   scene.traverse((child) => {
@@ -257,13 +279,24 @@ export function HumanSoldierModel({ position = [0, 0, 0], rotation = [0, 0, 0], 
   const group = useRef<THREE.Group>(null);
   const { scene } = useGLTF('/models/human_soldier.glb') as GLTFResult;
   
-  // Model animasyonu için
-  useFrame((_: any, delta: number) => {
-    if (group.current) {
-      // Hafif nefes alma hareketi
-      group.current.position.y = position[1] + Math.sin(Date.now() * 0.002) * 0.03;
-    }
-  });
+  // useEffect ile model animasyonu
+  useEffect(() => {
+    let animationFrame: number;
+    
+    const animate = () => {
+      if (group.current) {
+        // Hafif nefes alma hareketi
+        group.current.position.y = position[1] + Math.sin(Date.now() * 0.002) * 0.03;
+      }
+      animationFrame = requestAnimationFrame(animate);
+    };
+    
+    animate();
+    
+    return () => {
+      cancelAnimationFrame(animationFrame);
+    };
+  }, [position]);
   
   // Modeli geliştir
   scene.traverse((child) => {

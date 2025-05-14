@@ -796,123 +796,31 @@ const GameBoard3D = () => {
           decay={2}
         />
         
-        {/* Gelişmiş Atmosferik Efektler */}
+        {/* Basitleştirilmiş Atmosferik Efektler */}
         {!isBattlePhase && (
-          <>
-            {/* Üç Boyutlu Bulutlar */}
-            <Float speed={0.5} rotationIntensity={0.2} floatIntensity={0.5}>
-              <group position={[15, 15, -10]}>
-                <mesh>
-                  <sphereGeometry args={[2, 16, 16]} />
-                  <meshStandardMaterial 
-                    color="#ffffff" 
-                    transparent 
-                    opacity={0.5} 
-                    roughness={0.9}
-                    envMapIntensity={0.7}
-                  />
-                </mesh>
-                <mesh position={[1, -0.5, 1]}>
-                  <sphereGeometry args={[1.5, 16, 16]} />
-                  <meshStandardMaterial 
-                    color="#ffffff" 
-                    transparent 
-                    opacity={0.6} 
-                    roughness={0.9}
-                  />
-                </mesh>
-                <mesh position={[-1, -0.2, -0.5]}>
-                  <sphereGeometry args={[1.7, 16, 16]} />
-                  <meshStandardMaterial 
-                    color="#ffffff" 
-                    transparent 
-                    opacity={0.55} 
-                    roughness={0.9}
-                  />
-                </mesh>
-              </group>
-            </Float>
-            
-            <Float speed={0.3} rotationIntensity={0.1} floatIntensity={0.3}>
-              <group position={[-15, 12, -5]}>
-                <mesh>
-                  <sphereGeometry args={[1.8, 16, 16]} />
-                  <meshStandardMaterial 
-                    color="#ffffff" 
-                    transparent 
-                    opacity={0.4} 
-                    roughness={0.9}
-                  />
-                </mesh>
-                <mesh position={[0.8, 0.2, 0.8]}>
-                  <sphereGeometry args={[1.4, 16, 16]} />
-                  <meshStandardMaterial 
-                    color="#ffffff" 
-                    transparent 
-                    opacity={0.45} 
-                    roughness={0.9}
-                  />
-                </mesh>
-              </group>
-            </Float>
-          </>
+          <group position={[15, 15, -10]}>
+            <mesh>
+              <sphereGeometry args={[2, 16, 16]} />
+              <meshStandardMaterial 
+                color="#ffffff" 
+                transparent 
+                opacity={0.5} 
+                roughness={0.9}
+              />
+            </mesh>
+          </group>
         )}
         
-        {/* Savaş aşamasında dramatik atmosfer */}
-        {isBattlePhase && (
-          <>
-            <Float speed={0.2} rotationIntensity={0.1} floatIntensity={0.2}>
-              <group position={[0, 20, 0]}>
-                <mesh>
-                  <sphereGeometry args={[3, 16, 16]} />
-                  <meshStandardMaterial 
-                    color="#334466" 
-                    transparent 
-                    opacity={0.3} 
-                    roughness={0.7}
-                    metalness={0.3}
-                  />
-                </mesh>
-              </group>
-            </Float>
-          </>
-        )}
-        
-        {/* Gelişmiş Parçacık Efektleri */}
-        {/* Genel parlak parçacıklar */}
+        {/* Basitleştirilmiş Parçacık Efektleri */}
+        {/* Genel parlak parçacıklar - Sayısı azaltıldı */}
         <Sparkles
-          count={isBattlePhase ? 80 : 60}
-          scale={12}
+          count={20}
+          scale={10}
           size={0.4}
           speed={0.2}
-          opacity={0.2}
+          opacity={0.15}
           color={isBattlePhase ? "#5050ff" : "#ffbb33"}
         />
-        
-        {/* Savaş fazında ekstra mavi parçacıklar */}
-        {isBattlePhase && (
-          <Sparkles
-            count={40}
-            scale={8}
-            size={0.5}
-            speed={0.3}
-            opacity={0.25}
-            color="#6699ff"
-          />
-        )}
-        
-        {/* Hazırlık fazında güneş ışığı parçacıkları */}
-        {!isBattlePhase && (
-          <Sparkles
-            count={30}
-            scale={6}
-            size={0.6}
-            speed={0.1}
-            opacity={0.3}
-            color="#ffdd99"
-            position={[5, 8, 5]}
-          />
-        )}
         
         {/* Kamera kontrolleri */}
         <CameraController />
@@ -920,20 +828,12 @@ const GameBoard3D = () => {
         {/* Oyun alanı */}
         <Battlefield />
         
-        {/* Gelişmiş Post-processing Efektleri */}
+        {/* Basitleştirilmiş Post-processing Efektleri */}
         <EffectComposer>
-          {/* Bloom efekti - Parlak kısımları vurgular */}
+          {/* Bloom efekti - Sadece en temel ayarlarla */}
           <Bloom
-            intensity={0.35}
-            luminanceThreshold={0.6}
-            luminanceSmoothing={0.9}
-            radius={0.6}
-          />
-          {/* Vignette efekti - Kenarları karartır, görsel odak oluşturur */}
-          <Vignette
-            offset={0.3}
-            darkness={0.7}
-            eskil={false}
+            intensity={0.2}
+            luminanceThreshold={0.8}
           />
         </EffectComposer>
         
