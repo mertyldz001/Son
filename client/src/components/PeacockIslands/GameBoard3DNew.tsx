@@ -446,23 +446,56 @@ const GameScene = () => {
       {/* Arka plan rengi - daha açık ve modern */}
       <color attach="background" args={['#364c6b']} />
       
-      {/* Neon modern zemin - parlak efektlerle */}
-      <mesh 
-        rotation={[-Math.PI / 2, 0, 0]} 
-        position={[0, -0.2, 6]} 
-        receiveShadow
-      >
-        <planeGeometry args={[20, 13]} />
-        <meshPhysicalMaterial 
-          color="#2a8d4e"
-          roughness={0.5} 
-          metalness={0.3}
-          clearcoat={0.4}
-          reflectivity={0.3}
-          emissive="#1a5530"
-          emissiveIntensity={0.2}
-        />
-      </mesh>
+      {/* TFT stili arena zemini - parlak ve derinlikli */}
+      <group position={[0, -0.25, 6]}>
+        {/* Ana zemin */}
+        <mesh 
+          rotation={[-Math.PI / 2, 0, 0]} 
+          position={[0, 0, 0]} 
+          receiveShadow
+        >
+          <planeGeometry args={[22, 15]} />
+          <meshPhysicalMaterial 
+            color="#2a8d4e"
+            roughness={0.4} 
+            metalness={0.4}
+            clearcoat={0.5}
+            reflectivity={0.4}
+            emissive="#1a5530"
+            emissiveIntensity={0.2}
+          />
+        </mesh>
+        
+        {/* Dekoratif kenar - TFT arena stili */}
+        <mesh 
+          rotation={[-Math.PI / 2, 0, 0]}
+          position={[0, 0.05, 0]}
+          receiveShadow
+        >
+          <ringGeometry args={[10, 10.5, 6]} />
+          <meshStandardMaterial 
+            color="#c0c0d0"
+            emissive="#8080a0"
+            emissiveIntensity={0.3}
+            metalness={0.8}
+            roughness={0.2}
+          />
+        </mesh>
+        
+        {/* Parlak ışık halkası - TFT stili */}
+        <mesh 
+          rotation={[-Math.PI / 2, 0, 0]}
+          position={[0, 0.1, 0]}
+        >
+          <ringGeometry args={[9.5, 9.8, 6]} />
+          <meshBasicMaterial 
+            color="#80a0ff"
+            transparent={true}
+            opacity={0.6}
+            side={THREE.DoubleSide}
+          />
+        </mesh>
+      </group>
       
       {/* Hexagonal Savaş Alanı - Daha geniş aralıklı */}
       <group position={[0, 0.1, 0]} scale={1.1}>

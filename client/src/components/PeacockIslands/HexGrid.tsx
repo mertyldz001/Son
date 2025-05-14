@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import * as THREE from 'three';
+import { useFrame } from '@react-three/fiber';
 import { Unit } from '../../lib/game/peacockIslands/types';
 import { PeacockWarriorModel, HumanSoldierModel } from './3DModels';
 
@@ -30,16 +31,35 @@ function HexTile({
   onHover, 
   onUnhover 
 }: HexTileProps) {
-  // Neon modern cam efekti - canlı renkler
+  // Neon modern cam efekti - canlı renkler (TFT stili)
   const baseColor = isPlayerSide ? "#4f9bff" : "#ff5252"; // Çok daha parlak neon mavi ve kırmızı
   const hoverColor = isPlayerSide ? "#64bdff" : "#ff7070"; // Ultra parlak vurgu renkleri
   const edgeColor = isPlayerSide ? "#0088ff" : "#ff2222";
   
+  // TFT stili hover animasyonu - yumuşak geçişli
+  const hoverScale = useRef(new THREE.Vector3(1, 1, 1));
+  const hoverHeight = useRef(0);
+  const glowIntensity = useRef(0);
+  
+  // Hover animasyonu - TFT stili yumuşak geçiş
+  useFrame(() => {
+    if (isHovered) {
+      hoverScale.current.lerp(new THREE.Vector3(1.08, 1.1, 1.08), 0.15);
+      hoverHeight.current += (0.1 - hoverHeight.current) * 0.1;
+      glowIntensity.current += (1.0 - glowIntensity.current) * 0.15;
+    } else {
+      hoverScale.current.lerp(new THREE.Vector3(1, 1, 1), 0.1);
+      hoverHeight.current += (0 - hoverHeight.current) * 0.1;
+      glowIntensity.current += (0.4 - glowIntensity.current) * 0.1;
+    }
+  });
+  
   return (
     <group position={position}>
       <mesh 
-        position={[0, 0.01, 0]} 
+        position={[0, hoverHeight.current, 0]} 
         rotation={[-Math.PI / 2, 0, 0]}
+        scale={hoverScale.current}
         onPointerOver={onHover}
         onPointerOut={onUnhover}
         onClick={(e) => {
@@ -65,47 +85,68 @@ function HexTile({
           isOccupied
         }}
       >
-        <boxGeometry args={[size * 1.5, 0.25, size * 1.5]} />
+        {/* TFT stili hexagonal geometri yerine kareden */}
+        <cylinderGeometry args={[size * 1.0, size * 1.0, 0.3, 6, 1, false]} />
         <meshPhysicalMaterial 
           color={isHovered ? hoverColor : baseColor} 
-          roughness={0.2}
-          metalness={0.4}
+          roughness={0.15} // Çok parlak
+          metalness={0.7}  // Daha metalik görünüm
           transparent={true}
-          opacity={isOccupied ? 0.8 : 0.9}
+          opacity={isOccupied ? 0.85 : 0.95}
           emissive={isHovered ? hoverColor : baseColor}
-          emissiveIntensity={0.4}
-          clearcoat={0.8}
-          clearcoatRoughness={0.3}
-          transmission={0.6}
-          reflectivity={0.5}
+          emissiveIntensity={glowIntensity.current} // Animasyonlu glow efekti
+          clearcoat={1.0}  // Tam parlak yüzey
+          clearcoatRoughness={0.2}
+          transmission={0.4}
+          reflectivity={0.8}
+          envMapIntensity={1.5} // Çevre yansıması
         />
       </mesh>
       
-      {/* Modern neon kenar çizgisi */}
+      {/* TFT stili parlak kenar çizgisi */}
       <mesh 
         position={[0, 0.035, 0]} 
         rotation={[-Math.PI / 2, 0, 0]}
+        scale={hoverScale.current}
       >
-        <ringGeometry args={[size * 1.5, size * 1.55, 6]} />
+        <ringGeometry args={[size * 1.05, size * 1.1, 6]} />
         <meshBasicMaterial 
           color={isHovered ? "#ffffff" : edgeColor} 
           side={THREE.DoubleSide} 
           transparent={true}
-          opacity={0.9}
+          opacity={isHovered ? 1.0 : 0.9}
         />
       </mesh>
       
-      {/* İç parlama efekti */}
+      {/* TFT stili glow efekti */}
       <mesh 
         position={[0, 0.02, 0]} 
         rotation={[-Math.PI / 2, 0, 0]}
+        scale={hoverScale.current}
       >
-        <ringGeometry args={[size * 1.4, size * 1.45, 6]} />
-        <meshBasicMaterial 
+        <ringGeometry args={[size * 0.95, size * 1.0, 6]} />
+        <meshStandardMaterial 
           color={isHovered ? "#ffffff" : baseColor} 
           side={THREE.DoubleSide} 
           transparent={true}
-          opacity={0.7}
+          opacity={isHovered ? 0.9 : 0.7}
+          emissive={isHovered ? "#ffffff" : baseColor}
+          emissiveIntensity={glowIntensity.current}
+        />
+      </mesh>
+      
+      {/* TFT stili iç dolgu efekti */}
+      <mesh
+        position={[0, 0.01, 0]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        scale={hoverScale.current}
+      >
+        <circleGeometry args={[size * 0.9, 6]} />
+        <meshBasicMaterial
+          color={isPlayerSide ? "#1a4a9f" : "#9f1a1a"}
+          transparent={true}
+          opacity={0.3}
+          side={THREE.DoubleSide}
         />
       </mesh>
       
