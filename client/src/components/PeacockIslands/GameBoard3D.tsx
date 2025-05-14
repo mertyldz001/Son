@@ -10,12 +10,14 @@ import {
   Cloud,
   Float,
   MeshDistortMaterial,
-  PresentationControls
+  PresentationControls,
+  KeyboardControls
 } from '@react-three/drei';
 import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
 import * as THREE from 'three';
 import { usePeacockIslandsStore } from '../../lib/stores/usePeacockIslandsStore';
 import { PeacockWarriorModel, HumanSoldierModel } from './3DModels';
+import { PenguinAvatar } from './PenguinAvatar';
 
 // Animasyonlu su yüzeyi bileşeni
 const AnimatedWater = ({ position = [0, 0, 0], size = 20 }) => {
@@ -825,6 +827,18 @@ const GameBoard3D = () => {
         
         {/* Kamera kontrolleri */}
         <CameraController />
+        
+        {/* Klavye kontrolleri ve oyuncu karakteri */}
+        <KeyboardControls
+          map={[
+            { name: "KeyW", keys: ["ArrowUp", "KeyW"] },
+            { name: "KeyS", keys: ["ArrowDown", "KeyS"] },
+            { name: "KeyA", keys: ["ArrowLeft", "KeyA"] },
+            { name: "KeyD", keys: ["ArrowRight", "KeyD"] }
+          ]}
+        >
+          <PenguinAvatar />
+        </KeyboardControls>
         
         {/* Oyun alanı */}
         <Battlefield />
