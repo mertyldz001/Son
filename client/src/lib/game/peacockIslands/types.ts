@@ -1,6 +1,19 @@
 // Oyun fazlarını tanımlayan tip
 export type GamePhase = "menu" | "preparation" | "battle" | "gameOver";
 
+// Oyun durumu
+export interface GameState {
+  currentPhase: GamePhase;
+  currentTurn: number;
+  player: Player;
+  npc: Player;
+  preparationTimeLeft: number;
+  currentEnemyWave: EnemyWave | null;
+  lastBattleResult: BattleResult | null;
+  actionLog: string[]; // Oyuncuya gösterilecek aksiyon günlüğü
+  battleLog: string[]; // Savaş kayıtları
+}
+
 // Oyuncu tipi
 export interface Player {
   id: string;

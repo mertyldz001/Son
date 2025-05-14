@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { usePeacockIslandsStore } from "../../lib/stores/usePeacockIslandsStore";
 import { useAudio } from "../../lib/stores/useAudio";
-import GameBoard3D from "./GameBoard3D";
+import GameBoard3D from "./GameBoard3DNew";
 
 const GameOver = () => {
   const { player, currentTurn, resetGame } = usePeacockIslandsStore();

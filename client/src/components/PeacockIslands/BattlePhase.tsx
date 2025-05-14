@@ -4,7 +4,7 @@ import { useAudio } from "../../lib/stores/useAudio";
 import { getEnemyTypeName, getEnemyTypeDescription } from "../../lib/game/peacockIslands/enemies";
 import { PeacockEnemy, BattleResult, FeatherInventory } from "../../lib/game/peacockIslands/types";
 import { getFeatherColorName } from "../../lib/game/peacockIslands/battle";
-import GameBoard3D from "./GameBoard3D";
+import GameBoard3D from "./GameBoard3DNew";
 
 const BattlePhase = () => {
   const { player, npc, currentEnemyWave, endBattlePhase, processBattle } = usePeacockIslandsStore();
