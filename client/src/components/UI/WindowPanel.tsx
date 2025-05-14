@@ -129,7 +129,7 @@ const WindowPanel: React.FC<WindowPanelProps> = ({
     <motion.div 
       ref={constraintsRef}
       className="absolute inset-0 pointer-events-none overflow-hidden"
-      style={{ zIndex: isFullScreen ? 100 : 10 }}
+      style={{ zIndex: isFullScreen ? 100 : 'auto' }}
     >
       <motion.div
         ref={panelRef}

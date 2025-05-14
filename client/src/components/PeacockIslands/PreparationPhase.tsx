@@ -173,10 +173,10 @@ const PreparationPhase = () => {
           </div>
         </div>
         
-        {/* Ana içerik */}
-        <div className="flex gap-4 h-3/4 pointer-events-auto">
+        {/* Ana içerik - Yeni düzen */}
+        <div className="flex gap-6 h-3/4 pointer-events-auto">
           {/* Sol panel - Oyuncu bilgileri */}
-          <div className="w-1/4 glass-panel rounded-lg p-4 flex flex-col text-white">
+          <div className="w-1/4 glass-panel rounded-lg p-4 flex flex-col text-white relative z-10">
             <div className="flex items-center mb-4">
               <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center mr-3 border-2 border-blue-400">
                 <span className="material-icons">person</span>
@@ -361,7 +361,7 @@ const PreparationPhase = () => {
           </div>
           
           {/* Orta panel - Ada yönetimi ve tüy/yumurta sistemleri */}
-          <div className="flex-1 relative">
+          <div className="flex-1 relative z-0">
             {/* Üst düğme çubuğu - TFT stilinde */}
             <div className="absolute top-5 right-5 flex gap-3 z-10">
               <button 
