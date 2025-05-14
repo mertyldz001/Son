@@ -31,8 +31,14 @@ const addDeployUnitFunctions = () => {
           isDeployed: true
         };
         
+        console.log(`Birim ${unitId} pozisyona yerleştirildi: q:${position.q}, r:${position.r}, s:${position.s}`);
+        
         // State'i güncelle
         if (isPlayer) {
+          const newActionLog = [...(state.actionLog || []), 
+            `${updatedUnits[unitIndex].type === 'warrior' ? 'Tavus Askeri' : 'İnsan Askeri'} savaş alanına yerleştirildi!`
+          ];
+          
           return {
             ...state,
             player: {
@@ -42,7 +48,7 @@ const addDeployUnitFunctions = () => {
                 units: updatedUnits
               }
             },
-            actionLog: [...state.actionLog, `${updatedUnits[unitIndex].type === 'warrior' ? 'Tavus Askeri' : 'İnsan Askeri'} savaş alanına yerleştirildi!`]
+            actionLog: newActionLog
           };
         } else {
           return {
@@ -80,8 +86,14 @@ const addDeployUnitFunctions = () => {
           isDeployed: false
         };
         
+        console.log(`Birim ${unitId} savaş alanından çıkarıldı`);
+        
         // State'i güncelle
         if (isPlayer) {
+          const newActionLog = [...(state.actionLog || []), 
+            `${updatedUnits[unitIndex].type === 'warrior' ? 'Tavus Askeri' : 'İnsan Askeri'} savaş alanından çıkarıldı!`
+          ];
+          
           return {
             ...state,
             player: {
@@ -91,7 +103,7 @@ const addDeployUnitFunctions = () => {
                 units: updatedUnits
               }
             },
-            actionLog: [...state.actionLog, `${updatedUnits[unitIndex].type === 'warrior' ? 'Tavus Askeri' : 'İnsan Askeri'} savaş alanından çıkarıldı!`]
+            actionLog: newActionLog
           };
         } else {
           return {

@@ -174,6 +174,8 @@ export const usePeacockIslandsStore = create<PeacockIslandsStore>((set, get) => 
   preparationTimeLeft: PREPARATION_TIME,
   currentEnemyWave: null,
   lastBattleResult: null,
+  actionLog: [],
+  battleLog: [],
   
   // Oyun akışı eylemleri
   startGame: () => {

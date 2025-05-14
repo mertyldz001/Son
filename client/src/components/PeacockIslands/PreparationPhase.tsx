@@ -30,8 +30,28 @@ const PreparationPhase = () => {
   
   // Birim ve UI durum değişkenleri
   const [showUnitCards, setShowUnitCards] = useState(false);
+  const [draggedUnit, setDraggedUnit] = useState<Unit | null>(null);
+  
+  // Birim kategorileri
   const peacockWarriors = player.island.units.filter((unit: Unit) => unit.type === "warrior");
   const humanSoldiers = player.island.units.filter((unit: Unit) => unit.type === "soldier");
+  
+  // Her bir üye durumunu takip et (yerleştirildi mi?)
+  const deployedUnits = player.island.units.filter((unit: Unit) => unit.isDeployed);
+  
+  // Hex koordinata tıklandığında
+  const handleHexClick = (coords: {q: number, r: number, s: number}) => {
+    if (draggedUnit) {
+      // Eğer bir birim seçiliyse ve oyuncu tarafına sürükleniyorsa
+      if (coords.r >= 3) { // Oyuncu tarafı (alt 3 sıra)
+        deployUnit(player.id, draggedUnit.id, coords);
+        playClick();
+        setDraggedUnit(null);
+        return true;
+      }
+    }
+    return false;
+  };
   const { playClick, playCollect, playBuild } = useAudio();
   
   const [lastTime, setLastTime] = useState(Date.now());
@@ -135,8 +155,7 @@ const PreparationPhase = () => {
   const peacockWarriorCount = activeWarriors.length;
   const humanSoldierCount = activeSoldiers.length;
 
-  // Savaş alanındaki konumlandırılmış birimler
-  const deployedUnits = player.island.units.filter((unit: Unit) => unit.isDeployed);
+  // NOT: Yukarıda deployedUnits değişkeni zaten tanımlandı
   
   return (
     <div className="w-full h-full relative">
@@ -843,21 +862,23 @@ const PreparationPhase = () => {
                       <div className="space-y-2">
                         {peacockWarriors.map((unit: Unit) => (
                           <div key={unit.id} className="transition-transform transform hover:scale-[1.02]">
-                            <DragDrop 
-                              unit={unit} 
-                              onDrop={(unit, hexCoords) => {
-                                deployUnit(player.id, unit.id, hexCoords);
-                                playClick();
+                            <div 
+                              className={`cursor-grab ${unit.isDeployed ? 'opacity-60' : ''}`}
+                              onMouseDown={() => {
+                                if (!unit.isDeployed) {
+                                  setDraggedUnit(unit);
+                                  playClick();
+                                }
                               }}
                             >
                               <UnitCard 
                                 unit={unit} 
-                                isDragging={false} 
+                                isDragging={draggedUnit?.id === unit.id} 
                                 onDragStart={() => {}} 
                                 onDragEnd={() => {}} 
                                 isDeployed={unit.isDeployed}
                               />
-                            </DragDrop>
+                            </div>
                           </div>
                         ))}
                       </div>
@@ -871,21 +892,23 @@ const PreparationPhase = () => {
                       <div className="space-y-2">
                         {humanSoldiers.map((unit: Unit) => (
                           <div key={unit.id} className="transition-transform transform hover:scale-[1.02]">
-                            <DragDrop 
-                              unit={unit} 
-                              onDrop={(unit, hexCoords) => {
-                                deployUnit(player.id, unit.id, hexCoords);
-                                playClick();
+                            <div 
+                              className={`cursor-grab ${unit.isDeployed ? 'opacity-60' : ''}`}
+                              onMouseDown={() => {
+                                if (!unit.isDeployed) {
+                                  setDraggedUnit(unit);
+                                  playClick();
+                                }
                               }}
                             >
                               <UnitCard 
                                 unit={unit} 
-                                isDragging={false} 
+                                isDragging={draggedUnit?.id === unit.id} 
                                 onDragStart={() => {}} 
                                 onDragEnd={() => {}} 
                                 isDeployed={unit.isDeployed}
                               />
-                            </DragDrop>
+                            </div>
                           </div>
                         ))}
                       </div>
