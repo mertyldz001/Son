@@ -143,11 +143,26 @@ export function PeacockWarriorModel({ position = [0, 0, 0], rotation = [0, 0, 0]
       break;
   }
   
-  // Modelin rengini ayarla
+  // Modelin rengini ve materyalini gelişmiş hale getir
   scene.traverse((child) => {
     if (child instanceof THREE.Mesh && child.material instanceof THREE.MeshStandardMaterial) {
       child.material = child.material.clone();
       child.material.color.multiply(color);
+      
+      // Gelişmiş materyal özellikleri
+      child.material.metalness = 0.4;  // Metalik görünüm
+      child.material.roughness = 0.3;  // Daha pürüzsüz yüzey
+      child.material.envMapIntensity = 1.5; // Çevre yansıması
+      
+      // Gölge ve ışık efektleri
+      child.castShadow = true;
+      child.receiveShadow = true;
+      
+      // Emissive (kendi kendine parlayan) özellik ekle
+      if (type === "alpha") {
+        child.material.emissive = new THREE.Color(0xff3300);
+        child.material.emissiveIntensity = 0.3;
+      }
     }
   });
   
@@ -158,7 +173,7 @@ export function PeacockWarriorModel({ position = [0, 0, 0], rotation = [0, 0, 0]
   );
 }
 
-// İnsan asker modeli
+// Geliştirilmiş insan asker modeli
 export function HumanSoldierModel({ position = [0, 0, 0], rotation = [0, 0, 0], scale = 1 }: { 
   position?: [number, number, number]; 
   rotation?: [number, number, number];
@@ -167,9 +182,45 @@ export function HumanSoldierModel({ position = [0, 0, 0], rotation = [0, 0, 0], 
   const group = useRef<THREE.Group>(null);
   const { scene } = useGLTF('/models/human_soldier.glb') as GLTFResult;
   
+  // Model animasyonu için
+  useFrame((_, delta) => {
+    if (group.current) {
+      // Hafif nefes alma hareketi
+      group.current.position.y = position[1] + Math.sin(Date.now() * 0.002) * 0.03;
+    }
+  });
+  
+  // Modeli geliştir
+  scene.traverse((child) => {
+    if (child instanceof THREE.Mesh && child.material instanceof THREE.MeshStandardMaterial) {
+      child.material = child.material.clone();
+      
+      // Metalik zırh parçaları için
+      child.material.metalness = 0.7;
+      child.material.roughness = 0.2;
+      child.material.envMapIntensity = 1.8;
+      
+      // Gölge oluşturma ve alma
+      child.castShadow = true;
+      child.receiveShadow = true;
+      
+      // Hafif parlaklık
+      child.material.emissive = new THREE.Color(0x3366ff);
+      child.material.emissiveIntensity = 0.1;
+    }
+  });
+  
   return (
     <group ref={group} position={position} rotation={rotation} scale={[scale, scale, scale]}>
       <primitive object={scene.clone()} />
+      
+      {/* Asker etrafında hafif ışık efekti */}
+      <pointLight 
+        position={[0, 0.5, 0]} 
+        intensity={0.4} 
+        distance={1.5} 
+        color="#6699ff"
+      />
     </group>
   );
 }
