@@ -282,7 +282,7 @@ const EnemyIsland = ({ position = [0, 0, 0] }) => {
 // Ana oyun alanı
 const GameScene = () => {
   const { currentPhase, player } = usePeacockIslandsStore();
-  const [zoom, setZoom] = useState(18);
+  const [zoom, setZoom] = useState(25);
   const [hoveredHex, setHoveredHex] = useState<{q: number, r: number, s: number} | null>(null);
   const [dragCursor, setDragCursor] = useState<{
     visible: boolean;
@@ -312,18 +312,18 @@ const GameScene = () => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === '+' || e.key === '=') {
         console.log("Yakınlaşma komutu alındı");
-        if (zoom > 12) { // Minimum zoom (daha yakın)
+        if (zoom > 18) { // Minimum zoom (daha yakın)
           setZoom(z => {
-            const newZoom = z - 1.5;
+            const newZoom = z - 2.5;
             console.log("Yeni zoom seviyesi:", newZoom);
             return newZoom;
           });
         }
       } else if (e.key === '-' || e.key === '_') {
         console.log("Uzaklaşma komutu alındı");
-        if (zoom < 24) { // Maksimum zoom (daha uzak)
+        if (zoom < 40) { // Maksimum zoom (daha uzak)
           setZoom(z => {
-            const newZoom = z + 1.5;
+            const newZoom = z + 2.5;
             console.log("Yeni zoom seviyesi:", newZoom);
             return newZoom;
           });
@@ -408,11 +408,11 @@ const GameScene = () => {
   
   return (
     <>
-      {/* Düz görünüm için kamera */}
+      {/* Düz görünüm için kamera - daha uzak mesafe */}
       <PerspectiveCamera 
-        position={[0, 0, 15]} 
+        position={[0, 2, 25]} 
         rotation={[0, 0, 0]} 
-        fov={30}
+        fov={25}
         near={0.1} 
         far={100}
         makeDefault
