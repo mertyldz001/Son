@@ -19,6 +19,8 @@ import * as THREE from 'three';
 import { usePeacockIslandsStore } from '../../lib/stores/usePeacockIslandsStore';
 import { PeacockWarriorModel, HumanSoldierModel } from './3DModels';
 import { PenguinAvatar } from './PenguinAvatar';
+import HexGrid from './HexGrid';
+import { getDeployedUnitPositionsMap } from '../../lib/game/peacockIslands/unitSystem';
 
 // Animasyonlu su yüzeyi bileşeni
 const AnimatedWater = ({ position = [0, 0, 0], size = 20 }) => {

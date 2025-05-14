@@ -3,7 +3,7 @@ import { usePeacockIslandsStore } from "../../lib/stores/usePeacockIslandsStore"
 import { useAudio } from "../../lib/stores/useAudio";
 import { FeatherColor, HatcherySlot, Egg, Unit } from "../../lib/game/peacockIslands/types";
 import { getFeatherColorName, getBonusTypeName } from "../../lib/game/peacockIslands/battle";
-import GameBoard3D from "./GameBoard3D";
+import GameBoard3D from "./GameBoard3DNew";
 import { FeatherViewer, EggViewer } from "./ModelViewer";
 import UnitCard from "./UnitCard";
 import DragDrop from "./DragDrop";
