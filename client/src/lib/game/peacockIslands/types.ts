@@ -59,6 +59,7 @@ export interface HatcherySlot {
   id: string;
   egg: Egg | null;
   isActive: boolean;
+  status: "empty" | "incubating" | "ready"; // Durumu
 }
 
 // Bina tipi
