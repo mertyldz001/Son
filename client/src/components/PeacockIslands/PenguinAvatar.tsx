@@ -9,7 +9,7 @@ import { usePeacockIslandsStore } from "../../lib/stores/usePeacockIslandsStore"
 export function PenguinAvatar() {
   const { currentPhase } = usePeacockIslandsStore();
   const model = useRef<THREE.Group>(null);
-  const [position, setPosition] = useState<[number, number, number]>([0, 0.3, 0]);
+  const [position, setPosition] = useState<[number, number, number]>([0, 0.05, 0]);
   const [rotation, setRotation] = useState<[number, number, number]>([0, 0, 0]);
   const [isMoving, setIsMoving] = useState(false);
   
@@ -20,8 +20,8 @@ export function PenguinAvatar() {
   const moveRight = useKeyboardControls(state => state.KeyD);
   
   // Hareket hızı
-  const speed = 0.05;
-  const rotateSpeed = 0.1;
+  const speed = 0.04; // Daha kontrollü hareket için hızı azalttık
+  const rotateSpeed = 0.08; // Dönüş hızını azalttık
   
   // Animasyon ve hareket
   useFrame((_, delta) => {
@@ -70,7 +70,7 @@ export function PenguinAvatar() {
         // Model animasyonu
         if (moving) {
           const bounce = Math.sin(Date.now() * 0.01) * 0.05;
-          model.current.position.y = 0.3 + bounce;
+          model.current.position.y = 0.05 + bounce; // Düşük y değeri ile zemine yakın tutuyoruz
         }
       }
     }
@@ -90,24 +90,24 @@ export function PenguinAvatar() {
       floatIntensity={0.2}
       position={position}
     >
-      <group ref={model} rotation={rotation} scale={[1.2, 1.2, 1.2]}>
+      <group ref={model} rotation={rotation} scale={[0.5, 0.5, 0.5]}>
         <primitive object={gltf.scene.clone()} />
         
         {/* Avatar efektleri */}
         <Sparkles 
-          count={15}
-          scale={1.5}
-          size={0.2}
+          count={10}
+          scale={0.8}
+          size={0.1}
           speed={0.3}
           color="#aaddff"
-          position={[0, 0.5, 0]}
+          position={[0, 0.3, 0]}
         />
         
         {/* Oyuncu vurgusu */}
         <pointLight
-          position={[0, 0.5, 0]}
-          intensity={0.4}
-          distance={2}
+          position={[0, 0.2, 0]}
+          intensity={0.3}
+          distance={1}
           color="#66ccff"
         />
       </group>
