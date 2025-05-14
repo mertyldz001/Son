@@ -152,11 +152,12 @@ const GameMenu = () => {
       {loading && (
         <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-black to-indigo-950/90 z-50">
           <div className="flex flex-col items-center relative">
-            {/* Altıgen yükleme animasyonu */}
+            {/* Geliştirilmiş altıgen yükleme animasyonu */}
             <div className="relative w-40 h-40">
+              {/* Dış altıgen katmanı */}
               {[...Array(6)].map((_, i) => (
                 <motion.div
-                  key={`loading-hex-${i}`}
+                  key={`loading-hex-outer-${i}`}
                   className="absolute top-0 left-0 w-full h-full"
                   style={{
                     transformOrigin: "center",
@@ -164,7 +165,7 @@ const GameMenu = () => {
                   }}
                 >
                   <motion.div
-                    className="absolute top-0 w-2 h-10 bg-gradient-to-b from-blue-400 to-blue-600 rounded-full"
+                    className="absolute top-0 w-2 h-12 bg-gradient-to-b from-blue-400 to-blue-600 rounded-full"
                     style={{ left: "calc(50% - 1px)" }}
                     initial={{ scaleY: 0.3, opacity: 0.3 }}
                     animate={{ 
@@ -172,22 +173,57 @@ const GameMenu = () => {
                       opacity: [0.3, 1, 0.3],
                     }}
                     transition={{
-                      duration: 1.5,
+                      duration: 1.8,
                       repeat: Infinity,
-                      delay: i * 0.2,
+                      delay: i * 0.18,
                       ease: "easeInOut"
                     }}
                   />
                 </motion.div>
               ))}
               
-              {/* Ortadaki logo/amblem */}
+              {/* İç altıgen katmanı - Ters yönde dönen */}
+              <div className="absolute inset-0 scale-75">
+                {[...Array(6)].map((_, i) => (
+                  <motion.div
+                    key={`loading-hex-inner-${i}`}
+                    className="absolute top-0 left-0 w-full h-full"
+                    style={{
+                      transformOrigin: "center",
+                      rotate: `${i * 60 + 30}deg`,
+                    }}
+                  >
+                    <motion.div
+                      className="absolute top-0 w-1.5 h-9 bg-gradient-to-b from-amber-300 to-amber-500 rounded-full"
+                      style={{ left: "calc(50% - 0.75px)" }}
+                      initial={{ scaleY: 0.5, opacity: 0.3 }}
+                      animate={{ 
+                        scaleY: [0.5, 1, 0.5], 
+                        opacity: [0.3, 0.8, 0.3],
+                      }}
+                      transition={{
+                        duration: 1.5,
+                        repeat: Infinity,
+                        delay: i * 0.14,
+                        ease: "easeInOut"
+                      }}
+                    />
+                  </motion.div>
+                ))}
+              </div>
+              
+              {/* Ortadaki logo/amblem - Daha şık tasarım */}
               <motion.div
-                className="absolute inset-0 m-auto w-16 h-16 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center"
-                initial={{ scale: 0.9, opacity: 0.6 }}
+                className="absolute inset-0 m-auto w-20 h-20 rounded-lg overflow-hidden backdrop-blur-sm bg-gradient-to-br from-amber-500/90 to-amber-600/90 flex items-center justify-center rotate-45 shadow-lg border-2 border-amber-300/30"
+                initial={{ scale: 0.9, opacity: 0.7, rotate: 45 }}
                 animate={{ 
-                  scale: [0.9, 1.1, 0.9],
-                  opacity: [0.6, 1, 0.6]
+                  scale: [0.9, 1, 0.9],
+                  opacity: [0.7, 1, 0.7],
+                  boxShadow: [
+                    "0 0 10px rgba(251, 191, 36, 0.3)",
+                    "0 0 20px rgba(251, 191, 36, 0.5)",
+                    "0 0 10px rgba(251, 191, 36, 0.3)"
+                  ]
                 }}
                 transition={{
                   duration: 3,
@@ -195,8 +231,26 @@ const GameMenu = () => {
                   ease: "easeInOut"
                 }}
               >
-                <span className="text-white text-xl font-bold">TKA</span>
+                <div className="rotate-[-45deg] flex flex-col items-center justify-center">
+                  <span className="text-white text-xl font-bold tracking-wider">TKA</span>
+                  <div className="w-full h-px bg-white/30 mt-1 mb-1"></div>
+                  <span className="text-white/70 text-[9px] tracking-widest">TAVUS KUŞU</span>
+                </div>
               </motion.div>
+              
+              {/* Dış ışık halkası */}
+              <motion.div
+                className="absolute inset-0 m-auto w-36 h-36 rounded-full border border-blue-400/20"
+                animate={{
+                  opacity: [0.2, 0.4, 0.2],
+                  scale: [0.9, 1.05, 0.9]
+                }}
+                transition={{
+                  duration: 4,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              />
             </div>
             
             {/* Yükleniyor metni */}
@@ -223,16 +277,89 @@ const GameMenu = () => {
       )}
       
       <div className="absolute inset-0 flex items-center justify-between z-10">
-        {/* Sol tarafta dekoratif elementler */}
+        {/* Sol tarafta geliştirilmiş TFT tarzı altıgen paneller */}
         <motion.div 
           initial={{ opacity: 0, x: -50 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8, delay: 0.3 }}
           className="hidden lg:block w-1/4 h-full"
         >
-          <div className="flex flex-col items-end justify-center h-full pr-10">
-            <div className="w-32 h-60 border-2 border-amber-500/30 rounded-full bg-gradient-to-br from-amber-900/20 to-amber-500/10 backdrop-blur-sm" />
-            <div className="w-24 h-24 -mt-20 ml-10 border-2 border-blue-500/30 rounded-full bg-gradient-to-br from-blue-900/20 to-blue-500/10 backdrop-blur-sm" />
+          <div className="flex flex-col items-end justify-center h-full pr-10 relative">
+            {/* Büyük altıgen panel - Peacock savaşçısı içeren panel */}
+            <motion.div 
+              className="w-56 h-72 backdrop-blur-sm relative overflow-hidden"
+              style={{ 
+                clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)',
+                background: 'linear-gradient(135deg, rgba(30,41,59,0.6) 0%, rgba(30,58,138,0.3) 100%)'
+              }}
+              initial={{ y: 30, opacity: 0.6 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 2, delay: 0.8 }}
+            >
+              <div className="absolute inset-0 border-2 border-blue-400/20" 
+                style={{ clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)' }} />
+              
+              {/* İç çerçeve */}
+              <div className="absolute inset-2 border border-blue-400/10"
+                style={{ clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)' }} />
+              
+              {/* Üst kısım - Başlık */}
+              <div className="absolute top-4 left-0 right-0 text-center">
+                <div className="font-semibold text-blue-300/90 uppercase tracking-wider text-sm">Tavus Savaşçısı</div>
+                <div className="w-16 h-0.5 bg-blue-500/30 mx-auto mt-1"></div>
+              </div>
+              
+              {/* Orta kısım - İçerik */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <motion.div
+                  animate={{ rotateY: 360 }}
+                  transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                  className="w-48 h-48 opacity-70"
+                >
+                  {/* Burada bir peacock grafiği/ikonu olacak */}
+                  <div className="w-full h-full rounded-full flex items-center justify-center">
+                    <div className="w-16 h-16 rotate-45 bg-gradient-to-br from-amber-500/30 to-amber-600/20 backdrop-blur-sm rounded-lg"></div>
+                  </div>
+                </motion.div>
+              </div>
+              
+              {/* Alt kısım - Özellikler */}
+              <div className="absolute bottom-6 left-0 right-0 text-center">
+                <div className="flex justify-center space-x-4">
+                  <div className="flex flex-col items-center">
+                    <div className="text-amber-400 text-xs">GÜÇ</div>
+                    <div className="text-white font-bold">15</div>
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <div className="text-amber-400 text-xs">SAVUNMA</div>
+                    <div className="text-white font-bold">12</div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+            
+            {/* Küçük altıgen panel - Oyun bilgisi */}
+            <motion.div 
+              className="w-36 h-36 backdrop-blur-sm relative overflow-hidden ml-24 -mt-20"
+              style={{ 
+                clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)',
+                background: 'linear-gradient(135deg, rgba(67,56,202,0.4) 0%, rgba(79,70,229,0.2) 100%)'
+              }}
+              initial={{ y: 30, opacity: 0.6, rotate: 30 }}
+              animate={{ y: 0, opacity: 1, rotate: 30 }}
+              transition={{ duration: 2, delay: 1.2 }}
+            >
+              <div className="absolute inset-0 border-2 border-indigo-400/20" 
+                style={{ clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)' }} />
+              
+              <div className="absolute inset-0 flex items-center justify-center -rotate-30">
+                <div className="text-center">
+                  <div className="font-semibold text-indigo-300/90 text-sm">Savaş Taktiği</div>
+                  <div className="w-12 h-0.5 bg-indigo-500/30 mx-auto my-1"></div>
+                  <div className="text-white/70 text-xs">Savunma ve Strateji</div>
+                </div>
+              </div>
+            </motion.div>
           </div>
         </motion.div>
         
@@ -243,12 +370,54 @@ const GameMenu = () => {
           transition={{ duration: 0.8 }}
           className="w-full md:w-2/3 lg:w-1/2 mx-auto px-6"
         >
-          <div className="text-center">
+          <div className="text-center relative">
+            {/* Arka planda altıgen desen */}
+            <div className="absolute inset-0 -z-10 opacity-10">
+              {Array.from({ length: 20 }).map((_, i) => (
+                <div 
+                  key={`bg-hex-${i}`}
+                  className="absolute bg-white/5"
+                  style={{ 
+                    clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)',
+                    width: `${30 + Math.random() * 20}px`,
+                    height: `${30 + Math.random() * 20}px`,
+                    left: `${Math.random() * 100}%`,
+                    top: `${Math.random() * 100}%`,
+                    transform: `rotate(${Math.random() * 60}deg)`,
+                    opacity: 0.1 + Math.random() * 0.2
+                  }}
+                />
+              ))}
+            </div>
+            
+            {/* Logo/Amblem */}
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 1, delay: 0.1 }}
+              className="mx-auto w-24 h-24 mb-3 relative"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-amber-500/20 to-amber-600/10 rounded-xl rotate-45 backdrop-blur-sm border border-amber-500/20" />
+              <div className="absolute inset-2 border border-amber-500/10 rounded-lg rotate-45" />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="text-2xl font-bold text-amber-400/90 rotate-[-45deg]">TKA</div>
+              </div>
+              
+              {/* Işık efekti */}
+              <motion.div
+                animate={{ 
+                  boxShadow: ['0 0 10px rgba(251,191,36,0.1)', '0 0 20px rgba(251,191,36,0.3)', '0 0 10px rgba(251,191,36,0.1)'] 
+                }}
+                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute inset-0 rounded-xl rotate-45"
+              />
+            </motion.div>
+
             <motion.h1 
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="text-6xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-500 drop-shadow-[0_2px_5px_rgba(255,175,0,0.5)]"
+              className="text-6xl font-extrabold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-500 drop-shadow-[0_2px_5px_rgba(255,175,0,0.5)]"
             >
               Tavus Kuşu Adaları
             </motion.h1>
