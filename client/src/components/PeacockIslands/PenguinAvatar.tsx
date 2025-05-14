@@ -25,7 +25,7 @@ export function PenguinAvatar() {
   
   // Animasyon ve hareket
   useFrame((_, delta) => {
-    if (currentPhase !== "battle") {  // Sadece hazırlık aşamasında hareket etsin
+    if (currentPhase === "preparation") {  // Sadece hazırlık aşamasında hareket etsin
       let moving = false;
       const newPosition = [...position] as [number, number, number];
       let newRotation = rotation[1];
@@ -76,11 +76,11 @@ export function PenguinAvatar() {
     }
   });
   
-  // Model
-  const { scene, error } = useGLTF('/models/tft_penguin.glb');
+  // Model (useGLTF fonksiyonu error özelliğini döndürmez)
+  const gltf = useGLTF('/models/tft_penguin.glb');
   
-  if (error || !scene || currentPhase === "battle") {
-    return null;  // Savaş aşamasında veya model yüklenemediğinde görünmez
+  if (!gltf.scene || currentPhase !== "preparation") {
+    return null;  // Sadece hazırlık aşamasında görünür
   }
   
   return (
@@ -91,7 +91,7 @@ export function PenguinAvatar() {
       position={position}
     >
       <group ref={model} rotation={rotation} scale={[2.5, 2.5, 2.5]}>
-        <primitive object={scene.clone()} />
+        <primitive object={gltf.scene.clone()} />
         
         {/* Avatar efektleri */}
         <Sparkles 
