@@ -371,13 +371,14 @@ const CameraControls = () => {
   useFrame(() => {
     // Key event handling için getKeyboardState oluşturulacak
     const keyState = {
-      up: keyboard.pressed('I'),
-      down: keyboard.pressed('K'),
-      left: keyboard.pressed('J'),
-      right: keyboard.pressed('L'),
-      in: keyboard.pressed('O'),
-      out: keyboard.pressed('U'),
-      reset: keyboard.justPressed('R'),
+      // WASD yerine IJKL tuşları kullanılacak
+      up: keyboard.pressed('i') || keyboard.pressed('I'),
+      down: keyboard.pressed('k') || keyboard.pressed('K'),
+      left: keyboard.pressed('j') || keyboard.pressed('J'),
+      right: keyboard.pressed('l') || keyboard.pressed('L'),
+      in: keyboard.pressed('o') || keyboard.pressed('O'),
+      out: keyboard.pressed('u') || keyboard.pressed('U'),
+      reset: keyboard.pressed('r') || keyboard.pressed('R'),
       zoomIn: keyboard.pressed('=') || keyboard.pressed('+'),
       zoomOut: keyboard.pressed('-'),
       rotateLeft: keyboard.pressed('1'),
@@ -386,22 +387,22 @@ const CameraControls = () => {
       rotateDown: keyboard.pressed('8')
     };
     
-    // Kamera hareketi
-    if (keyState.up) camera.position.y += 0.2;
-    if (keyState.down) camera.position.y -= 0.2;
-    if (keyState.left) camera.position.x -= 0.2;
-    if (keyState.right) camera.position.x += 0.2;
+    // Kamera hareketi - Daha belirgin hareket
+    if (keyState.up) camera.position.y += 0.5;
+    if (keyState.down) camera.position.y -= 0.5;
+    if (keyState.left) camera.position.x -= 0.5;
+    if (keyState.right) camera.position.x += 0.5;
     if (keyState.in) {
-      // İleri hareket - baktığı yöne doğru
+      // İleri hareket - baktığı yöne doğru (daha hızlı)
       const direction = new THREE.Vector3();
       camera.getWorldDirection(direction);
-      camera.position.addScaledVector(direction, 0.5);
+      camera.position.addScaledVector(direction, 1.0);
     }
     if (keyState.out) {
-      // Geri hareket - baktığı yönün tersine
+      // Geri hareket - baktığı yönün tersine (daha hızlı)
       const direction = new THREE.Vector3();
       camera.getWorldDirection(direction);
-      camera.position.addScaledVector(direction, -0.5);
+      camera.position.addScaledVector(direction, -1.0);
     }
     
     // Zoom
@@ -445,27 +446,28 @@ const CameraControls = () => {
 
 // Basit klavye durumu kontrolü için yardımcı sınıf
 const keyboard = {
-  _pressed: {},
-  _justPressed: {},
+  _pressed: {} as Record<string, boolean>,
+  _justPressed: {} as Record<string, boolean>,
   
-  pressed: function(keyCode) {
+  pressed: function(keyCode: string): boolean {
     return this._pressed[keyCode] === true;
   },
   
-  justPressed: function(keyCode) {
+  justPressed: function(keyCode: string): boolean {
     const wasPressed = this._justPressed[keyCode] === true;
     this._justPressed[keyCode] = false;
     return wasPressed;
   },
   
-  keydown: function(event) {
+  keydown: function(event: KeyboardEvent): void {
+    console.log(`Tuş basıldı: ${event.key}`); // Debug log
     this._pressed[event.key] = true;
-    if (!this._pressed[event.key]) {
+    if (!this._justPressed[event.key]) {
       this._justPressed[event.key] = true;
     }
   },
   
-  keyup: function(event) {
+  keyup: function(event: KeyboardEvent): void {
     this._pressed[event.key] = false;
   }
 };
