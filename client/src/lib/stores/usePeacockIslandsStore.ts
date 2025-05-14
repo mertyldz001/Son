@@ -21,7 +21,7 @@ import { createEnemyWave } from "../game/peacockIslands/enemies";
 import { simulateBattle, getEggBonusValue } from "../game/peacockIslands/battle";
 
 // Başlangıç durumları için sabitler
-const INITIAL_GOLD = 100;
+const INITIAL_GOLD = 10;
 const INITIAL_EGGS = 0;
 const INITIAL_SOLDIERS = 5;
 const INITIAL_SOLDIER_HEALTH = 30;
@@ -264,8 +264,37 @@ export const usePeacockIslandsStore = create<PeacockIslandsStore>((set, get) => 
         npc: updatedNpc
       });
     } else {
-      // Oyuncu kaybettiyse oyun biter
-      set({ currentPhase: "gameOver" });
+      // Oyuncu kaybettiyse sonraki tura geç (oyun bitmiyor, yeni bir tura başlıyor)
+      const updatedPlayer = { 
+        ...player,
+        island: {
+          ...player.island,
+          resources: {
+            ...player.island.resources,
+            gold: player.island.resources.gold + 20 // Kaybedene ekstra altın
+          }
+        }
+      };
+      
+      const updatedNpc = {
+        ...npc,
+        island: {
+          ...npc.island,
+          resources: {
+            ...npc.island.resources,
+            gold: npc.island.resources.gold + 5
+          }
+        }
+      };
+      
+      set({ 
+        currentPhase: "preparation",
+        currentTurn: currentTurn + 1,
+        preparationTimeLeft: PREPARATION_TIME,
+        currentEnemyWave: null,
+        player: updatedPlayer,
+        npc: updatedNpc
+      });
     }
   },
   

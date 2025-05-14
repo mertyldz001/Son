@@ -43,8 +43,19 @@ export const useAudio = create<AudioState>((set, get) => ({
   setBuildSound: (sound) => set({ buildSound: sound }),
   
   toggleMute: () => {
-    const { isMuted } = get();
+    const { isMuted, backgroundMusic } = get();
     const newMutedState = !isMuted;
+    
+    // Müzik çalarsa durdur, durmuşsa çalmaya başlat
+    if (backgroundMusic) {
+      if (newMutedState) {
+        backgroundMusic.pause();
+      } else {
+        backgroundMusic.play().catch(error => {
+          console.log("Müzik başlatılamadı:", error);
+        });
+      }
+    }
     
     // Just update the muted state
     set({ isMuted: newMutedState });

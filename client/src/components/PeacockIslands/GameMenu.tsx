@@ -1,26 +1,70 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { usePeacockIslandsStore } from "../../lib/stores/usePeacockIslandsStore";
 import { useAudio } from "../../lib/stores/useAudio";
+import { motion } from "framer-motion";
 
 const GameMenu = () => {
   const { startGame } = usePeacockIslandsStore();
-  const { backgroundMusic, toggleMute, isMuted } = useAudio();
+  const { backgroundMusic, toggleMute, isMuted, setBackgroundMusic } = useAudio();
+  const [loading, setLoading] = useState(true);
   
-  // Start background music when menu appears
+  // Yeni müzik dosyasını yükle ve arka plan müziği olarak ayarla
   useEffect(() => {
-    if (backgroundMusic && !isMuted) {
-      backgroundMusic.currentTime = 0;
-      backgroundMusic.play().catch(err => console.error("Failed to play background music:", err));
-    }
-  }, [backgroundMusic, isMuted]);
+    const loadMusic = async () => {
+      try {
+        const newMusic = new Audio("/music/medieval-fantasy-rpg.mp3");
+        newMusic.loop = true;
+        newMusic.volume = 0.3;
+        setBackgroundMusic(newMusic);
+        
+        // Yüklendiğinde otomatik olarak başlat (eğer sessize alınmadıysa)
+        if (!isMuted) {
+          await newMusic.play();
+        }
+        
+        setLoading(false);
+      } catch (error) {
+        console.error("Müzik yüklenemedi:", error);
+        setLoading(false);
+      }
+    };
+    
+    loadMusic();
+    
+    // Temizlik işlevi
+    return () => {
+      if (backgroundMusic) {
+        backgroundMusic.pause();
+        backgroundMusic.currentTime = 0;
+      }
+    };
+  }, []);
   
   const handleStartGame = () => {
     startGame();
   };
   
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-b from-indigo-900 via-purple-900 to-black text-white">
-      <div className="max-w-2xl mx-auto text-center p-6 bg-black/70 rounded-lg">
+    <div 
+      className="min-h-screen w-full flex flex-col items-center justify-center bg-cover bg-center text-white relative"
+      style={{ backgroundImage: 'url("/images/tft-background.jpg")' }}
+    >
+      {/* Arka plan overlay */}
+      <div className="absolute inset-0 bg-black/70"></div>
+      
+      {/* Yükleniyor göstergesi */}
+      {loading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/80 z-10">
+          <div className="text-2xl text-blue-400">Yükleniyor...</div>
+        </div>
+      )}
+      
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        className="max-w-2xl mx-auto text-center p-6 bg-black/80 rounded-lg z-10 border border-purple-500/20"
+      >
         <h1 className="text-5xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500">
           Tavus Kuşu Adaları
         </h1>
@@ -71,7 +115,7 @@ const GameMenu = () => {
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };

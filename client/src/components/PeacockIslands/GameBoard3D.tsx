@@ -62,8 +62,8 @@ const createHexPosition = (q: number, r: number, size: number = 1) => {
   return [x, 0, z];
 };
 
-// Kare savaş meydanı hücresi - TFT stilinde
-const BattleSquare = ({ position, color, isHighlighted, isPlayerSide, isOccupied = false }: any) => {
+// Altıgen savaş meydanı hücresi - TFT stilinde
+const BattleHex = ({ position, color, isHighlighted, isPlayerSide, isOccupied = false }: any) => {
   const meshRef = useRef<THREE.Mesh>(null);
   const lineRef = useRef<THREE.LineSegments>(null);
   const [hovered, setHovered] = useState(false);
@@ -81,7 +81,7 @@ const BattleSquare = ({ position, color, isHighlighted, isPlayerSide, isOccupied
     const material = meshRef.current.material as THREE.MeshStandardMaterial;
     const lineMaterial = lineRef.current.material as THREE.LineBasicMaterial;
     
-    // Kare rengi - TFT stili
+    // Altıgen rengi - TFT stili
     const targetColor = new THREE.Color(
       isHighlighted ? '#4488ff' : 
       hovered ? '#44aa44' : 
@@ -94,26 +94,71 @@ const BattleSquare = ({ position, color, isHighlighted, isPlayerSide, isOccupied
     const targetOpacity = hovered || isHighlighted || isOccupied ? 1.0 : 0.3;
     lineMaterial.opacity += (targetOpacity - lineMaterial.opacity) * 10 * delta;
     
-    // Şeffaflık ayarı - TFT'deki gibi boş kareler hafif görünür
+    // Şeffaflık ayarı - TFT'deki gibi boş altıgenler hafif görünür
     const targetAlpha = hovered || isHighlighted || isOccupied ? 0.9 : 0.15;
     material.opacity += (targetAlpha - material.opacity) * 10 * delta;
   });
   
-  // Kare kenarları için geometri
-  const edgeGeometry = new THREE.EdgesGeometry(
-    new THREE.BoxGeometry(0.9, 0.1, 0.9)
-  );
+  // Altıgen şeklini oluştur
+  const hexShape = useMemo(() => {
+    const shape = new THREE.Shape();
+    const size = 0.5; // Altıgen boyutu
+    
+    // Altıgen şekli oluştur
+    for (let i = 0; i < 6; i++) {
+      const angle = (Math.PI / 3) * i;
+      const x = size * Math.cos(angle);
+      const y = size * Math.sin(angle);
+      if (i === 0) {
+        shape.moveTo(x, y);
+      } else {
+        shape.lineTo(x, y);
+      }
+    }
+    shape.closePath();
+    
+    return shape;
+  }, []);
+  
+  // Altıgen kenarları için geometri oluştur
+  const hexEdges = useMemo(() => {
+    const points: THREE.Vector3[] = [];
+    const size = 0.5;
+    
+    // Altıgen kenar noktalarını oluştur
+    for (let i = 0; i <= 6; i++) {
+      const angle = (Math.PI / 3) * (i % 6);
+      const x = size * Math.cos(angle);
+      const z = size * Math.sin(angle);
+      points.push(new THREE.Vector3(x, 0, z));
+    }
+    
+    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+    return geometry;
+  }, []);
   
   return (
     <group position={position}>
-      {/* Kare dolgusu */}
+      {/* Altıgen dolgusu */}
       <mesh 
         ref={meshRef}
         receiveShadow
+        rotation={[-Math.PI / 2, 0, 0]} // Yatay pozisyonda
         onPointerOver={() => setHovered(true)}
         onPointerOut={() => setHovered(false)}
       >
-        <boxGeometry args={[0.9, 0.1, 0.9]} />
+        <extrudeGeometry 
+          args={[
+            hexShape,
+            {
+              depth: 0.08,
+              bevelEnabled: true,
+              bevelSegments: 1,
+              bevelSize: 0.01,
+              bevelThickness: 0.01
+            }
+          ]} 
+        />
         <meshStandardMaterial 
           color={color} 
           roughness={0.7}
@@ -123,11 +168,9 @@ const BattleSquare = ({ position, color, isHighlighted, isPlayerSide, isOccupied
         />
       </mesh>
       
-      {/* Kare kenar çizgileri */}
-      <lineSegments 
-        ref={lineRef}
-      >
-        <primitive object={edgeGeometry} />
+      {/* Altıgen kenar çizgileri */}
+      <lineSegments ref={lineRef}>
+        <primitive object={hexEdges} />
         <lineBasicMaterial 
           color={isPlayerSide ? "#99ffaa" : "#ffaa99"} 
           transparent={true} 
@@ -435,26 +478,39 @@ const Island = ({ position, isPlayerIsland = false }: any) => {
 const Battlefield = () => {
   const { player, npc, currentEnemyWave, currentPhase } = usePeacockIslandsStore();
   
-  // Savaş alanının kareli düzeni
+  // Savaş alanının altıgen düzeni
   const isBattlePhase = currentPhase === "battle";
   
-  // Kare ızgara: 8x5 = 40 kare
-  const grid = { width: 8, height: 5 };
-  const squareSize = 1;
+  // Altıgen ızgara: Yaklaşık 40 altıgen - TFT tarzında
+  const grid = { 
+    radius: 3,  // Merkez noktadan radius kadar altıgen
+    centerOffset: -0.5 // Z-ekseninde merkez kaydırma (kullanıcı tarafının biraz daha geniş olması için)
+  };
+  const hexSize = 0.9;
   const gridPositions: any[] = [];
   
-  // Kare pozisyonlarını hesapla
-  for (let col = 0; col < grid.width; col++) {
-    for (let row = 0; row < grid.height; row++) {
-      const x = col * squareSize - (grid.width * squareSize / 2) + squareSize / 2;
-      const z = row * squareSize - (grid.height * squareSize / 2) + squareSize / 2;
+  // Altıgen koordinatlarını dönüştürme fonksiyonları
+  const hexToPixel = (q: number, r: number) => {
+    const x = hexSize * 1.5 * q;
+    const z = hexSize * Math.sqrt(3) * (r + q/2);
+    return [x, 0.05, z];
+  };
+  
+  // Altıgen ızgarayı oluştur
+  for (let q = -grid.radius; q <= grid.radius; q++) {
+    const r1 = Math.max(-grid.radius, -q - grid.radius);
+    const r2 = Math.min(grid.radius, -q + grid.radius);
+    
+    for (let r = r1; r <= r2; r++) {
+      const position = hexToPixel(q, r + grid.centerOffset);
       
       // Oyuncu ve düşman alanlarını ayır
-      const isPlayerSide = row < Math.floor(grid.height / 2);
+      const isPlayerSide = position[2] < 0;
       
       gridPositions.push({
-        position: [x, 0.05, z] as [number, number, number],
-        col, row,
+        position: position as [number, number, number],
+        q, r,
+        s: -q - r, // Üçüncü altıgen koordinatı
         isPlayerSide,
         isEnemySide: !isPlayerSide
       });
