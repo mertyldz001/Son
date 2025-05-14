@@ -408,11 +408,11 @@ const GameScene = () => {
   
   return (
     <>
-      {/* Düz görünüm için kamera - daha uzak mesafe */}
+      {/* Düz görünüm için kamera - daha yüksekten bakma */}
       <PerspectiveCamera 
-        position={[0, 2, 25]} 
-        rotation={[0, 0, 0]} 
-        fov={25}
+        position={[0, 15, 5]} 
+        rotation={[-Math.PI/3, 0, 0]} 
+        fov={30}
         near={0.1} 
         far={100}
         makeDefault

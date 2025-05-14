@@ -65,7 +65,7 @@ function HexTile({
           isOccupied
         }}
       >
-        <boxGeometry args={[size * 1.8, 0.1, size * 1.8]} />
+        <boxGeometry args={[size * 1.8, 0.2, size * 1.8]} />
         <meshStandardMaterial 
           color={isHovered ? hoverColor : baseColor} 
           roughness={0.7}
@@ -114,7 +114,7 @@ const HexGrid: React.FC<HexGridProps> = ({
   // Hexagon grid oluşturma
   const hexagons = [];
   
-  // Hexagonal grid oluşturma - Sütunlar dikey olacak şekilde düzenleme yap
+  // Düz grid oluşturma - Sütunları dümdüz hizala
   for (let r = 0; r < gridHeight; r++) {
     const offset = Math.floor(r / 2);
     
@@ -122,9 +122,9 @@ const HexGrid: React.FC<HexGridProps> = ({
       const s = -q - r;
       const key = `${q},${r},${s}`;
       
-      // Pozisyonlar - dikey sütunlar için
-      const x = size * (3/2) * q;
-      const z = size * Math.sqrt(3) * (r + q/2);
+      // Pozisyonlar - dikey sütunlar için, daha düzgün sırala
+      const x = size * 2 * q;  // Daha geniş aralık
+      const z = size * 2 * r;  // Tam dikey hizalama
       
       // Düzeltilmiş: Oyuncu tarafı - tam ortadan ayrım
       const isPlayerSide = r >= gridHeight / 2;
