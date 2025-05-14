@@ -30,10 +30,10 @@ function HexTile({
   onHover, 
   onUnhover 
 }: HexTileProps) {
-  // Oyuncuya veya düşmana göre farklı renkler - eski haline döndü
-  const baseColor = isPlayerSide ? "#1a4a7a" : "#701a1a";
-  const hoverColor = isPlayerSide ? "#2a6aa9" : "#a02a2a";
-  const edgeColor = isPlayerSide ? "#0e2e4d" : "#4d0e0e";
+  // TFT tarzı renklendirme - oyuncu tarafı mavi, düşman tarafı kırmızı
+  const baseColor = isPlayerSide ? "#235789" : "#701a1a"; // Daha açık mavi ve kırmızı
+  const hoverColor = isPlayerSide ? "#3d8ad8" : "#c02a2a"; // Vurgu renkleri daha parlak
+  const edgeColor = isPlayerSide ? "#113d6c" : "#4d0e0e";
   
   return (
     <group position={position}>
@@ -65,7 +65,7 @@ function HexTile({
           isOccupied
         }}
       >
-        <boxGeometry args={[size * 1.8, 0.25, size * 1.8]} />
+        <boxGeometry args={[size * 1.7, 0.25, size * 1.7]} />
         <meshStandardMaterial 
           color={isHovered ? hoverColor : baseColor} 
           roughness={0.7}
@@ -138,8 +138,8 @@ const HexGrid: React.FC<HexGridProps> = ({
       const x = size * 2 * (q - gridWidth/2 + 0.5);  // Merkezi hizalama için ofset ekle
       const z = size * 2 * r;  // Tam dikey hizalama
       
-      // Düzeltilmiş: Oyuncu tarafı - tam ortadan ayrım
-      const isPlayerSide = r >= gridHeight / 2;
+      // TFT tarzı: Oyuncu ve rakip tarafı - net ayrım
+      const isPlayerSide = r < gridHeight / 2;
       
       // Koordinat stringi (işgal durumunu kontrol etmek için)
       const coordString = `${q},${r},${s}`;

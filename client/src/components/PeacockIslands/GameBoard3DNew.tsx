@@ -434,6 +434,16 @@ const GameScene = () => {
       {/* Arka plan rengi - sabit düz renk */}
       <color attach="background" args={['#1a1a2e']} />
       
+      {/* TFT tarzı yeşil zemin - oyun alanının altında */}
+      <mesh 
+        rotation={[-Math.PI / 2, 0, 0]} 
+        position={[0, -0.2, 6]} 
+        receiveShadow
+      >
+        <planeGeometry args={[20, 13]} />
+        <meshStandardMaterial color="#1a4d2e" roughness={0.9} metalness={0.1} />
+      </mesh>
+      
       {/* Hexagonal Savaş Alanı - Ortada */}
       <group position={[0, 0.1, 0]} scale={1}>
         <HexGrid 
