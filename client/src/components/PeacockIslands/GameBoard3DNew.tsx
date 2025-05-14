@@ -418,11 +418,11 @@ const GameScene = () => {
         makeDefault
       />
       
-      {/* Işıklandırma - eski hali */}
-      <ambientLight intensity={0.3} />
+      {/* Işıklandırma - iyileştirilmiş */}
+      <ambientLight intensity={0.5} /> {/* Ortam ışığını arttır */}
       <directionalLight 
         position={[5, 12, 8]} 
-        intensity={1.5} 
+        intensity={1.8} 
         castShadow 
         shadow-mapSize={[2048, 2048]} 
         shadow-camera-left={-10}
@@ -430,18 +430,20 @@ const GameScene = () => {
         shadow-camera-top={10}
         shadow-camera-bottom={-10}
       />
+      {/* Ekstra dolgu ışık */}
+      <pointLight position={[-5, 10, -5]} intensity={0.8} color="#ffffff" />
       
-      {/* Arka plan rengi - sabit düz renk */}
-      <color attach="background" args={['#1a1a2e']} />
+      {/* Arka plan rengi - daha açık ve canlı */}
+      <color attach="background" args={['#263b53']} />
       
-      {/* TFT tarzı yeşil zemin - oyun alanının altında */}
+      {/* TFT tarzı yeşil zemin - oyun alanının altında - daha parlak ve canlı */}
       <mesh 
         rotation={[-Math.PI / 2, 0, 0]} 
         position={[0, -0.2, 6]} 
         receiveShadow
       >
         <planeGeometry args={[20, 13]} />
-        <meshStandardMaterial color="#1a4d2e" roughness={0.9} metalness={0.1} />
+        <meshStandardMaterial color="#2a6d3e" roughness={0.8} metalness={0.2} />
       </mesh>
       
       {/* Hexagonal Savaş Alanı - Ortada */}
