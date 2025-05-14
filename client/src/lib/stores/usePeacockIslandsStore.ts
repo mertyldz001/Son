@@ -701,13 +701,13 @@ export const usePeacockIslandsStore = create<PeacockIslandsStore>((set, get) => 
     const { green, blue, orange } = npc.island.featherInventory;
     
     if (green >= 3) {
-      get().combineFeathers(npc.id, "green");
+      get().combineFeathers(npc.id, "green", 1);
       actions.push("combineFeathers");
     } else if (blue >= 3) {
-      get().combineFeathers(npc.id, "blue");
+      get().combineFeathers(npc.id, "blue", 1);
       actions.push("combineFeathers");
     } else if (orange >= 3) {
-      get().combineFeathers(npc.id, "orange");
+      get().combineFeathers(npc.id, "orange", 1);
       actions.push("combineFeathers");
     }
     
