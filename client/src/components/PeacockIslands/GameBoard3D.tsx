@@ -349,13 +349,17 @@ const Battlefield = () => {
   );
 };
 
-// Kullanıcı Kamera Kontrol Bileşeni
+// Animasyonlu Kamera Kontrol Bileşeni
 const CameraControls = () => {
-  const { camera, gl } = useThree();
+  const { camera, gl, invalidate } = useThree();
+  const controlsRef = useRef<ThreeOrbitControls | null>(null);
   
   useEffect(() => {
-    // Üçüncü parti kütüphanelerle çalışırken DOM'u manuel oluştur
+    // Kontrolleri oluştur
     const controls = new ThreeOrbitControls(camera, gl.domElement);
+    
+    // Referansı sakla
+    controlsRef.current = controls;
     
     // Kamera ayarlarını yapılandır
     controls.enableDamping = true;
@@ -370,13 +374,31 @@ const CameraControls = () => {
     controls.maxDistance = 30;
     controls.maxPolarAngle = Math.PI / 1.5;
     
-    console.log('Kamera kontrolleri aktifleştirildi');
+    // Kontrol hareketlerini manuel olarak kontrol et
+    gl.domElement.addEventListener('mousedown', () => {
+      console.log('Fare tıklaması algılandı');
+      if (!controls.enabled) controls.enabled = true;
+    });
     
-    // Temizlik fonksiyonu - bileşen unmount olduğunda çalışır
+    // Kamera pozisyonu değişince render'ı güncelleme
+    controls.addEventListener('change', () => invalidate());
+    
+    console.log('Gelişmiş kamera kontrolleri aktifleştirildi');
+    
+    // Temizlik fonksiyonu
     return () => {
+      controls.removeEventListener('change', invalidate);
+      gl.domElement.removeEventListener('mousedown', () => {});
       controls.dispose();
     };
-  }, [camera, gl]);
+  }, [camera, gl, invalidate]);
+  
+  // Her kare güncellemesi yap
+  useFrame(() => {
+    if (controlsRef.current) {
+      controlsRef.current.update();
+    }
+  });
   
   return null;
 };
