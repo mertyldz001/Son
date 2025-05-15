@@ -30,7 +30,6 @@ const PreparationPhase = () => {
   } = usePeacockIslandsStore();
   
   // Birim ve UI durum değişkenleri
-  const [showUnitCards, setShowUnitCards] = useState(false);
   const [draggedUnit, setDraggedUnit] = useState<Unit | null>(null);
   
   // Birim kategorileri
@@ -807,16 +806,13 @@ const PreparationPhase = () => {
                   </div>
                 </div>
                 
-                {/* Asker Kartları Açma Butonu */}
-                <button
-                  onClick={() => setShowUnitCards(!showUnitCards)}
-                  className="px-3 py-2 bg-gradient-to-b from-indigo-700 to-indigo-900 border border-indigo-500/50 rounded-md text-sm text-indigo-200 font-medium flex items-center transition hover:bg-gradient-to-b hover:from-indigo-600 hover:to-indigo-800"
-                >
-                  <span className="material-icons text-sm mr-1">
-                    {showUnitCards ? "visibility_off" : "visibility"}
-                  </span>
-                  {showUnitCards ? "Kartları Gizle" : "Askerleri Göster"}
-                </button>
+                {/* Asker bilgisi - Sürekli görünür olduğu için buton kaldırıldı */}
+                <div className="px-3 py-2 bg-gradient-to-b from-indigo-700 to-indigo-900 border border-indigo-500/50 rounded-md text-sm text-indigo-200 font-medium">
+                  <div className="flex items-center">
+                    <span className="material-icons text-sm mr-1">info</span>
+                    <span>Askerleriniz hazır</span>
+                  </div>
+                </div>
               </div>
               
               {/* Hazırlık Ipuçları */}
@@ -826,8 +822,8 @@ const PreparationPhase = () => {
                   İPUCU
                 </h4>
                 <p className="text-xs text-slate-300/80 mt-1">
-                  Askerlerinizi savaş alanına yerleştirmek için, önce "Askerleri Göster" butonuna tıklayın, 
-                  sonra onları haritadaki mavi alanlara sürükleyin.
+                  Askerlerinizi savaş alanına yerleştirmek için, 
+                  onları alttaki panelden seçip haritadaki mavi alanlara sürükleyin.
                 </p>
               </div>
               
@@ -862,10 +858,10 @@ const PreparationPhase = () => {
           </div>
         </div>
         
-        {/* Asker Kartları Paneli */}
-        {showUnitCards && (
-          <div className="fixed top-1/2 left-4 transform -translate-y-1/2 w-52 max-h-[70vh] overflow-y-auto pointer-events-auto">
-            <div className="bg-slate-900/95 backdrop-blur-sm border border-slate-700/50 rounded-lg shadow-xl p-3">
+        {/* Asker Kartları Paneli - Sabit alt bölüm olarak gösteriliyor */}
+        <div className="fixed bottom-24 left-0 right-0 pointer-events-auto">
+          <div className="bg-slate-900/90 backdrop-blur-sm border-t border-slate-700/50 p-4 shadow-lg">
+            <div className="max-w-7xl mx-auto">
               <h3 className="text-white font-bold text-lg mb-3 flex items-center">
                 <span className="material-icons text-amber-400 mr-2">military_tech</span>
                 Askerleriniz
@@ -874,16 +870,16 @@ const PreparationPhase = () => {
               {player.island.units.length === 0 ? (
                 <p className="text-slate-400 text-sm mb-2">Henüz askeriniz yok. "Asker Eğit" butonuna tıklayarak asker alabilirsiniz.</p>
               ) : (
-                <div className="space-y-4">
+                <div className="flex gap-4">
                   {/* Tavuskuşu Askerleri */}
                   {peacockWarriors.length > 0 && (
-                    <div>
+                    <div className="flex-1">
                       <h4 className="text-blue-300 text-sm font-medium mb-2">Tavuskuşu Askerleri</h4>
-                      <div className="space-y-2">
-                        {peacockWarriors.map((unit: Unit) => (
+                      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-2">
+                        {peacockWarriors.filter((unit: Unit) => !unit.isDeployed).map((unit: Unit) => (
                           <div key={unit.id} className="transition-transform transform hover:scale-[1.02]">
                             <div 
-                              className={`cursor-grab ${unit.isDeployed ? 'opacity-60' : ''}`}
+                              className="cursor-grab"
                               onMouseDown={() => {
                                 if (!unit.isDeployed) {
                                   setDraggedUnit(unit);
@@ -907,13 +903,13 @@ const PreparationPhase = () => {
                   
                   {/* İnsan Askerleri */}
                   {humanSoldiers.length > 0 && (
-                    <div>
+                    <div className="flex-1">
                       <h4 className="text-amber-300 text-sm font-medium mb-2">İnsan Askerleri</h4>
-                      <div className="space-y-2">
-                        {humanSoldiers.map((unit: Unit) => (
+                      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-2">
+                        {humanSoldiers.filter((unit: Unit) => !unit.isDeployed).map((unit: Unit) => (
                           <div key={unit.id} className="transition-transform transform hover:scale-[1.02]">
                             <div 
-                              className={`cursor-grab ${unit.isDeployed ? 'opacity-60' : ''}`}
+                              className="cursor-grab"
                               onMouseDown={() => {
                                 if (!unit.isDeployed) {
                                   setDraggedUnit(unit);
@@ -938,7 +934,7 @@ const PreparationPhase = () => {
               )}
             </div>
           </div>
-        )}
+        </div>
         
         {/* Aktivite Logu - Sol kısma taşındı ve şeffaflaştırıldı */}
         <div className="fixed left-4 bottom-24 z-50 w-64 max-h-40 overflow-y-auto">
