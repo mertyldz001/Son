@@ -70,7 +70,7 @@ const HexTile: React.FC<HexTileProps> = ({
   const size = 0.7; // En büyük hex ölçüsü - referans görüntüdeki gibi geniş aralıklar için
 
   // İnce çizgili hexagon için geometri değişiklikleri
-  const hexLineWidth = 0.03; // Daha kalın ve belirgin kenar çizgisi
+  const hexLineWidth = 0.02; // Orta kalınlıkta kenar çizgisi
   
   // Geometrileri memorize et - performans için aynı geometriler tekrar tekrar oluşturulmasın
   const outerRingGeometry = useMemo(() => new THREE.RingGeometry(size - hexLineWidth, size, 6), [size, hexLineWidth]);

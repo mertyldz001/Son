@@ -138,7 +138,7 @@ function HexTile({
       >
         {/* DIŞARIDA ALTIGEN ÇIZGI - SADECE İNCE KENAR ÇİZGİSİ */}
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.025, 0]}>
-          <ringGeometry args={[tileSize * 0.7, tileSize, 6]} />
+          <ringGeometry args={[tileSize * 0.8, tileSize, 6]} />
           <meshBasicMaterial 
             color="#ffffff"
             side={THREE.DoubleSide}
