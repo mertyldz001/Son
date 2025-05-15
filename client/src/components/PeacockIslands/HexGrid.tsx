@@ -24,7 +24,7 @@ interface HexTileProps {
 
 function HexTile({ 
   position, 
-  size, 
+  size: tileSize, // Rename to avoid duplication 
   hexCoords, 
   isPlayerSide, 
   isHovered, 
@@ -71,6 +71,10 @@ function HexTile({
   const baseColor = tileBaseColor;
   const hoverColor = tileHoverColor;
   const edgeColor = tileEdgeColor;
+  
+  // Hex ölçüleri - daha geniş aralıklı hexagon için
+  // Boyutu zaten parametre olarak alıyoruz
+  const hexLineWidth = 0.018; // İnce kenar çizgisi
   
   // TFT stili hover animasyonu - yumuşak geçişli
   const hoverScale = useRef(new THREE.Vector3(1, 1, 1));
@@ -132,25 +136,13 @@ function HexTile({
           isOccupied
         }}
       >
-        {/* DIŞARIDA ALTIGEN ÇIZGI - KALIN VE NET */}
+        {/* DIŞARIDA ALTIGEN ÇIZGI - SADECE İNCE KENAR ÇİZGİSİ */}
         <mesh rotation={[-Math.PI / 2, Math.PI, 0]} position={[0, 0.025, 0]}>
-          <ringGeometry args={[size * 0.94, size * 1.05, 6]} />
+          <ringGeometry args={[tileSize * 0.94, tileSize * 1.02, 6]} />
           <meshBasicMaterial 
             color={isHovered ? "#ffffff" : edgeColor}
             side={THREE.DoubleSide}
             transparent={false}
-          />
-        </mesh>
-        
-        {/* İÇERDEKI RENK ALANI - ALTIGEN - 180 derece çevrildi (2. İstek) */}
-        <mesh rotation={[-Math.PI / 2, Math.PI, 0]} position={[0, 0.02, 0]}>
-          <ringGeometry args={[0, size * 0.92, 6]} />
-          <meshStandardMaterial 
-            color={isHovered ? hoverColor : baseColor}
-            emissive={isHovered ? hoverColor : baseColor}
-            emissiveIntensity={0.4}
-            roughness={0.2}
-            metalness={0.7}
           />
         </mesh>
       </group>

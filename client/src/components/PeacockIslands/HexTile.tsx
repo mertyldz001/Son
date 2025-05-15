@@ -66,12 +66,14 @@ const HexTile: React.FC<HexTileProps> = ({
   const hoverColor = tileHoverColor;
   const edgeColor = tileEdgeColor;
 
-  // Hexagon'un ölçüleri - sabit
-  const size = 0.45;
+  // Hexagon'un ölçüleri - daha büyük aralıklı 
+  const size = 0.6; // Daha da büyük hex ölçüsü - daha geniş aralıklar için
+
+  // İnce çizgili hexagon için geometri değişiklikleri
+  const hexLineWidth = 0.01; // Çok daha ince kenar çizgisi
   
   // Geometrileri memorize et - performans için aynı geometriler tekrar tekrar oluşturulmasın
-  const outerRingGeometry = useMemo(() => new THREE.RingGeometry(size * 0.94, size * 1.05, 6), [size]);
-  const innerRingGeometry = useMemo(() => new THREE.RingGeometry(0, size * 0.92, 6), [size]);
+  const outerRingGeometry = useMemo(() => new THREE.RingGeometry(size - hexLineWidth, size, 6), [size, hexLineWidth]);
 
   // Hover animasyonu için
   const scale = useRef(new THREE.Vector3(1, 1, 1));
@@ -124,26 +126,18 @@ const HexTile: React.FC<HexTileProps> = ({
     >
       <group position={[0, hoverHeight.current, 0]} scale={scale.current}>
         {/* Geometri ve materyal optimizasyonu - azaltılmış hesaplamalar */}
-        {/* Dış çizgi - önceden oluşturulmuş geometriyi kullan */}
+        {/* Dış çizgi - sadece ince kenarlı altıgen */}
         <mesh rotation={[-Math.PI / 2, Math.PI, 0]} position={[0, 0.025, 0]}>
           <primitive attach="geometry" object={outerRingGeometry} />
           <meshBasicMaterial 
-            color={isHovered ? "#ffffff" : edgeColor}
+            color={isHovered ? "#ffffff" : "#ffffff"}
             side={THREE.DoubleSide}
             transparent={false}
             toneMapped={false} // Daha az post-processing
           />
         </mesh>
         
-        {/* İç kısım - önceden oluşturulmuş geometriyi kullan */}
-        <mesh rotation={[-Math.PI / 2, Math.PI, 0]} position={[0, 0.02, 0]}>
-          <primitive attach="geometry" object={innerRingGeometry} />
-          <meshLambertMaterial // StandardMaterial yerine daha hafif Lambert kullanımı 
-            color={isHovered ? hoverColor : baseColor}
-            emissive={isHovered ? hoverColor : baseColor}
-            emissiveIntensity={0.5}
-          />
-        </mesh>
+        {/* İç kısım - artık iç kısım yok, sadece dış çizgi var */}
       </group>
     </group>
   );
