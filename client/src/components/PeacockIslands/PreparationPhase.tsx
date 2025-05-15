@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { usePeacockIslandsStore } from "../../lib/stores/usePeacockIslandsStore";
 import { useAudio } from "../../lib/stores/useAudio";
 import { FeatherColor, HatcherySlot, Egg, Unit } from "../../lib/game/peacockIslands/types";
@@ -872,13 +872,13 @@ const PreparationPhase = () => {
                     </h4>
                     {/* Kart yuvaları - sadece 5 asker satın alınabilir */}
                     <div className="grid grid-cols-5 gap-4">
-                      {[
+                      {useMemo(() => [
                         { type: "Okçu", attack: 12, defense: 6, health: 30, speed: 8 },
                         { type: "Piyade", attack: 8, defense: 12, health: 40, speed: 5 },
                         { type: "Süvari", attack: 10, defense: 8, health: 35, speed: 10 },
                         { type: "Şövalye", attack: 15, defense: 10, health: 35, speed: 6 },
                         { type: "Mızrakçı", attack: 10, defense: 10, health: 30, speed: 7 }
-                      ].map((unitType, index) => {
+                      ], []).map((unitType, index) => {
                         // Hazırlık fazında satın alınan asker sayısı
                         const purchasedSoldiersCount = player.island.units
                           .filter((u: Unit) => u.type === 'soldier' && !u.isDeployed).length;
@@ -893,39 +893,62 @@ const PreparationPhase = () => {
                           <div 
                             key={index}
                             className={`relative cursor-pointer transition-all duration-300 ${player.island.gold < 2 || maxSoldiersReached ? 'opacity-70 cursor-not-allowed' : ''}`}
-                            onClick={() => {
-                              // Kartın herhangi bir yerine tıklandığında satın alma işlemi
-                              if (!isPurchased && !maxSoldiersReached && player.island.gold >= 2) {
-                                playClick();
-                                
-                                // Önce altını düş
-                                trainSoldiers(player.id, 1);
-                                
-                                // Yeni asker oluştur
-                                const newUnit: Unit = {
-                                  id: `soldier-${Date.now().toString(36)}`,
-                                  type: 'soldier',
-                                  health: unitType.health,
-                                  attack: unitType.attack,
-                                  defense: unitType.defense,
-                                  speed: unitType.speed,
-                                  isDeployed: false // Sonradan yerleştirilecek
-                                };
-                                
-                                // Askeri oyuncuya ekle
-                                usePeacockIslandsStore.getState().addUnitToPlayer(player.id, [newUnit]);
-                                
-                                // Askeri sürüklenecek obje olarak ayarla
-                                setDraggedUnit(newUnit);
-                                
-                                // Aksiyon loguna ekle
-                                setActionLog(prev => [...prev, `${unitType.type} satın alındı!`]);
-                                
-                                // Alınabilecek maksimum asker sayısını kontrol et
-                                if (purchasedSoldiersCount + 1 >= 5) {
-                                  // Maksimum askere ulaşıldı
-                                  setActionLog(prev => [...prev, "Maksimum asker sayısına ulaştınız! (5 asker)"]);
-                                }
+                            onClick={(e) => {
+                              // Olay yayılımını engelle
+                              e.stopPropagation();
+                              
+                              // Hata ayıklama bilgisi
+                              console.log(`Tıklanan kart: ${unitType.type}, Satın alınmış mı: ${isPurchased}`);
+                              
+                              // Eğer kart zaten satın alınmışsa hiçbir şey yapma
+                              if (isPurchased) {
+                                console.log("Bu kart zaten satın alınmış!");
+                                return;
+                              }
+                              
+                              // Maximum askere ulaşıldıysa hiçbir şey yapma
+                              if (maxSoldiersReached) {
+                                console.log("Maksimum asker sayısına ulaşıldı! (5 asker)");
+                                return;
+                              }
+                              
+                              // Yeterli altın yoksa hiçbir şey yapma
+                              if (player.island.gold < 2) {
+                                console.log("Yeterli altın yok!");
+                                return;
+                              }
+                              
+                              // Ses çal
+                              playClick();
+                              
+                              // Önce altını düş - optimizasyon için store doğrudan kullanılıyor
+                              const store = usePeacockIslandsStore.getState();
+                              store.updatePlayerGold(player.id, -2);
+                              
+                              // Yeni asker oluştur - performans için ID daha basit üretiliyor
+                              const newUnit: Unit = {
+                                id: `soldier-${index}-${Date.now()}`,
+                                type: 'soldier',
+                                health: unitType.health,
+                                attack: unitType.attack,
+                                defense: unitType.defense,
+                                speed: unitType.speed,
+                                isDeployed: false
+                              };
+                              
+                              // Askeri oyuncuya ekle
+                              store.addUnitToPlayer(player.id, [newUnit]);
+                              
+                              // Askeri sürüklenecek obje olarak ayarla
+                              setDraggedUnit(newUnit);
+                              
+                              // Aksiyon loguna ekle - optimize edilmiş
+                              const newLog = `${unitType.type} satın alındı!`;
+                              setActionLog(prev => [...prev, newLog]);
+                              
+                              // Alınabilecek maksimum asker sayısı kontrolü - optimize edilmiş
+                              if (purchasedSoldiersCount === 4) {
+                                setActionLog(prev => [...prev, "Maksimum asker sayısına ulaştınız! (5 asker)"]);
                               }
                             }}
                           >
