@@ -204,7 +204,7 @@ const PreparationPhase = () => {
       window.removeEventListener('mouseup', handleMouseUp);
       window.removeEventListener('hex-click', handleHexClick as EventListener);
     };
-  }, [draggedUnit, player.id, deployUnit, playClick]);
+  }, [draggedUnit, player.id, playClick, setActionLog]);
 
   return (
     <div className="w-full h-full relative">
@@ -399,19 +399,7 @@ const PreparationPhase = () => {
                   Tüy Topla
                 </button>
                 
-                <button 
-                  className="bg-gradient-to-r from-red-600 to-red-800 hover:from-red-500 hover:to-red-700 text-white font-bold py-3 px-4 rounded-lg w-full flex items-center justify-center transition-all duration-300 border border-red-500/50 shadow-md hover:shadow-lg"
-                  onClick={() => handleTrainSoldiers(1)}
-                >
-                  <div className="flex items-center">
-                    <span className="material-icons mr-2">military_tech</span>
-                    <span>Asker Eğit</span>
-                  </div>
-                  <div className="ml-auto flex items-center bg-red-900/80 px-2 py-1 rounded-full text-xs border border-red-600/50">
-                    <span className="material-icons text-xs mr-1">paid</span>
-                    <span>5</span>
-                  </div>
-                </button>
+
               </div>
             </WindowPanel>
             
