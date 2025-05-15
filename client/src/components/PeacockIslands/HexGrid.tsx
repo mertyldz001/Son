@@ -195,9 +195,9 @@ const HexGrid: React.FC<HexGridProps> = ({
   // Tam ekran görüntüsündeki gibi çok daha sade ve düzenli grid
   const gridWidthTotal = horizontalSpacing * columnsPerRow; // Grid toplam genişliği
   
-  // Grid merkezi
-  const centerX = 0;
-  const centerZ = 0;
+  // Grid merkezi - yeşil dikdörtgenin tam ortasına yerleştirme
+  const centerX = 0; // X koordinatı ortalı
+  const centerZ = 0; // Z koordinatını dikdörtgenin orta noktasına ayarla
   
   // Hexagon oluşturma işlemini memoize ediyoruz - performans için
   const hexTiles = React.useMemo(() => {
