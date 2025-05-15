@@ -554,7 +554,7 @@ const GameBoard3D = () => {
       <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-green-700 to-green-500 opacity-40 z-0"></div>
       <Canvas
         shadows
-        className="w-full max-w-4xl h-full max-h-[85vh] mx-auto my-auto"
+        className="w-full max-w-4xl h-full max-h-[85vh] mx-auto my-auto touch-action-none"
         camera={{
           position: [cameraPosition[0], cameraPosition[1], cameraPosition[2]],
           fov: 40,
@@ -564,6 +564,10 @@ const GameBoard3D = () => {
         gl={{
           antialias: true,
           powerPreference: "default"
+        }}
+        onCreated={({ gl }) => {
+          // Mobil için multi-touch sorunlarını gider
+          gl.domElement.style.touchAction = 'none';
         }}
       >
         <color attach="background" args={[backgroundColor]} />

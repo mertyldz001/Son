@@ -105,12 +105,13 @@ export function PenguinAvatar() {
   
   return (
     <>
-      {/* Tıklanabilir zemin oluştur - görünmez ama tıklanabilir */}
+      {/* Tıklanabilir zemin oluştur - görünmez ama tıklanabilir (mobil desteği ile) */}
       <mesh 
         position={[0, 0, 0]} 
         rotation={[-Math.PI / 2, 0, 0]} 
         receiveShadow 
         onClick={handleGroundClick}
+        onPointerDown={handleGroundClick} // Mobil dokunma için
       >
         <planeGeometry args={[30, 30]} />
         <meshStandardMaterial 
