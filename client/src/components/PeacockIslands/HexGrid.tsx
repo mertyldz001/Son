@@ -57,7 +57,7 @@ function HexTile({
   
   return (
     <group position={position}>
-      {/* SADECE tek bir altıgen - TFT tarzı basit */}
+      {/* Görünüm düzeltildi - içerideki renk alanı altıgen olarak ayarlandı */}
       <mesh 
         position={[0, hoverHeight.current, 0]} 
         rotation={[-Math.PI / 2, 0, 0]}
@@ -86,8 +86,8 @@ function HexTile({
           isOccupied
         }}
       >
-        {/* TFT style hexagon - single piece with outline */}
-        <cylinderGeometry args={[size, size, 0.08, 6, 1, false]} />
+        {/* İçerideki renk alanı - altıgen olarak yapıldı */}
+        <cylinderGeometry args={[size * 0.95, size * 0.95, 0.08, 6, 1, false]} />
         <meshPhysicalMaterial 
           color={isHovered ? hoverColor : baseColor} 
           emissive={isHovered ? hoverColor : baseColor}
@@ -100,18 +100,18 @@ function HexTile({
         />
       </mesh>
       
-      {/* Kenar çizgisi - tam boyutta */}
+      {/* Dışarıdaki altıgen çizgi - daha kalın ve görünür */}
       <mesh 
         position={[0, 0.05, 0]} 
         rotation={[-Math.PI / 2, 0, 0]}
         scale={hoverScale.current}
       >
-        <ringGeometry args={[size * 0.99, size * 1.01, 6]} />
+        <ringGeometry args={[size * 0.94, size * 1.02, 6]} />
         <meshBasicMaterial 
           color={isHovered ? "#ffffff" : edgeColor}
           side={THREE.DoubleSide}
           transparent={true}
-          opacity={isHovered ? 1 : 0.9}
+          opacity={isHovered ? 1 : 1}
         />
       </mesh>
       
