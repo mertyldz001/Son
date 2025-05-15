@@ -74,6 +74,9 @@ const HexTile: React.FC<HexTileProps> = ({
   
   // Geometrileri memorize et - performans için aynı geometriler tekrar tekrar oluşturulmasın
   const outerRingGeometry = useMemo(() => new THREE.RingGeometry(size - hexLineWidth, size, 6), [size, hexLineWidth]);
+  
+  // Işıklı halka efekti için ek geometri
+  const glowRingGeometry = useMemo(() => new THREE.RingGeometry(size + 0.01, size + 0.02, 6), [size]);
 
   // Hover animasyonu için
   const scale = useRef(new THREE.Vector3(1, 1, 1));
@@ -126,11 +129,11 @@ const HexTile: React.FC<HexTileProps> = ({
     >
       <group position={[0, hoverHeight.current, 0]} scale={scale.current}>
         {/* Geometri ve materyal optimizasyonu - azaltılmış hesaplamalar */}
-        {/* Dış çizgi - sadece ince kenarlı altıgen */}
+        {/* Dış çizgi - sadece ince kenarlı altıgen - daha estetik */}
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.025, 0]}>
           <primitive attach="geometry" object={outerRingGeometry} />
           <meshBasicMaterial 
-            color="#ffffff"
+            color={isHovered ? (isPlayerSide ? "#80cbc4" : "#ef9a9a") : "#ffffff"}
             side={THREE.DoubleSide}
             transparent={true}
             opacity={isHovered ? 1.0 : 0.9}
@@ -139,6 +142,20 @@ const HexTile: React.FC<HexTileProps> = ({
         </mesh>
         
         {/* İç kısım - artık iç kısım yok, sadece dış çizgi var */}
+        
+        {/* Işıklı halka efekti - hover durumunda görünür */}
+        {isHovered && (
+          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, 0]}>
+            <primitive attach="geometry" object={glowRingGeometry} />
+            <meshBasicMaterial 
+              color={isPlayerSide ? "#4db6ac" : "#e57373"}
+              side={THREE.DoubleSide}
+              transparent={true}
+              opacity={0.7}
+              toneMapped={false}
+            />
+          </mesh>
+        )}
       </group>
     </group>
   );
