@@ -9,6 +9,7 @@ interface UnitCardProps {
   onDragStart: () => void;
   onDragEnd: () => void;
   isDeployed: boolean;
+  slotIndex?: number;
 }
 
 const UnitCard: React.FC<UnitCardProps> = ({
@@ -16,7 +17,8 @@ const UnitCard: React.FC<UnitCardProps> = ({
   isDragging,
   onDragStart,
   onDragEnd,
-  isDeployed
+  isDeployed,
+  slotIndex
 }) => {
   // Birim tipine göre görsel ve stil ayarları
   const getUnitColor = () => {
@@ -35,6 +37,10 @@ const UnitCard: React.FC<UnitCardProps> = ({
       animate={{
         scale: isDragging ? 1.05 : 1,
         boxShadow: isDragging ? '0 10px 20px rgba(0,0,0,0.3)' : '0 4px 8px rgba(0,0,0,0.1)',
+        y: isDragging ? -20 : 0,
+      }}
+      transition={{
+        duration: 0.15
       }}
       onMouseDown={!isDeployed ? onDragStart : undefined}
       onMouseUp={!isDeployed ? onDragEnd : undefined}
@@ -45,6 +51,18 @@ const UnitCard: React.FC<UnitCardProps> = ({
       {/* Kart Başlığı */}
       <div className="absolute top-0 left-0 right-0 bg-gradient-to-b from-black/80 to-transparent p-2 z-10">
         <h4 className="text-white text-sm font-bold">{getUnitName()}</h4>
+      </div>
+      
+      {/* Numara */}
+      {slotIndex !== undefined && (
+        <div className="absolute top-2 right-2 bg-amber-600 text-white w-6 h-6 flex items-center justify-center rounded-full z-20 font-bold text-sm">
+          {slotIndex + 1}
+        </div>
+      )}
+      
+      {/* Arka plan resmi */}
+      <div className="absolute inset-0 bg-slate-800 opacity-50">
+        <div className="w-full h-full bg-[url('/textures/card_bg.jpg')] bg-cover bg-center opacity-30 mix-blend-overlay"></div>
       </div>
       
       {/* 3D Model Gösterimi */}
@@ -60,21 +78,11 @@ const UnitCard: React.FC<UnitCardProps> = ({
         )}
       </div>
       
-      {/* Birim Özellikleri */}
-      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2 z-10">
-        <div className="grid grid-cols-3 gap-1 text-white">
-          <div className="flex flex-col items-center bg-black/30 rounded p-1">
-            <span className="text-xs text-gray-300">CAN</span>
-            <span className="text-md font-bold">{unit.health}</span>
-          </div>
-          <div className="flex flex-col items-center bg-black/30 rounded p-1">
-            <span className="text-xs text-gray-300">GÜÇ</span>
-            <span className="text-md font-bold">{unit.attack}</span>
-          </div>
-          <div className="flex flex-col items-center bg-black/30 rounded p-1">
-            <span className="text-xs text-gray-300">HIZ</span>
-            <span className="text-md font-bold">{Math.floor(unit.speed * 10)}</span>
-          </div>
+      {/* Altın değeri */}
+      <div className="absolute bottom-3 left-0 right-0 flex justify-center items-center">
+        <div className="px-3 py-1 bg-amber-900/70 rounded-full border border-amber-500/50 flex items-center gap-1">
+          <span className="material-icons text-amber-400 text-sm">attach_money</span>
+          <span className="text-white font-bold">2</span>
         </div>
       </div>
       

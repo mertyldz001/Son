@@ -870,98 +870,110 @@ const PreparationPhase = () => {
                       <span className="material-icons text-amber-400 mr-1 text-sm">category</span>
                       Mevcut Askerler
                     </h4>
-                    <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                      {/* Farklı tipte 5 adet asker */}
+                    {/* Kart yuvaları - sadece 5 asker satın alınabilir */}
+                    <div className="grid grid-cols-5 gap-4">
                       {[
                         { type: "Okçu", attack: 12, defense: 6, health: 30, speed: 8 },
                         { type: "Piyade", attack: 8, defense: 12, health: 40, speed: 5 },
                         { type: "Süvari", attack: 10, defense: 8, health: 35, speed: 10 },
                         { type: "Şövalye", attack: 15, defense: 10, health: 35, speed: 6 },
                         { type: "Mızrakçı", attack: 10, defense: 10, health: 30, speed: 7 }
-                      ].map((unitType, index) => (
-                        <div key={index} className="bg-slate-800 border border-slate-700 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-transform transform hover:scale-[1.05]">
-                          <div className="bg-gradient-to-r from-amber-900 to-amber-700 px-3 py-1 text-white text-xs font-bold flex justify-between items-center">
-                            <span>{unitType.type}</span>
-                            <span className="flex items-center text-amber-300">
-                              <span className="material-icons text-[12px] mr-1">attach_money</span>2
-                            </span>
-                          </div>
-                          <div className="p-3 flex flex-col gap-1">
-                            <div className="flex justify-center mb-2 h-16">
-                              <div className="w-12 h-12 bg-slate-700 rounded-full flex items-center justify-center">
-                                <span className="material-icons text-amber-400 text-2xl">
-                                  {unitType.type === "Okçu" ? "gps_fixed" :
-                                   unitType.type === "Piyade" ? "shield" :
-                                   unitType.type === "Süvari" ? "speed" :
-                                   unitType.type === "Şövalye" ? "security" :
-                                   "military_tech"}
-                                </span>
-                              </div>
-                            </div>
-                            <div className="grid grid-cols-2 gap-1 text-[10px]">
-                              <div className="flex items-center text-red-300">
-                                <span className="material-icons text-[10px] mr-1">local_fire_department</span>
-                                <span>Saldırı: {unitType.attack}</span>
-                              </div>
-                              <div className="flex items-center text-blue-300">
-                                <span className="material-icons text-[10px] mr-1">shield</span>
-                                <span>Savunma: {unitType.defense}</span>
-                              </div>
-                              <div className="flex items-center text-green-300">
-                                <span className="material-icons text-[10px] mr-1">favorite</span>
-                                <span>Can: {unitType.health}</span>
-                              </div>
-                              <div className="flex items-center text-yellow-300">
-                                <span className="material-icons text-[10px] mr-1">speed</span>
-                                <span>Hız: {unitType.speed}</span>
-                              </div>
-                            </div>
-                            
-                            <button 
-                              className={`mt-2 w-full px-2 py-1 rounded-md text-[10px] font-bold 
-                                ${player.island.gold >= 2 
-                                  ? 'bg-amber-600 hover:bg-amber-500 text-white' 
-                                  : 'bg-slate-700 text-slate-500 cursor-not-allowed'}`}
-                              onClick={() => {
-                                if (player.island.gold >= 2) {
-                                  playClick();
-                                  
-                                  // Önce altını düş
-                                  if (player.island.gold >= 2) {
-                                    trainSoldiers(player.id, 1);
-                                    
-                                    // Yeni asker oluştur
-                                    const newUnit: Unit = {
-                                      id: `soldier-${Date.now().toString(36)}`,
-                                      type: 'soldier',
-                                      health: unitType.health,
-                                      attack: unitType.attack,
-                                      defense: unitType.defense,
-                                      speed: unitType.speed,
-                                      isDeployed: false // Sonradan yerleştirilecek
-                                    };
-                                    
-                                    // Askeri oyuncuya ekle
-                                    usePeacockIslandsStore.getState().addUnitToPlayer(player.id, [newUnit]);
-                                    
-                                    // Askeri sürüklenecek obje olarak ayarla
-                                    setDraggedUnit(newUnit);
-                                  }
-                                  
-                                  // Aksiyon loguna ekle
-                                  setActionLog(prev => [...prev, `${unitType.type} satın alındı!`]);
+                      ].map((unitType, index) => {
+                        // Hazırlık fazında satın alınan asker sayısı
+                        const purchasedSoldiersCount = player.island.units
+                          .filter((u: Unit) => u.type === 'soldier' && !u.isDeployed).length;
+                          
+                        // Bu kart satın alındı mı?
+                        const isPurchased = purchasedSoldiersCount > index;
+                        
+                        // Her fazda en fazla 5 asker satın alınabilir
+                        const maxSoldiersReached = purchasedSoldiersCount >= 5;
+                        
+                        return (
+                          <div 
+                            key={index}
+                            className={`relative cursor-pointer transition-all duration-300 ${player.island.gold < 2 || maxSoldiersReached ? 'opacity-70 cursor-not-allowed' : ''}`}
+                            onClick={() => {
+                              // Kartın herhangi bir yerine tıklandığında satın alma işlemi
+                              if (!isPurchased && !maxSoldiersReached && player.island.gold >= 2) {
+                                playClick();
+                                
+                                // Önce altını düş
+                                trainSoldiers(player.id, 1);
+                                
+                                // Yeni asker oluştur
+                                const newUnit: Unit = {
+                                  id: `soldier-${Date.now().toString(36)}`,
+                                  type: 'soldier',
+                                  health: unitType.health,
+                                  attack: unitType.attack,
+                                  defense: unitType.defense,
+                                  speed: unitType.speed,
+                                  isDeployed: false // Sonradan yerleştirilecek
+                                };
+                                
+                                // Askeri oyuncuya ekle
+                                usePeacockIslandsStore.getState().addUnitToPlayer(player.id, [newUnit]);
+                                
+                                // Askeri sürüklenecek obje olarak ayarla
+                                setDraggedUnit(newUnit);
+                                
+                                // Aksiyon loguna ekle
+                                setActionLog(prev => [...prev, `${unitType.type} satın alındı!`]);
+                                
+                                // Alınabilecek maksimum asker sayısını kontrol et
+                                if (purchasedSoldiersCount + 1 >= 5) {
+                                  // Maksimum askere ulaşıldı
+                                  setActionLog(prev => [...prev, "Maksimum asker sayısına ulaştınız! (5 asker)"]);
                                 }
-                              }}
-                              disabled={player.island.gold < 2}
-                            >
-                              <span className="flex items-center justify-center">
-                                <span className="material-icons text-[10px] mr-1">add_shopping_cart</span>
-                                Satın Al
-                              </span>
-                            </button>
+                              }
+                            }}
+                          >
+                            {/* Kart yuvası - boşsa göster, satın alındıysa gizle */}
+                            {!isPurchased ? (
+                              <div className="mb-2 bg-slate-800 border border-slate-700 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-transform transform hover:scale-[1.05]">
+                                <div className="bg-gradient-to-r from-amber-900 to-amber-700 px-3 py-1 text-white text-xs font-bold flex justify-between items-center">
+                                  <span>{unitType.type}</span>
+                                  <span className="flex items-center text-amber-300">
+                                    <span className="material-icons text-[12px] mr-1">attach_money</span>2
+                                  </span>
+                                </div>
+                                <div className="p-3 flex flex-col gap-1">
+                                  <div className="flex justify-center mb-2 h-16">
+                                    <div className="w-12 h-12 bg-slate-700 rounded-full flex items-center justify-center">
+                                      <span className="material-icons text-amber-400 text-2xl">
+                                        {unitType.type === "Okçu" ? "gps_fixed" :
+                                        unitType.type === "Piyade" ? "shield" :
+                                        unitType.type === "Süvari" ? "speed" :
+                                        unitType.type === "Şövalye" ? "security" :
+                                        "military_tech"}
+                                      </span>
+                                    </div>
+                                  </div>
+                                  
+                                  {/* Asker fiyatı - altın işareti*/}
+                                  <div className="mt-2 flex justify-center">
+                                    <div className="px-3 py-1 bg-amber-900/70 rounded-full border border-amber-500/50 flex items-center gap-1">
+                                      <span className="material-icons text-amber-400 text-sm">attach_money</span>
+                                      <span className="text-white font-bold">2</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            ) : (
+                              // Satın alınan kart için boş yuva göster
+                              <div className="mb-2 h-44 bg-slate-800/30 rounded-lg border-2 border-dashed border-slate-600/30 flex items-center justify-center">
+                                <div className="text-slate-500 text-xs">Savaş Alanına Yerleştirildi</div>
+                              </div>
+                            )}
+                            
+                            {/* Kart numarası */}
+                            <div className="absolute top-2 right-2 w-6 h-6 bg-amber-600 rounded-full flex items-center justify-center text-white text-xs font-bold z-10">
+                              {index + 1}
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 </div>
