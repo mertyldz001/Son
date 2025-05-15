@@ -391,13 +391,7 @@ const PreparationPhase = () => {
               className="mt-4"
             >
               <div className="grid grid-cols-1 gap-2">
-                <button 
-                  className="bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-500 hover:to-blue-700 text-white font-bold py-3 px-4 rounded-lg w-full mb-1 flex items-center justify-center transition-all duration-300 border border-blue-500/50 shadow-md hover:shadow-lg"
-                  onClick={() => handleCollectFeathers()}
-                >
-                  <span className="material-icons mr-2">eco</span>
-                  Tüy Topla
-                </button>
+                {/* Tüy toplama butonu kaldırıldı */}
                 
 
               </div>
