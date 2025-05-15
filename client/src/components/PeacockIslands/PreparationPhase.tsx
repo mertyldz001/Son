@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useMemo } from "react";
+import React, { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import { usePeacockIslandsStore } from "../../lib/stores/usePeacockIslandsStore";
 import { useAudio } from "../../lib/stores/useAudio";
 import { FeatherColor, HatcherySlot, Egg, Unit } from "../../lib/game/peacockIslands/types";
@@ -72,11 +72,18 @@ const PreparationPhase = () => {
   const [armyPanelMinimized, setArmyPanelMinimized] = useState(true);
   const [activitiesPanelMinimized, setActivitiesPanelMinimized] = useState(true);
   
+  // Kartların satın alınma durumunu saklamak için bir ref oluştur
+  const purchasedCardRefs = useRef<boolean[]>([false, false, false, false, false]);
+  
   // Tur değişimini izle ve asker kartlarını sıfırla
   useEffect(() => {
     // Her tur başlangıcında satın alınan kartları sıfırla
     console.log("Yeni tur başladı, kart durumları sıfırlanıyor...");
-    // Not: Bu useEffect sadece currentTurn değiştiğinde çalışacak
+    // Tüm kartları satın alınmamış duruma getir
+    purchasedCardRefs.current = [false, false, false, false, false];
+    
+    // Bir sonraki render'da tüm kartların görünür olması için state'i güncelle
+    setActionLog(prev => [...prev, "Yeni bir hazırlık fazı başladı. Market yenilendi."]);
   }, [currentTurn]);
   
   // Hazırlık zamanını güncelle
@@ -890,8 +897,8 @@ const PreparationPhase = () => {
                         const purchasedSoldiersCount = player.island.units
                           .filter((u: Unit) => u.type === 'soldier' && !u.isDeployed).length;
                           
-                        // Bu kart satın alındı mı? Durumu React state'de tutalım
-                        const [isPurchased, setIsPurchased] = useState(false);
+                        // Bu kart şu anda satın alınmış mı kontrol et
+                        const isPurchased = purchasedCardRefs.current[index];
                         
                         // Her fazda en fazla 5 asker satın alınabilir
                         const maxSoldiersReached = purchasedSoldiersCount >= 5;
@@ -955,7 +962,7 @@ const PreparationPhase = () => {
                               setDraggedUnit(newUnit);
                               
                               // Bu kartı satın alınmış olarak işaretle (böylece kart yuvası gizlenecek)
-                              setIsPurchased(true);
+                              purchasedCardRefs.current[index] = true;
                               
                               // Aksiyon loguna ekle - optimize edilmiş
                               const newLog = `${unitType.type} satın alındı!`;
