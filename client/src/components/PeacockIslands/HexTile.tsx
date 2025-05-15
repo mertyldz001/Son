@@ -101,8 +101,8 @@ const HexTile: React.FC<HexTileProps> = ({
       onClick={onHover}
     >
       <group position={[0, hoverHeight.current, 0]} scale={scale.current}>
-        {/* Dış çizgi - hep beyaz (çizgi grafiğindeki gibi) */}
-        <mesh rotation={[-Math.PI / 2, Math.PI, 0]} position={[0, 0.025, 0]}>
+        {/* Dış çizgi - hep beyaz (çizgi grafiğindeki gibi) - 90 derece döndürülmüş */}
+        <mesh rotation={[-Math.PI / 2, Math.PI / 2, 0]} position={[0, 0.025, 0]}>
           <ringGeometry args={[size * 0.94, size * 1.05, 6]} />
           <meshBasicMaterial 
             color={isHovered ? "#ffffff" : edgeColor}
@@ -111,8 +111,8 @@ const HexTile: React.FC<HexTileProps> = ({
           />
         </mesh>
         
-        {/* İç kısım - renk değişimi burada olur */}
-        <mesh rotation={[-Math.PI / 2, Math.PI, 0]} position={[0, 0.02, 0]}>
+        {/* İç kısım - renk değişimi burada olur - 90 derece döndürülmüş */}
+        <mesh rotation={[-Math.PI / 2, Math.PI / 2, 0]} position={[0, 0.02, 0]}>
           <ringGeometry args={[0, size * 0.92, 6]} />
           <meshStandardMaterial 
             color={isHovered ? hoverColor : baseColor}
