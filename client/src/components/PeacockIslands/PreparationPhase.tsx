@@ -406,20 +406,7 @@ const PreparationPhase = () => {
               </div>
             </WindowPanel>
             
-            <div className="mt-auto glass-panel bg-slate-900/30 rounded-lg p-3 h-1/4 overflow-y-auto border border-slate-600/20">
-              <h4 className="text-xs font-semibold mb-2 flex items-center text-blue-300">
-                <span className="material-icons text-xs mr-1">history</span>
-                Aktivite Logu
-              </h4>
-              <div className="space-y-2">
-                {actionLog.map((log, index) => (
-                  <div key={index} className="text-xs text-gray-300 flex items-start bg-slate-800/30 p-2 rounded border border-slate-700/30">
-                    <span className="material-icons text-xs mr-2 text-green-400 mt-0.5">check_circle</span>
-                    <span>{log}</span>
-                  </div>
-                )).slice(-5)}
-              </div>
-            </div>
+            {/* Aktivite logu kaldırıldı - Daha sonra sayfa altında yeniden konumlandırılacak */}
           </div>
           
           {/* Orta panel - Ada yönetimi ve tüy/yumurta sistemleri */}
@@ -952,6 +939,24 @@ const PreparationPhase = () => {
             </div>
           </div>
         )}
+        
+        {/* Aktivite Logu - Sol alt köşeye taşındı ve şeffaflaştırıldı */}
+        <div className="fixed bottom-4 left-4 z-50 w-64 max-h-40 overflow-y-auto">
+          <div className="glass-panel bg-slate-900/20 backdrop-blur-sm rounded-lg p-2 border border-slate-600/10">
+            <h4 className="text-xs font-semibold mb-1 flex items-center text-blue-300/80">
+              <span className="material-icons text-xs mr-1">history</span>
+              Aktivite Logu
+            </h4>
+            <div className="space-y-1">
+              {actionLog.map((log, index) => (
+                <div key={index} className="text-xs text-gray-300/90 flex items-start bg-slate-800/20 p-1.5 rounded border border-slate-700/20">
+                  <span className="material-icons text-[10px] mr-1 text-green-400/80 mt-0.5">check_circle</span>
+                  <span className="text-[10px]">{log}</span>
+                </div>
+              )).slice(-3)}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
