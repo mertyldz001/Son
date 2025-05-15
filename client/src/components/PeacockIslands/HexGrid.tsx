@@ -137,13 +137,13 @@ function HexTile({
         }}
       >
         {/* DIŞARIDA ALTIGEN ÇIZGI - SADECE İNCE KENAR ÇİZGİSİ */}
-        <mesh rotation={[-Math.PI / 2, Math.PI, 0]} position={[0, 0.025, 0]}>
-          <ringGeometry args={[tileSize * 0.97, tileSize * 1.01, 6]} />
+        <mesh rotation={[-Math.PI / 2, Math.PI / 2, 0]} position={[0, 0.025, 0]}>
+          <ringGeometry args={[tileSize * 0.7, tileSize, 6]} />
           <meshBasicMaterial 
             color="#ffffff"
             side={THREE.DoubleSide}
             transparent={true}
-            opacity={isHovered ? 0.9 : 0.7}
+            opacity={isHovered ? 1.0 : 0.9}
           />
         </mesh>
       </group>
