@@ -1,7 +1,7 @@
-// Oyun fazlarını tanımlayan tip
+// Oyun durumu ve türler
+
 export type GamePhase = "menu" | "preparation" | "battle" | "gameOver";
 
-// Oyun durumu
 export interface GameState {
   currentPhase: GamePhase;
   currentTurn: number;
@@ -10,11 +10,11 @@ export interface GameState {
   preparationTimeLeft: number;
   currentEnemyWave: EnemyWave | null;
   lastBattleResult: BattleResult | null;
-  actionLog: string[]; // Oyuncuya gösterilecek aksiyon günlüğü
-  battleLog: string[]; // Savaş kayıtları
+  actionLog: GameAction[];
+  battleLog: BattleLog[];
+  advancedMode: boolean; // Advanced mode
 }
 
-// Oyuncu tipi
 export interface Player {
   id: string;
   name: string;
@@ -22,80 +22,51 @@ export interface Player {
   island: Island;
 }
 
-// Ada tipi
 export interface Island {
   id: string;
   name: string;
-  owner: string; // Oyuncu ID'si
-  resources: Resources;
+  owner: string;
+  resources: {
+    gold: number;
+    eggs: number;
+  };
   buildings: Building[];
   army: Army;
-  hatchery: HatcherySlot[]; // Kuluçka yuvaları
-  featherInventory: FeatherInventory; // Tüy envanteri
-  units: Unit[]; // Asker ve savaşçı birimleri
-  gold: number; // Altın miktarı
+  hatchery: HatcherySlot[];
+  featherInventory: FeatherInventory;
+  units: Unit[];
+  gold: number; // İhtiyaç duyulursa doğrudan altın miktarı
 }
 
-// Birim tipi
 export interface Unit {
   id: string;
-  type: UnitType;
-  playerId: string; // Birime sahip olan oyuncu ID'si
+  type: 'warrior' | 'soldier';
+  health: number;
+  attack: number;
+  defense: number;
+  speed: number;
+  isDeployed: boolean;
+  position?: {
+    q: number;
+    r: number;
+    s: number;
+  };
+}
+
+export interface Army {
+  soldiers: number;
   health: number;
   attackPower: number;
   attackSpeed: number;
-  position?: { q: number, r: number, s: number }; // Hexagonal grid pozisyonu
-  isDeployed: boolean; // Savaş alanına yerleştirildi mi?
+  bonuses: Bonuses;
 }
 
-// Birim tipleri
-export type UnitType = "warrior" | "soldier";
-
-// Kaynaklar
-export interface Resources {
-  gold: number;
-  eggs: number; // Toplam yumurta sayısı
+export interface Bonuses {
+  health: number;
+  attackPower: number;
+  attackSpeed: number;
 }
 
-// Tüy renkleri
-export type FeatherColor = "green" | "blue" | "orange";
-
-// Tüy envanteri
-export interface FeatherInventory {
-  green: number;
-  blue: number;
-  orange: number;
-}
-
-// Tüy tipi
-export interface Feather {
-  id: string;
-  color: FeatherColor;
-}
-
-// Yumurta tipi
-export interface Egg {
-  id: string;
-  color: FeatherColor;
-  bonusType: BonusType;
-  bonusValue: number;
-}
-
-// Bonus tipleri
-export type BonusType = "health" | "attackSpeed" | "attackPower";
-
-// Kuluçka yuvası
-export interface HatcherySlot {
-  id: string;
-  egg: Egg | null;
-  isActive: boolean;
-  status: "empty" | "incubating" | "ready"; // Durumu
-}
-
-// Bina tipi
-export type BuildingType = "barracks" | "mine" | "hatchery";
-
-// Bina
 export interface Building {
   id: string;
   type: BuildingType;
@@ -103,72 +74,77 @@ export interface Building {
   productionRate: number;
 }
 
-// Ordu
-export interface Army {
-  soldiers: number;
-  health: number; // Toplam can
-  attackPower: number; // Toplam saldırı gücü
-  attackSpeed: number; // Toplam saldırı hızı (%)
-  bonuses: {
-    health: number;
-    attackPower: number;
-    attackSpeed: number;
-  };
-}
+export type BuildingType = "barracks" | "mine" | "hatchery";
 
-// Tavus Kuşu Düşman tipi
-export interface PeacockEnemy {
+export interface HatcherySlot {
   id: string;
-  level: number;
-  health: number;
-  attackPower: number;
-  type: PeacockEnemyType;
+  isActive: boolean;
+  egg: Egg | null;
 }
 
-// Düşman türleri
-export type PeacockEnemyType = "chick" | "juvenile" | "adult" | "alpha";
+export interface Egg {
+  id: string;
+  color: FeatherColor;
+  bonusType: BonusType;
+  bonusValue: number;
+}
 
-// Düşman dalgası
+export type BonusType = "health" | "attackPower" | "attackSpeed";
+
+export interface FeatherInventory {
+  green: number;
+  blue: number;
+  orange: number;
+}
+
+export type FeatherColor = "green" | "blue" | "orange";
+
+export interface Feather {
+  id: string;
+  color: FeatherColor;
+}
+
 export interface EnemyWave {
   id: string;
   level: number;
-  enemies: PeacockEnemy[];
-  totalHealth: number;
-  totalAttackPower: number;
-  defeated: boolean;
+  units: Unit[];
+  spawnRate: number;
 }
 
-// Savaş Sonucu
 export interface BattleResult {
-  playerVictory: boolean;
-  enemiesDefeated: number;
-  feathersCollected: FeatherInventory;
+  playerWon: boolean;
   playerDamage: number;
-  remainingPlayerHealth: number;
+  enemiesDefeated: number;
+  turnsElapsed: number;
 }
 
-// Oyun durumu
-export interface GameState {
-  currentPhase: GamePhase;
-  currentTurn: number;
-  player: Player;
-  npc: Player;
-  preparationTimeLeft: number; // Saniye cinsinden
-  currentEnemyWave: EnemyWave | null;
-  lastBattleResult: BattleResult | null; 
+export interface BattleLog {
+  turn: number;
+  actions: BattleAction[];
 }
 
-// İşlem tipleri
+export interface BattleAction {
+  actorId: string;
+  targetId: string | null;
+  type: "attack" | "defend" | "die";
+  damage?: number;
+}
+
+export interface GameAction {
+  playerId: string;
+  type: ActionType;
+  targetId?: string;
+  amount?: number;
+  description: string;
+}
+
 export type ActionType = 
   | "collectFeathers" 
   | "trainSoldiers" 
-  | "upgradeBuilding" 
-  | "combineFeathers" 
+  | "upgradeBuilding"
   | "hatchEgg"
-  | "activateEgg";
-
-// İşlem
-export interface GameAction {
-  type: ActionType;
-  payload?: any; // Her işlem için farklı payload'lar olabilir
-}
+  | "activateEgg"
+  | "gameStart"
+  | "preparation"
+  | "battle"
+  | "gameOver";

@@ -176,6 +176,7 @@ export const usePeacockIslandsStore = create<PeacockIslandsStore>((set, get) => 
   lastBattleResult: null,
   actionLog: [],
   battleLog: [],
+  advancedMode: true, // Advanced modu aktif edelim
   
   // Oyun akışı eylemleri
   startGame: () => {
