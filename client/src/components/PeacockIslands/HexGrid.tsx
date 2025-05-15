@@ -167,11 +167,11 @@ const HexGrid: React.FC<HexGridProps> = ({
 }) => {
   const [hoveredTile, setHoveredTile] = useState<HexCoordinates | null>(null);
 
-  // Hexagon grid oluşturma
+  // Hexagon grid oluşturma - ekran görüntüsündeki düzen için tamamen yeni yaklaşım
   const hexagons = [];
   
-  // Ekran görüntüsündeki düzene uygun grid oluşturma
-  // Tam balık pulu şeklinde nizami dizilim
+  // Tam olarak istenen ekran görüntüsündeki gibi 3D geometri oluşturma
+  // Nizami dizilimli basit grid
   const totalRows = 3; // Oyuncu ve düşman tarafı için ayrı ayrı 3'er sıra (toplam 6)
   const columnsPerRow = 7; // Her sırada 7 sütun
   
@@ -179,9 +179,10 @@ const HexGrid: React.FC<HexGridProps> = ({
   gridWidth = columnsPerRow;
   gridHeight = totalRows * 2; // Toplam 6 sıra (3 oyuncu + 3 düşman)
   
-  // Daha düzenli ve nizami görünüm için sıklaştırma faktörleri
-  const horizontalSpacing = size * 1.05; // Yatay hücreler arası mesafe
-  const verticalSpacing = size * 0.85;   // Dikey hücreler arası mesafe
+  // Daha düzenli ve geniş aralıklı grid için ölçekleme faktörleri
+  const horizontalSpacing = size * 2.2; // Yatay hücreler arası mesafe - geniş
+  const verticalSpacing = size * 2.2;   // Dikey hücreler arası mesafe - geniş
+  // Tam ekran görüntüsündeki gibi çok daha sade ve düzenli grid
   const gridWidthTotal = horizontalSpacing * columnsPerRow; // Grid toplam genişliği
   
   // Grid merkezi
@@ -196,12 +197,12 @@ const HexGrid: React.FC<HexGridProps> = ({
       const s = -q - r;
       const key = `${q},${r},${s}`;
       
-      // Altıgenlerin balıksırtı/petek düzeni için offset hesaplama
-      // Tek numaralı sıralar yarım birim sağa kaydırılır
-      const rowOffset = row % 2 === 1 ? horizontalSpacing / 2 : 0;
+      // Yeni düzen: Tamamen düz hizalı satırlar (ekran görüntüsündeki gibi)
+      // Balık sırtı değil, sade ve düz sıralar 
+      const rowOffset = 0; // Tek ve çift sırada offset farkı yok - düz bir grid
       
-      // X pozisyonu: Grid'in merkezini referans alarak ve petek düzeni için offset uygulayarak
-      const x = centerX + (col * horizontalSpacing) - (gridWidthTotal / 2) + (horizontalSpacing / 2) + rowOffset;
+      // X pozisyonu: Grid'in merkezini referans alarak ve düz bir düzen için offset uygulayarak
+      const x = centerX + (col * horizontalSpacing) - (gridWidthTotal / 2) + (horizontalSpacing / 2);
       
       // Z pozisyonu: Oyuncu tarafı (pozitif z) - aşağıdan yukarı sıralanır
       const z = centerZ + (verticalSpacing * (totalRows - 1 - row));
@@ -240,15 +241,15 @@ const HexGrid: React.FC<HexGridProps> = ({
       const s = -q - r;
       const key = `${q},${r},${s}`;
       
-      // Altıgenlerin balıksırtı/petek düzeni için offset hesaplama
-      // Tek numaralı sıralar yarım birim sağa kaydırılır
-      const rowOffset = row % 2 === 1 ? horizontalSpacing / 2 : 0;
+      // Yeni düzen: Düşman tarafı için tamamen düz hizalı satırlar
+      // Balık sırtı değil, ekran görüntüsündeki gibi daha sade ve düz sıralar
+      const rowOffset = 0; // Tek ve çift sırada offset farkı yok
       
-      // X pozisyonu: Grid'in merkezini referans alarak ve petek düzeni için offset uygulayarak
-      const x = centerX + (col * horizontalSpacing) - (gridWidthTotal / 2) + (horizontalSpacing / 2) + rowOffset;
+      // X pozisyonu: Grid'in merkezini referans alarak ve düz bir düzen için offset uygulayarak
+      const x = centerX + (col * horizontalSpacing) - (gridWidthTotal / 2) + (horizontalSpacing / 2);
       
       // Z pozisyonu: Düşman tarafı (negatif z) - yukarıdan aşağı sıralanır
-      const z = centerZ - (verticalSpacing * row) - verticalSpacing; // Boşluk ekleyerek
+      const z = centerZ - (verticalSpacing * row) - verticalSpacing;
       
       // Bu düşman tarafı (son 3 sıra)
       const isPlayerSide = false;
@@ -287,12 +288,13 @@ const HexGrid: React.FC<HexGridProps> = ({
     
     // Koordinat pozisyonu bulmak için (oyuncuya/düşmana göre)
     // Aynı yerleşim mantığını kullanarak birimlerin konumlarını hesapla
+    // Yeni grid tasarımına uygun olarak düzenlendi
     
     let isPlayerSide = r < totalRows;
     let realRow = isPlayerSide ? r : r - totalRows;
     
-    const rowOffset = realRow % 2 === 1 ? horizontalSpacing / 2 : 0;
-    const x = centerX + (q * horizontalSpacing) - (gridWidthTotal / 2) + (horizontalSpacing / 2) + rowOffset;
+    // Yeni düzene göre rowOffset kullanmıyoruz - tüm sıralar düz hizalı
+    const x = centerX + (q * horizontalSpacing) - (gridWidthTotal / 2) + (horizontalSpacing / 2);
     let z = 0;
     
     if (isPlayerSide) {
