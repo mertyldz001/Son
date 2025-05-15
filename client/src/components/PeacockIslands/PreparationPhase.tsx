@@ -921,9 +921,8 @@ const PreparationPhase = () => {
                               // Ses çal
                               playClick();
                               
-                              // Önce altını düş - optimizasyon için store doğrudan kullanılıyor
-                              const store = usePeacockIslandsStore.getState();
-                              store.updatePlayerGold(player.id, -2);
+                              // Önce altını düş - trainSoldiers fonksiyonu kullanılıyor
+                              trainSoldiers(player.id, 1); // Bu fonksiyon altın değerini düşürüyor
                               
                               // Yeni asker oluştur - performans için ID daha basit üretiliyor
                               const newUnit: Unit = {
