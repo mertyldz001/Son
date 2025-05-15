@@ -675,21 +675,21 @@ const PreparationPhase = () => {
                         <div 
                           key={slotId}
                           className={`p-2 border rounded-lg flex flex-col items-center ${
-                            slot.status === "empty"
+                            !slot.egg
                               ? "border-gray-600/30 bg-gray-800/20"
-                              : slot.status === "incubating"
+                              : !slot.egg.ready
                                 ? "border-blue-600/30 bg-blue-900/20"
                                 : "border-green-600/30 bg-green-900/20"
                           } cursor-pointer relative`}
                           onClick={() => setSelectedHatcherySlot(slot)}
                         >
                           <div className="h-16 w-full">
-                            {slot.status !== "empty" && slot.egg ? (
+                            {slot.egg ? (
                               <EggViewer 
                                 color={slot.egg?.color} 
                                 scale={0.6} 
                                 rotate={true}
-                                isActive={slot.status === "ready"}
+                                isActive={slot.egg?.ready}
                               />
                             ) : (
                               <div className="flex items-center justify-center h-full">
@@ -699,9 +699,9 @@ const PreparationPhase = () => {
                           </div>
                           
                           <div className="mt-2 w-full text-center">
-                            {slot.status === "empty" ? (
+                            {!slot.egg ? (
                               <span className="text-gray-400 text-xs">Boş Yuva</span>
-                            ) : slot.status === "incubating" && slot.egg ? (
+                            ) : !slot.egg.ready ? (
                               <div>
                                 <span className={`text-xs font-medium ${
                                   slot.egg?.color === "green" ? "text-green-400" : 
@@ -729,7 +729,7 @@ const PreparationPhase = () => {
                                   </span>
                                 </div>
                               </div>
-                            ) : slot.status === "ready" && slot.egg ? (
+                            ) : (
                               <div>
                                 <span className={`text-xs font-medium ${
                                   slot.egg?.color === "green" ? "text-green-400" : 
@@ -758,7 +758,7 @@ const PreparationPhase = () => {
                                   Aktifleştir
                                 </button>
                               </div>
-                            ) : null}
+                            )}
                           </div>
                         </div>
                       ))}
