@@ -1,8 +1,7 @@
 import { useRef, useState, useEffect } from "react";
-import { useGLTF, Float, Html } from "@react-three/drei";
+import { useGLTF } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
-import { usePeacockIslandsStore } from "../../lib/stores/usePeacockIslandsStore";
 
 // TFT tarzı penguen modeli - Kullanıcı için avatar
 export function PenguinAvatar() {
@@ -12,21 +11,44 @@ export function PenguinAvatar() {
   const [isMoving, setIsMoving] = useState(false);
   const [targetPosition, setTargetPosition] = useState<THREE.Vector3 | null>(null);
   
-  // Küçük şampiyon pengu ismi
-  const penguName = "Küçük şampiyon pengu";
-  
-  // Hareket hızı
-  const speed = 0.05;
+  // Hareket hızı - daha akıcı hareket için hızı artır
+  const speed = 0.08;
   
   // ThreeJS dünyası için erişim
   const { raycaster, camera, scene } = useThree();
+  
+  // Sadece sütunlar ve yeşil bahçe alanında hareket edebilme kontrolü
+  const isValidPosition = (point: THREE.Vector3): boolean => {
+    // Hexagonal sütunlar ve yeşil bahçe bölgesi için sınırlar
+    // Merkezden başlayarak hex grid ve çevresindeki yeşil alan tanımı
+    const centerX = 0;
+    const centerZ = 0;
+    
+    // Hexagonal grid alanı (sütunlar)
+    const gridWidth = 7;  // x-ekseninde 7 sütun
+    const gridHeight = 6; // z-ekseninde 6 sütun
+    const cellSize = 1.2; // Her hücrenin boyutu
+    
+    // Grid alanını hesapla
+    const gridBoundsX = (gridWidth * cellSize) / 2;
+    const gridBoundsZ = (gridHeight * cellSize) / 2;
+    
+    // Yeşil bahçe alanı için ilave sınır
+    const gardenMargin = 2.0; // Gridden yeşil alana doğru uzanan mesafe
+    
+    // X ve Z koordinatları merkeze göre normalize et
+    const relativeX = Math.abs(point.x - centerX);
+    const relativeZ = Math.abs(point.z - centerZ);
+    
+    // Sütunlar ve yeşil bahçe alanında mı kontrol et
+    return relativeX <= (gridBoundsX + gardenMargin) && 
+           relativeZ <= (gridBoundsZ + gardenMargin);
+  };
   
   // Mobil dokunma ve tıklama için DOM tabanlı çözüm
   useEffect(() => {
     // Mobil cihazlar için dokunma olayını yakalamak için
     const handleTouch = (event: TouchEvent | MouseEvent) => {
-      console.log("Dokunma veya tıklama algılandı!");
-      
       // Canvas elemanını bul
       const canvas = document.querySelector('canvas');
       if (!canvas) return;
@@ -73,19 +95,17 @@ export function PenguinAvatar() {
       
       // Raycaster ile düzlemin kesişimini bul
       if (raycaster.ray.intersectPlane(groundPlane, targetPoint)) {
-        console.log("Hedef nokta bulundu:", targetPoint);
-        
-        // Sınırlar içinde kal
-        const maxX = 6, maxZ = 5;
-        const minX = -6, minZ = -5;
-        targetPoint.x = Math.max(minX, Math.min(maxX, targetPoint.x));
-        targetPoint.z = Math.max(minZ, Math.min(maxZ, targetPoint.z));
+        // Geçerli pozisyon kontrolü
+        if (!isValidPosition(targetPoint)) {
+          console.log("Geçersiz hedef: Sütunlar ve bahçe dışında");
+          return; // Geçersiz pozisyon
+        }
         
         // Hedef pozisyonu ayarla
         setTargetPosition(targetPoint);
         setIsMoving(true);
         
-        // Hedef yöne dönüş
+        // Hedef yöne dönüş - daha yumuşak rotasyon
         const deltaX = targetPoint.x - position[0];
         const deltaZ = targetPoint.z - position[2];
         const angle = Math.atan2(deltaX, deltaZ);
@@ -102,9 +122,9 @@ export function PenguinAvatar() {
       document.removeEventListener('click', handleTouch);
       document.removeEventListener('touchstart', handleTouch);
     };
-  }, [camera, raycaster, position]);
+  }, [camera, raycaster, scene, position]);
   
-  // Animasyon ve hareket
+  // Animasyon ve hareket - daha akıcı ve gçzel
   useFrame((_, delta) => {
     if (targetPosition && isMoving) {
       // Mevcut pozisyon
@@ -117,12 +137,25 @@ export function PenguinAvatar() {
       if (distance < 0.1) {
         setIsMoving(false);
         setTargetPosition(null);
+        // Karakterin sabit kalmasını sağla - idle animasyonu olmadan
         return;
       }
       
-      // Hareket yönü ve mesafesi
+      // Hareket yönü - daha akıcı hareket için
       const direction = new THREE.Vector3().subVectors(targetPosition, currentPos).normalize();
-      const moveDistance = speed * delta * 60; // 60 FPS'de normal hız
+      
+      // Hız eğrisi - hareket başlangıcında ve bitişinde yavaşlama
+      let moveSpeed = speed;
+      if (distance < 1.0) {
+        // Hedefe yaklaşırken yavaşla
+        moveSpeed = speed * (distance / 1.0);
+      }
+      
+      // Minimum hız garantisi
+      moveSpeed = Math.max(speed * 0.5, moveSpeed);
+      
+      // Hareket mesafesini hesapla
+      const moveDistance = moveSpeed * delta * 60;
       
       // Yeni pozisyon
       const newX = currentPos.x + direction.x * Math.min(moveDistance, distance);
@@ -131,10 +164,10 @@ export function PenguinAvatar() {
       // Pozisyonu güncelle
       setPosition([newX, position[1], newZ]);
       
-      // Zıplama efekti
+      // Hareket sırasında karakterin yüksekliği sabit kalır
       if (model.current) {
-        const bounce = Math.sin(Date.now() * 0.01) * 0.05;
-        model.current.position.y = 0.05 + bounce;
+        // Idle animasyonu olmadan, sabit yükseklik
+        model.current.position.y = 0.05;
       }
     }
   });
@@ -144,29 +177,9 @@ export function PenguinAvatar() {
   if (!penguinScene) return null;
   
   return (
-    <Float 
-      speed={1.5}
-      rotationIntensity={0.2}
-      floatIntensity={0.2}
+    <group
       position={[position[0], position[1], position[2]]}
     >
-      {/* İsim etiketi */}
-      <Html
-        position={[0, 1.2, 0]}
-        center
-        distanceFactor={10}
-      >
-        <div className="bg-white px-2 py-1 rounded-full text-black font-medium text-sm whitespace-nowrap">
-          {penguName}
-        </div>
-      </Html>
-      
-      {/* Yeşil ok - aşağıya doğru */}
-      <mesh position={[0, 1.5, 0]}>
-        <coneGeometry args={[0.2, 0.4, 3]} />
-        <meshBasicMaterial color="#4ade80" />
-      </mesh>
-      
       {/* Penguen modeli */}
       <group 
         ref={model} 
@@ -175,7 +188,7 @@ export function PenguinAvatar() {
       >
         <primitive object={penguinScene.clone()} />
       </group>
-    </Float>
+    </group>
   );
 }
 
