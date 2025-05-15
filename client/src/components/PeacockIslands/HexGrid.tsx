@@ -85,9 +85,9 @@ function HexTile({
           isOccupied
         }}
       >
-        {/* Dışardaki altıgen çizgi - belirgin ve kalın */}
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, 0]}>
-          <ringGeometry args={[size * 0.93, size * 1.03, 6]} />
+        {/* YALNIZCA TEK BİR ALTIGEN ÇIZGI - ÇOK KALIN VE NET */}
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.025, 0]}>
+          <ringGeometry args={[size * 0.94, size * 1.05, 6]} />
           <meshBasicMaterial 
             color={isHovered ? "#ffffff" : edgeColor}
             side={THREE.DoubleSide}
@@ -95,9 +95,9 @@ function HexTile({
           />
         </mesh>
         
-        {/* İçerdeki altıgen renk alanı */}
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]}>
-          <cylinderGeometry args={[size * 0.9, size * 0.9, 0.05, 6, 1, false]} />
+        {/* İÇERDEKI RENK ALANI - TAM ALTIGEN */}
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, 0]}>
+          <ringGeometry args={[0, size * 0.92, 6]} />
           <meshStandardMaterial 
             color={isHovered ? hoverColor : baseColor}
             emissive={isHovered ? hoverColor : baseColor}
