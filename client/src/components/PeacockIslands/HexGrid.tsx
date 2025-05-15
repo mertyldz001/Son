@@ -140,9 +140,10 @@ function HexTile({
         <mesh rotation={[-Math.PI / 2, Math.PI, 0]} position={[0, 0.025, 0]}>
           <ringGeometry args={[tileSize * 0.94, tileSize * 1.02, 6]} />
           <meshBasicMaterial 
-            color={isHovered ? "#ffffff" : edgeColor}
+            color={isHovered ? "#ffffff" : "#ffffff"}
             side={THREE.DoubleSide}
             transparent={false}
+            opacity={0.8}
           />
         </mesh>
       </group>
