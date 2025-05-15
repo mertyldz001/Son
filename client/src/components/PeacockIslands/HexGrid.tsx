@@ -57,10 +57,9 @@ function HexTile({
   
   return (
     <group position={position}>
-      {/* Görünüm düzeltildi - içerideki renk alanı altıgen olarak ayarlandı */}
-      <mesh 
-        position={[0, hoverHeight.current, 0]} 
-        rotation={[-Math.PI / 2, 0, 0]}
+      {/* Tamamı altıgen olarak yeniden düzenlendi */}
+      <group
+        position={[0, hoverHeight.current, 0]}
         scale={hoverScale.current}
         onPointerOver={onHover}
         onPointerOut={onUnhover}
@@ -86,34 +85,28 @@ function HexTile({
           isOccupied
         }}
       >
-        {/* İçerideki renk alanı - altıgen olarak yapıldı */}
-        <cylinderGeometry args={[size * 0.95, size * 0.95, 0.08, 6, 1, false]} />
-        <meshPhysicalMaterial 
-          color={isHovered ? hoverColor : baseColor} 
-          emissive={isHovered ? hoverColor : baseColor}
-          emissiveIntensity={0.4}
-          roughness={0.2}
-          metalness={0.8}
-          clearcoat={0.8}
-          reflectivity={0.7}
-          transmission={0.1}
-        />
-      </mesh>
-      
-      {/* Dışarıdaki altıgen çizgi - daha kalın ve görünür */}
-      <mesh 
-        position={[0, 0.05, 0]} 
-        rotation={[-Math.PI / 2, 0, 0]}
-        scale={hoverScale.current}
-      >
-        <ringGeometry args={[size * 0.94, size * 1.02, 6]} />
-        <meshBasicMaterial 
-          color={isHovered ? "#ffffff" : edgeColor}
-          side={THREE.DoubleSide}
-          transparent={true}
-          opacity={isHovered ? 1 : 1}
-        />
-      </mesh>
+        {/* Dışardaki altıgen çizgi - belirgin ve kalın */}
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, 0]}>
+          <ringGeometry args={[size * 0.93, size * 1.03, 6]} />
+          <meshBasicMaterial 
+            color={isHovered ? "#ffffff" : edgeColor}
+            side={THREE.DoubleSide}
+            transparent={false}
+          />
+        </mesh>
+        
+        {/* İçerdeki altıgen renk alanı */}
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]}>
+          <cylinderGeometry args={[size * 0.9, size * 0.9, 0.05, 6, 1, false]} />
+          <meshStandardMaterial 
+            color={isHovered ? hoverColor : baseColor}
+            emissive={isHovered ? hoverColor : baseColor}
+            emissiveIntensity={0.4}
+            roughness={0.2}
+            metalness={0.7}
+          />
+        </mesh>
+      </group>
       
       {/* Koordinat bilgisi (debug için) */}
       {/*
