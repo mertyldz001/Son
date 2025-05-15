@@ -70,9 +70,14 @@ const PlayerIsland = ({ position = [0, 0, 0] as [number, number, number] }) => {
 
   // Ada süsleme faktörü - kenarlar boyunca
   const decorationCount = 12;  // Daha fazla süs ekle
+  
+  // TypeScript hata düzeltmesi (3. İstek)
+  const safePosition = Array.isArray(position) ? 
+    [position[0] || 0, position[1] || 0, position[2] || 0] as [number, number, number] : 
+    [0, 0, 0] as [number, number, number];
     
   return (
-    <group position={position}>
+    <group position={safePosition}>
       {/* Deniz altı bazı */}
       <mesh 
         position={[0, -0.5, 0]} 
@@ -181,9 +186,14 @@ const EnemyIsland = ({ position = [0, 0, 0] }) => {
 
   // Ada süsleme faktörü - kenarlar boyunca
   const decorationCount = 12;
+  
+  // TypeScript hata düzeltmesi (3. İstek)
+  const safePosition = Array.isArray(position) ? 
+    [position[0] || 0, position[1] || 0, position[2] || 0] as [number, number, number] : 
+    [0, 0, 0] as [number, number, number];
     
   return (
-    <group position={position}>
+    <group position={safePosition}>
       {/* Deniz altı bazı */}
       <mesh 
         position={[0, -0.5, 0]} 
