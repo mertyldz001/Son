@@ -771,177 +771,182 @@ const PreparationPhase = () => {
         </div>
         
         {/* Alt panel - Asker yönetimi için */}
-        <div className="fixed bottom-0 left-0 right-0 h-24 pointer-events-auto">
-          <div className="bg-gradient-to-t from-slate-900/95 to-slate-900/85 backdrop-blur-sm border-t border-slate-700/50 h-full shadow-lg">
-            <div className="mx-auto max-w-7xl h-full flex items-center justify-between px-4">
-              {/* Birimler ve yönetim */}
-              <div className="flex items-center gap-4">
-                <div className="flex flex-col items-center bg-slate-800/60 rounded-md p-2 border border-slate-600/40">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-12 h-12 bg-slate-800 rounded-md flex items-center justify-center border border-blue-400/30">
-                      <span className="material-icons text-blue-400">shield</span>
+        <div className="fixed bottom-0 left-0 right-0 pointer-events-auto">
+          <div>
+            {/* Ana kontrol paneli - kısaltıldı */}
+            <div className="bg-gradient-to-t from-slate-900/95 to-slate-900/85 backdrop-blur-sm border-t border-slate-700/50 h-24 shadow-lg">
+              <div className="mx-auto max-w-7xl h-full flex items-center justify-between px-4">
+                {/* Birimler ve yönetim */}
+                <div className="flex items-center gap-4">
+                  <div className="flex flex-col items-center bg-slate-800/60 rounded-md p-2 border border-slate-600/40">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-12 h-12 bg-slate-800 rounded-md flex items-center justify-center border border-blue-400/30">
+                        <span className="material-icons text-blue-400">shield</span>
+                      </div>
+                      <div>
+                        <h4 className="text-xs text-blue-300 font-medium">Tavus Askerleri</h4>
+                        <p className="text-lg font-bold text-white">{peacockWarriorCount}</p>
+                      </div>
                     </div>
-                    <div>
-                      <h4 className="text-xs text-blue-300 font-medium">Tavus Askerleri</h4>
-                      <p className="text-lg font-bold text-white">{peacockWarriorCount}</p>
+                    <div className="text-[10px] text-blue-200/80 mt-1">
+                      Saha: {player.island.units.filter((u: Unit) => u.type === "warrior" && u.isDeployed).length} / {player.island.units.filter((u: Unit) => u.type === "warrior").length}
                     </div>
                   </div>
-                  <div className="text-[10px] text-blue-200/80 mt-1">
-                    Saha: {player.island.units.filter((u: Unit) => u.type === "warrior" && u.isDeployed).length} / {player.island.units.filter((u: Unit) => u.type === "warrior").length}
+                  
+                  <div className="flex flex-col items-center bg-slate-800/60 rounded-md p-2 border border-slate-600/40">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-12 h-12 bg-slate-800 rounded-md flex items-center justify-center border border-amber-400/30">
+                        <span className="material-icons text-amber-400">person_outline</span>
+                      </div>
+                      <div>
+                        <h4 className="text-xs text-amber-300 font-medium">İnsan Askerleri</h4>
+                        <p className="text-lg font-bold text-white">{humanSoldierCount}</p>
+                      </div>
+                    </div>
+                    <div className="text-[10px] text-amber-200/80 mt-1">
+                      Saha: {player.island.units.filter((u: Unit) => u.type === "soldier" && u.isDeployed).length} / {player.island.units.filter((u: Unit) => u.type === "soldier").length}
+                    </div>
+                  </div>
+                  
+                  {/* Asker bilgisi - Sürekli görünür olduğu için buton kaldırıldı */}
+                  <div className="px-3 py-2 bg-gradient-to-b from-indigo-700 to-indigo-900 border border-indigo-500/50 rounded-md text-sm text-indigo-200 font-medium">
+                    <div className="flex items-center">
+                      <span className="material-icons text-sm mr-1">info</span>
+                      <span>Askerleriniz hazır</span>
+                    </div>
                   </div>
                 </div>
                 
-                <div className="flex flex-col items-center bg-slate-800/60 rounded-md p-2 border border-slate-600/40">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-12 h-12 bg-slate-800 rounded-md flex items-center justify-center border border-amber-400/30">
-                      <span className="material-icons text-amber-400">person_outline</span>
-                    </div>
-                    <div>
-                      <h4 className="text-xs text-amber-300 font-medium">İnsan Askerleri</h4>
-                      <p className="text-lg font-bold text-white">{humanSoldierCount}</p>
-                    </div>
-                  </div>
-                  <div className="text-[10px] text-amber-200/80 mt-1">
-                    Saha: {player.island.units.filter((u: Unit) => u.type === "soldier" && u.isDeployed).length} / {player.island.units.filter((u: Unit) => u.type === "soldier").length}
-                  </div>
+                {/* Hazırlık Ipuçları */}
+                <div className="w-96 h-16 bg-slate-800/60 rounded-md border border-slate-600/40 p-2">
+                  <h4 className="text-xs text-slate-300 font-medium flex items-center">
+                    <span className="material-icons text-xs mr-1">tips_and_updates</span>
+                    İPUCU
+                  </h4>
+                  <p className="text-xs text-slate-300/80 mt-1">
+                    Askerlerinizi savaş alanına yerleştirmek için, 
+                    onları alttaki panelden seçip haritadaki mavi alanlara sürükleyin.
+                  </p>
                 </div>
                 
-                {/* Asker bilgisi - Sürekli görünür olduğu için buton kaldırıldı */}
-                <div className="px-3 py-2 bg-gradient-to-b from-indigo-700 to-indigo-900 border border-indigo-500/50 rounded-md text-sm text-indigo-200 font-medium">
-                  <div className="flex items-center">
-                    <span className="material-icons text-sm mr-1">info</span>
-                    <span>Askerleriniz hazır</span>
-                  </div>
+                {/* Düğmeler */}
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => {
+                      playClick();
+                      trainSoldiers(player.id, 1);
+                      setActionLog(prev => [...prev, "Yeni asker eğitildi!"]);
+                    }}
+                    disabled={player.island.gold < 5}
+                    className={`px-3 py-2 bg-gradient-to-b from-amber-800 to-amber-900 border border-amber-600/50 rounded-md text-sm text-amber-200 font-medium flex items-center transition hover:bg-gradient-to-b hover:from-amber-700 hover:to-amber-800 ${player.island.gold < 5 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  >
+                    <span className="material-icons text-sm mr-1">person_add</span>
+                    Asker Eğit (5 Altın)
+                  </button>
+                  
+                  <button
+                    onClick={() => {
+                      playClick();
+                      updatePreparationTime(-preparationTimeLeft); // Zamanı bitir
+                      setActionLog(prev => [...prev, "Savaş fazı başlatıldı!"]);
+                    }}
+                    className="px-3 py-2 bg-gradient-to-b from-red-800 to-red-900 border border-red-600/50 rounded-md text-sm text-red-200 font-medium flex items-center transition hover:bg-gradient-to-b hover:from-red-700 hover:to-red-800"
+                  >
+                    <span className="material-icons text-sm mr-1">swords</span>
+                    Savaşa Başla
+                  </button>
                 </div>
               </div>
-              
-              {/* Hazırlık Ipuçları */}
-              <div className="w-96 h-16 bg-slate-800/60 rounded-md border border-slate-600/40 p-2">
-                <h4 className="text-xs text-slate-300 font-medium flex items-center">
-                  <span className="material-icons text-xs mr-1">tips_and_updates</span>
-                  İPUCU
-                </h4>
-                <p className="text-xs text-slate-300/80 mt-1">
-                  Askerlerinizi savaş alanına yerleştirmek için, 
-                  onları alttaki panelden seçip haritadaki mavi alanlara sürükleyin.
-                </p>
-              </div>
-              
-              {/* Düğmeler */}
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => {
-                    playClick();
-                    trainSoldiers(player.id, 1);
-                    setActionLog(prev => [...prev, "Yeni asker eğitildi!"]);
-                  }}
-                  disabled={player.island.gold < 5}
-                  className={`px-3 py-2 bg-gradient-to-b from-amber-800 to-amber-900 border border-amber-600/50 rounded-md text-sm text-amber-200 font-medium flex items-center transition hover:bg-gradient-to-b hover:from-amber-700 hover:to-amber-800 ${player.island.gold < 5 ? 'opacity-50 cursor-not-allowed' : ''}`}
-                >
-                  <span className="material-icons text-sm mr-1">person_add</span>
-                  Asker Eğit (5 Altın)
-                </button>
+            </div>
+
+            {/* Askerleriniz Paneli - Butonların altına yerleştirildi */}
+            <div className="bg-gradient-to-t from-slate-900/95 to-slate-900/85 backdrop-blur-sm border-t border-slate-700/30 shadow-lg p-4">
+              <div className="max-w-7xl mx-auto">
+                <h3 className="text-white font-bold text-lg mb-3 flex items-center">
+                  <span className="material-icons text-amber-400 mr-2">military_tech</span>
+                  Askerleriniz
+                </h3>
                 
-                <button
-                  onClick={() => {
-                    playClick();
-                    updatePreparationTime(-preparationTimeLeft); // Zamanı bitir
-                    setActionLog(prev => [...prev, "Savaş fazı başlatıldı!"]);
-                  }}
-                  className="px-3 py-2 bg-gradient-to-b from-red-800 to-red-900 border border-red-600/50 rounded-md text-sm text-red-200 font-medium flex items-center transition hover:bg-gradient-to-b hover:from-red-700 hover:to-red-800"
-                >
-                  <span className="material-icons text-sm mr-1">swords</span>
-                  Savaşa Başla
-                </button>
+                {player.island.units.length === 0 ? (
+                  <p className="text-slate-400 text-sm mb-2">Henüz askeriniz yok. "Asker Eğit" butonuna tıklayarak asker alabilirsiniz.</p>
+                ) : (
+                  <div className="flex gap-6">
+                    {/* Tavuskuşu Askerleri */}
+                    {peacockWarriors.length > 0 && (
+                      <div className="flex-1">
+                        <h4 className="text-blue-300 text-sm font-bold mb-2 flex items-center">
+                          <span className="material-icons text-blue-400 mr-1 text-sm">verified</span>
+                          Tavuskuşu Askerleri
+                        </h4>
+                        <div className="grid grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-3">
+                          {peacockWarriors.filter((unit: Unit) => !unit.isDeployed).map((unit: Unit) => (
+                            <div key={unit.id} className="transition-transform transform hover:scale-[1.05]">
+                              <div 
+                                className="cursor-grab"
+                                onMouseDown={() => {
+                                  if (!unit.isDeployed) {
+                                    setDraggedUnit(unit);
+                                    playClick();
+                                  }
+                                }}
+                              >
+                                <UnitCard 
+                                  unit={unit} 
+                                  isDragging={draggedUnit?.id === unit.id} 
+                                  onDragStart={() => {}} 
+                                  onDragEnd={() => {}} 
+                                  isDeployed={unit.isDeployed}
+                                />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* İnsan Askerleri */}
+                    {humanSoldiers.length > 0 && (
+                      <div className="flex-1">
+                        <h4 className="text-amber-300 text-sm font-bold mb-2 flex items-center">
+                          <span className="material-icons text-amber-400 mr-1 text-sm">verified</span>
+                          İnsan Askerleri
+                        </h4>
+                        <div className="grid grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-3">
+                          {humanSoldiers.filter((unit: Unit) => !unit.isDeployed).map((unit: Unit) => (
+                            <div key={unit.id} className="transition-transform transform hover:scale-[1.05]">
+                              <div 
+                                className="cursor-grab"
+                                onMouseDown={() => {
+                                  if (!unit.isDeployed) {
+                                    setDraggedUnit(unit);
+                                    playClick();
+                                  }
+                                }}
+                              >
+                                <UnitCard 
+                                  unit={unit} 
+                                  isDragging={draggedUnit?.id === unit.id} 
+                                  onDragStart={() => {}} 
+                                  onDragEnd={() => {}} 
+                                  isDeployed={unit.isDeployed}
+                                />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </div>
         </div>
         
-        {/* Asker Kartları Paneli - Sol kısımda sabit panel olarak gösteriliyor */}
-        <div className="fixed left-0 top-1/4 bottom-24 w-72 pointer-events-auto z-10">
-          <div className="bg-slate-900/90 backdrop-blur-sm border-r border-slate-700/50 p-4 shadow-lg h-full overflow-y-auto">
-            <h3 className="text-white font-bold text-lg mb-3 flex items-center">
-              <span className="material-icons text-amber-400 mr-2">military_tech</span>
-              Askerleriniz
-            </h3>
-            
-            {player.island.units.length === 0 ? (
-              <p className="text-slate-400 text-sm mb-2">Henüz askeriniz yok. "Asker Eğit" butonuna tıklayarak asker alabilirsiniz.</p>
-            ) : (
-              <div className="space-y-4">
-                {/* Tavuskuşu Askerleri */}
-                {peacockWarriors.length > 0 && (
-                  <div>
-                    <h4 className="text-blue-300 text-sm font-bold mb-2 flex items-center">
-                      <span className="material-icons text-blue-400 mr-1 text-sm">verified</span>
-                      Tavuskuşu Askerleri
-                    </h4>
-                    <div className="grid grid-cols-2 gap-2">
-                      {peacockWarriors.filter((unit: Unit) => !unit.isDeployed).map((unit: Unit) => (
-                        <div key={unit.id} className="transition-transform transform hover:scale-[1.05]">
-                          <div 
-                            className="cursor-grab"
-                            onMouseDown={() => {
-                              if (!unit.isDeployed) {
-                                setDraggedUnit(unit);
-                                playClick();
-                              }
-                            }}
-                          >
-                            <UnitCard 
-                              unit={unit} 
-                              isDragging={draggedUnit?.id === unit.id} 
-                              onDragStart={() => {}} 
-                              onDragEnd={() => {}} 
-                              isDeployed={unit.isDeployed}
-                            />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                
-                {/* İnsan Askerleri */}
-                {humanSoldiers.length > 0 && (
-                  <div>
-                    <h4 className="text-amber-300 text-sm font-bold mb-2 flex items-center">
-                      <span className="material-icons text-amber-400 mr-1 text-sm">verified</span>
-                      İnsan Askerleri
-                    </h4>
-                    <div className="grid grid-cols-2 gap-2">
-                      {humanSoldiers.filter((unit: Unit) => !unit.isDeployed).map((unit: Unit) => (
-                        <div key={unit.id} className="transition-transform transform hover:scale-[1.05]">
-                          <div 
-                            className="cursor-grab"
-                            onMouseDown={() => {
-                              if (!unit.isDeployed) {
-                                setDraggedUnit(unit);
-                                playClick();
-                              }
-                            }}
-                          >
-                            <UnitCard 
-                              unit={unit} 
-                              isDragging={draggedUnit?.id === unit.id} 
-                              onDragStart={() => {}} 
-                              onDragEnd={() => {}} 
-                              isDeployed={unit.isDeployed}
-                            />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
+        {/* Asker Kartları Paneli - Alt kısımda, butonların altında sabit panel olarak gösteriliyor */}
         
-        {/* Aktivite Logu - Sol kısma taşındı ve şeffaflaştırıldı */}
-        <div className="fixed left-4 bottom-24 z-50 w-64 max-h-40 overflow-y-auto">
+        {/* Aktivite Logu - Sağ alt köşeye taşındı ve şeffaflaştırıldı */}
+        <div className="fixed right-4 bottom-[420px] z-50 w-64 max-h-40 overflow-y-auto">
           <div className="glass-panel bg-slate-900/20 backdrop-blur-sm rounded-lg p-2 border border-slate-600/10">
             <h4 className="text-xs font-semibold mb-1 flex items-center text-blue-300/80">
               <span className="material-icons text-xs mr-1">history</span>
