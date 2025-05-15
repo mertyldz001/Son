@@ -773,46 +773,46 @@ const PreparationPhase = () => {
         {/* Alt panel - Asker yönetimi için */}
         <div className="fixed bottom-0 left-0 right-0 pointer-events-auto">
           <div>
-            {/* Ana kontrol paneli - kısaltıldı */}
+            {/* Ana kontrol paneli - Sadece savaş başlatma */}
             <div className="bg-gradient-to-t from-slate-900/95 to-slate-900/85 backdrop-blur-sm border-t border-slate-700/50 h-24 shadow-lg">
               <div className="mx-auto max-w-7xl h-full flex items-center justify-between px-4">
-                {/* Birimler ve yönetim */}
+                {/* Oyuncu Kaynakları */}
                 <div className="flex items-center gap-4">
-                  <div className="flex flex-col items-center bg-slate-800/60 rounded-md p-2 border border-slate-600/40">
-                    <div className="flex items-center space-x-2">
-                      <div className="w-12 h-12 bg-slate-800 rounded-md flex items-center justify-center border border-blue-400/30">
-                        <span className="material-icons text-blue-400">shield</span>
-                      </div>
-                      <div>
-                        <h4 className="text-xs text-blue-300 font-medium">Tavus Askerleri</h4>
-                        <p className="text-lg font-bold text-white">{peacockWarriorCount}</p>
-                      </div>
-                    </div>
-                    <div className="text-[10px] text-blue-200/80 mt-1">
-                      Saha: {player.island.units.filter((u: Unit) => u.type === "warrior" && u.isDeployed).length} / {player.island.units.filter((u: Unit) => u.type === "warrior").length}
-                    </div>
-                  </div>
-                  
-                  <div className="flex flex-col items-center bg-slate-800/60 rounded-md p-2 border border-slate-600/40">
+                  <div className="flex flex-col items-center bg-slate-800/60 rounded-md p-2 border border-amber-600/40">
                     <div className="flex items-center space-x-2">
                       <div className="w-12 h-12 bg-slate-800 rounded-md flex items-center justify-center border border-amber-400/30">
-                        <span className="material-icons text-amber-400">person_outline</span>
+                        <span className="material-icons text-amber-400">attach_money</span>
                       </div>
                       <div>
-                        <h4 className="text-xs text-amber-300 font-medium">İnsan Askerleri</h4>
-                        <p className="text-lg font-bold text-white">{humanSoldierCount}</p>
+                        <h4 className="text-xs text-amber-300 font-medium">Altın</h4>
+                        <p className="text-lg font-bold text-white">{player.island.gold}</p>
                       </div>
                     </div>
                     <div className="text-[10px] text-amber-200/80 mt-1">
-                      Saha: {player.island.units.filter((u: Unit) => u.type === "soldier" && u.isDeployed).length} / {player.island.units.filter((u: Unit) => u.type === "soldier").length}
+                      Her asker 2 altın
                     </div>
                   </div>
                   
-                  {/* Asker bilgisi - Sürekli görünür olduğu için buton kaldırıldı */}
+                  <div className="flex flex-col items-center bg-slate-800/60 rounded-md p-2 border border-blue-600/40">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-12 h-12 bg-slate-800 rounded-md flex items-center justify-center border border-blue-400/30">
+                        <span className="material-icons text-blue-400">military_tech</span>
+                      </div>
+                      <div>
+                        <h4 className="text-xs text-blue-300 font-medium">Ordunuz</h4>
+                        <p className="text-lg font-bold text-white">{deployedUnits.length}</p>
+                      </div>
+                    </div>
+                    <div className="text-[10px] text-blue-200/80 mt-1">
+                      Savaş alanına yerleştirilmiş askerler
+                    </div>
+                  </div>
+                  
+                  {/* Savaş bilgisi */}
                   <div className="px-3 py-2 bg-gradient-to-b from-indigo-700 to-indigo-900 border border-indigo-500/50 rounded-md text-sm text-indigo-200 font-medium">
                     <div className="flex items-center">
                       <span className="material-icons text-sm mr-1">info</span>
-                      <span>Askerleriniz hazır</span>
+                      <span>Hazırlık aşaması: {Math.floor(preparationTimeLeft)} saniye</span>
                     </div>
                   </div>
                 </div>
@@ -824,24 +824,24 @@ const PreparationPhase = () => {
                     İPUCU
                   </h4>
                   <p className="text-xs text-slate-300/80 mt-1">
-                    Askerlerinizi savaş alanına yerleştirmek için, 
-                    onları alttaki panelden seçip haritadaki mavi alanlara sürükleyin.
+                    Asker satın almak için alttaki marketten asker seçin. 
+                    Satın aldığınız askerleri anında savaş alanındaki mavi bölgelere yerleştirin.
                   </p>
                 </div>
                 
-                {/* Düğmeler */}
+                {/* Düğme */}
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => {
+                      // 3 altın kazandır
                       playClick();
-                      trainSoldiers(player.id, 1);
-                      setActionLog(prev => [...prev, "Yeni asker eğitildi!"]);
+                      trainSoldiers(player.id, -1.5); // Negatif değer verince altın artıyor
+                      setActionLog(prev => [...prev, "3 altın kazandınız!"]);
                     }}
-                    disabled={player.island.gold < 5}
-                    className={`px-3 py-2 bg-gradient-to-b from-amber-800 to-amber-900 border border-amber-600/50 rounded-md text-sm text-amber-200 font-medium flex items-center transition hover:bg-gradient-to-b hover:from-amber-700 hover:to-amber-800 ${player.island.gold < 5 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    className="px-3 py-2 bg-gradient-to-b from-amber-600 to-amber-800 border border-amber-500/50 rounded-md text-sm text-amber-200 font-medium flex items-center transition hover:bg-gradient-to-b hover:from-amber-500 hover:to-amber-700"
                   >
-                    <span className="material-icons text-sm mr-1">person_add</span>
-                    Asker Eğit (5 Altın)
+                    <span className="material-icons text-sm mr-1">payments</span>
+                    Altın Kazan
                   </button>
                   
                   <button
@@ -859,85 +859,133 @@ const PreparationPhase = () => {
               </div>
             </div>
 
-            {/* Askerleriniz Paneli - Butonların altına yerleştirildi */}
+            {/* Market Paneli - Butonların altına yerleştirildi */}
             <div className="bg-gradient-to-t from-slate-900/95 to-slate-900/85 backdrop-blur-sm border-t border-slate-700/30 shadow-lg p-4">
               <div className="max-w-7xl mx-auto">
                 <h3 className="text-white font-bold text-lg mb-3 flex items-center">
-                  <span className="material-icons text-amber-400 mr-2">military_tech</span>
-                  Askerleriniz
+                  <span className="material-icons text-amber-400 mr-2">shopping_cart</span>
+                  Asker Marketi
                 </h3>
                 
-                {player.island.units.length === 0 ? (
-                  <p className="text-slate-400 text-sm mb-2">Henüz askeriniz yok. "Asker Eğit" butonuna tıklayarak asker alabilirsiniz.</p>
-                ) : (
-                  <div className="flex gap-6">
-                    {/* Tavuskuşu Askerleri */}
-                    {peacockWarriors.length > 0 && (
-                      <div className="flex-1">
-                        <h4 className="text-blue-300 text-sm font-bold mb-2 flex items-center">
-                          <span className="material-icons text-blue-400 mr-1 text-sm">verified</span>
-                          Tavuskuşu Askerleri
-                        </h4>
-                        <div className="grid grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-3">
-                          {peacockWarriors.filter((unit: Unit) => !unit.isDeployed).map((unit: Unit) => (
-                            <div key={unit.id} className="transition-transform transform hover:scale-[1.05]">
-                              <div 
-                                className="cursor-grab"
-                                onMouseDown={() => {
-                                  if (!unit.isDeployed) {
-                                    setDraggedUnit(unit);
-                                    playClick();
-                                  }
-                                }}
-                              >
-                                <UnitCard 
-                                  unit={unit} 
-                                  isDragging={draggedUnit?.id === unit.id} 
-                                  onDragStart={() => {}} 
-                                  onDragEnd={() => {}} 
-                                  isDeployed={unit.isDeployed}
-                                />
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                    
-                    {/* İnsan Askerleri */}
-                    {humanSoldiers.length > 0 && (
-                      <div className="flex-1">
-                        <h4 className="text-amber-300 text-sm font-bold mb-2 flex items-center">
-                          <span className="material-icons text-amber-400 mr-1 text-sm">verified</span>
-                          İnsan Askerleri
-                        </h4>
-                        <div className="grid grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-3">
-                          {humanSoldiers.filter((unit: Unit) => !unit.isDeployed).map((unit: Unit) => (
-                            <div key={unit.id} className="transition-transform transform hover:scale-[1.05]">
-                              <div 
-                                className="cursor-grab"
-                                onMouseDown={() => {
-                                  if (!unit.isDeployed) {
-                                    setDraggedUnit(unit);
-                                    playClick();
-                                  }
-                                }}
-                              >
-                                <UnitCard 
-                                  unit={unit} 
-                                  isDragging={draggedUnit?.id === unit.id} 
-                                  onDragStart={() => {}} 
-                                  onDragEnd={() => {}} 
-                                  isDeployed={unit.isDeployed}
-                                />
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
+                <div className="flex flex-col">
+                  <div className="bg-slate-800/60 rounded-lg p-3 mb-3">
+                    <p className="text-slate-300 text-sm mb-2 flex items-center">
+                      <span className="material-icons text-amber-400 mr-1 text-sm">info</span>
+                      Satın aldığınız askerler direkt olarak savaş alanına yerleştirilecektir. Her asker 2 altındır.
+                    </p>
+                    <div className="flex justify-between">
+                      <p className="text-sm text-amber-300 flex items-center">
+                        <span className="material-icons text-amber-400 mr-1 text-sm">attach_money</span>
+                        Mevcut Altınınız: <span className="font-bold ml-1">{player.island.gold}</span>
+                      </p>
+                      <p className="text-sm text-blue-300 flex items-center">
+                        <span className="material-icons text-blue-400 mr-1 text-sm">military_tech</span>
+                        Savaş Alanındaki Askerler: <span className="font-bold ml-1">{deployedUnits.length}</span>
+                      </p>
+                    </div>
                   </div>
-                )}
+                  
+                  {/* İnsan Askerleri Market Listesi */}
+                  <div className="flex-1">
+                    <h4 className="text-amber-300 text-sm font-bold mb-2 flex items-center">
+                      <span className="material-icons text-amber-400 mr-1 text-sm">category</span>
+                      Mevcut Askerler
+                    </h4>
+                    <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                      {/* Farklı tipte 5 adet asker */}
+                      {[
+                        { type: "Okçu", attack: 12, defense: 6, health: 30, speed: 8 },
+                        { type: "Piyade", attack: 8, defense: 12, health: 40, speed: 5 },
+                        { type: "Süvari", attack: 10, defense: 8, health: 35, speed: 10 },
+                        { type: "Şövalye", attack: 15, defense: 10, health: 35, speed: 6 },
+                        { type: "Mızrakçı", attack: 10, defense: 10, health: 30, speed: 7 }
+                      ].map((unitType, index) => (
+                        <div key={index} className="bg-slate-800 border border-slate-700 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-transform transform hover:scale-[1.05]">
+                          <div className="bg-gradient-to-r from-amber-900 to-amber-700 px-3 py-1 text-white text-xs font-bold flex justify-between items-center">
+                            <span>{unitType.type}</span>
+                            <span className="flex items-center text-amber-300">
+                              <span className="material-icons text-[12px] mr-1">attach_money</span>2
+                            </span>
+                          </div>
+                          <div className="p-3 flex flex-col gap-1">
+                            <div className="flex justify-center mb-2 h-16">
+                              <div className="w-12 h-12 bg-slate-700 rounded-full flex items-center justify-center">
+                                <span className="material-icons text-amber-400 text-2xl">
+                                  {unitType.type === "Okçu" ? "gps_fixed" :
+                                   unitType.type === "Piyade" ? "shield" :
+                                   unitType.type === "Süvari" ? "speed" :
+                                   unitType.type === "Şövalye" ? "security" :
+                                   "military_tech"}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-1 text-[10px]">
+                              <div className="flex items-center text-red-300">
+                                <span className="material-icons text-[10px] mr-1">local_fire_department</span>
+                                <span>Saldırı: {unitType.attack}</span>
+                              </div>
+                              <div className="flex items-center text-blue-300">
+                                <span className="material-icons text-[10px] mr-1">shield</span>
+                                <span>Savunma: {unitType.defense}</span>
+                              </div>
+                              <div className="flex items-center text-green-300">
+                                <span className="material-icons text-[10px] mr-1">favorite</span>
+                                <span>Can: {unitType.health}</span>
+                              </div>
+                              <div className="flex items-center text-yellow-300">
+                                <span className="material-icons text-[10px] mr-1">speed</span>
+                                <span>Hız: {unitType.speed}</span>
+                              </div>
+                            </div>
+                            
+                            <button 
+                              className={`mt-2 w-full px-2 py-1 rounded-md text-[10px] font-bold 
+                                ${player.island.gold >= 2 
+                                  ? 'bg-amber-600 hover:bg-amber-500 text-white' 
+                                  : 'bg-slate-700 text-slate-500 cursor-not-allowed'}`}
+                              onClick={() => {
+                                if (player.island.gold >= 2) {
+                                  playClick();
+                                  
+                                  // Önce altını düş
+                                  if (player.island.gold >= 2) {
+                                    trainSoldiers(player.id, 1);
+                                    
+                                    // Yeni asker oluştur
+                                    const newUnit: Unit = {
+                                      id: `soldier-${Date.now().toString(36)}`,
+                                      type: 'soldier',
+                                      health: unitType.health,
+                                      attack: unitType.attack,
+                                      defense: unitType.defense,
+                                      speed: unitType.speed,
+                                      isDeployed: false // Sonradan yerleştirilecek
+                                    };
+                                    
+                                    // Askeri oyuncuya ekle
+                                    addUnitToPlayer(player.id, [newUnit]);
+                                    
+                                    // Askeri sürüklenecek obje olarak ayarla
+                                    setDraggedUnit(newUnit);
+                                  }
+                                  
+                                  // Aksiyon loguna ekle
+                                  setActionLog(prev => [...prev, `${unitType.type} satın alındı!`]);
+                                }
+                              }}
+                              disabled={player.island.gold < 2}
+                            >
+                              <span className="flex items-center justify-center">
+                                <span className="material-icons text-[10px] mr-1">add_shopping_cart</span>
+                                Satın Al
+                              </span>
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

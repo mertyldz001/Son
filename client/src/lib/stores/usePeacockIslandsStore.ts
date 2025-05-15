@@ -408,38 +408,52 @@ export const usePeacockIslandsStore = create<PeacockIslandsStore>((set, get) => 
   
   trainSoldiers: (playerId: string, amount: number) => {
     const { player, npc } = get();
-    const goldCost = amount * 5; // Her asker 5 altın
     
-    if (playerId === player.id && player.island.resources.gold >= goldCost) {
+    // Eğer amount negatifse, altın kazandır (test için)
+    if (amount < 0) {
+      if (playerId === player.id) {
+        const goldEarned = Math.abs(amount) * 2; // Her birim için 2 altın
+        const updatedPlayer = { 
+          ...player,
+          island: {
+            ...player.island,
+            gold: player.island.gold + goldEarned
+          }
+        };
+        set({ player: updatedPlayer });
+      } else if (playerId === npc.id) {
+        const goldEarned = Math.abs(amount) * 2;
+        const updatedNpc = { 
+          ...npc,
+          island: {
+            ...npc.island,
+            gold: npc.island.gold + goldEarned
+          }
+        };
+        set({ npc: updatedNpc });
+      }
+      return;
+    }
+    
+    // Normal asker eğitimi
+    const goldCost = amount * 2; // Her asker 2 altın (Markette her asker 2 altın)
+    
+    if (playerId === player.id && player.island.gold >= goldCost) {
       const updatedPlayer = { 
         ...player,
         island: {
           ...player.island,
-          resources: {
-            ...player.island.resources,
-            gold: player.island.resources.gold - goldCost
-          },
-          army: {
-            ...player.island.army,
-            soldiers: player.island.army.soldiers + amount
-          }
+          gold: player.island.gold - goldCost
         }
       };
       
       set({ player: updatedPlayer });
-    } else if (playerId === npc.id && npc.island.resources.gold >= goldCost) {
+    } else if (playerId === npc.id && npc.island.gold >= goldCost) {
       const updatedNpc = { 
         ...npc,
         island: {
           ...npc.island,
-          resources: {
-            ...npc.island.resources,
-            gold: npc.island.resources.gold - goldCost
-          },
-          army: {
-            ...npc.island.army,
-            soldiers: npc.island.army.soldiers + amount
-          }
+          gold: npc.island.gold - goldCost
         }
       };
       
