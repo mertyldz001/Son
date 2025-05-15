@@ -941,7 +941,7 @@ const PreparationPhase = () => {
         )}
         
         {/* Aktivite Logu - Sol kısma taşındı ve şeffaflaştırıldı */}
-        <div className="fixed left-4 top-1/3 z-50 w-64 max-h-40 overflow-y-auto">
+        <div className="fixed left-4 bottom-24 z-50 w-64 max-h-40 overflow-y-auto">
           <div className="glass-panel bg-slate-900/20 backdrop-blur-sm rounded-lg p-2 border border-slate-600/10">
             <h4 className="text-xs font-semibold mb-1 flex items-center text-blue-300/80">
               <span className="material-icons text-xs mr-1">history</span>
