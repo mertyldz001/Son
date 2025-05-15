@@ -448,30 +448,25 @@ const GameScene = () => {
         makeDefault
       />
       
-      {/* Işıklandırma - modern ve parlak tarz */}
-      <ambientLight intensity={0.7} /> {/* Ortam ışığını daha da arttır */}
-      <directionalLight 
-        position={[5, 12, 8]} 
-        intensity={2.0} 
-        castShadow 
-        shadow-mapSize={[2048, 2048]} 
-        shadow-camera-left={-10}
-        shadow-camera-right={10}
-        shadow-camera-top={10}
-        shadow-camera-bottom={-10}
-      />
-      {/* Ekstra dolgu ışıklar - birden fazla renk */}
-      <pointLight position={[-5, 10, -5]} intensity={0.9} color="#88ccff" />
-      <pointLight position={[5, 8, 5]} intensity={0.7} color="#ffaacc" />
+      {/* Işıklandırma - optimize edilmiş - daha az ışık kaynağı */}
+      <ambientLight intensity={0.9} /> {/* Ortam ışığını artırıyoruz böylece diğer ışıkları azaltabiliriz */}
       
-      {/* Glow efektleri - aşağıdan aydınlatma */}
-      <spotLight
-        position={[0, -5, 0]}
-        intensity={0.3}
-        angle={Math.PI / 4}
-        penumbra={0.8}
-        color="#aaffee"
+      {/* Ana ışık kaynağı - optimize edilmiş shadow map */}
+      <directionalLight 
+        position={[5, 15, 8]} 
+        intensity={1.5} 
+        castShadow 
+        shadow-mapSize={[1024, 1024]} // Daha düşük çözünürlük - daha hızlı render
+        shadow-camera-left={-15}
+        shadow-camera-right={15}
+        shadow-camera-top={15}
+        shadow-camera-bottom={-15}
       />
+      
+      {/* Sadece bir yardımcı ışık - performans optimizasyonu */}
+      <pointLight position={[-5, 10, -5]} intensity={0.5} color="#88ccff" />
+      
+      {/* Glow efektleri kaldırıldı - performans için */}
       
       {/* Arka plan rengi - daha açık ve modern */}
       <color attach="background" args={['#364c6b']} />

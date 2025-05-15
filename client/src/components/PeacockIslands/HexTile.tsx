@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { usePeacockIslandsStore } from '../../lib/stores/usePeacockIslandsStore';
@@ -68,24 +68,46 @@ const HexTile: React.FC<HexTileProps> = ({
 
   // Hexagon'un ölçüleri - sabit
   const size = 0.45;
+  
+  // Geometrileri memorize et - performans için aynı geometriler tekrar tekrar oluşturulmasın
+  const outerRingGeometry = useMemo(() => new THREE.RingGeometry(size * 0.94, size * 1.05, 6), [size]);
+  const innerRingGeometry = useMemo(() => new THREE.RingGeometry(0, size * 0.92, 6), [size]);
 
   // Hover animasyonu için
   const scale = useRef(new THREE.Vector3(1, 1, 1));
   const hoverHeight = useRef(0);
   const glowIntensity = useRef(0.3);
 
-  // Hover durumunda yumuşak animasyon için frame bazlı güncelleme
-  useFrame(() => {
+  // Performans optimizasyonu: Update sayacı - her 2 frame'de bir hesaplama yapar
+  const frameCounter = useRef(0);
+  
+  // Hover durumunda yumuşak animasyon için frame bazlı güncelleme - optimize edildi
+  useFrame((_, delta) => {
+    // Performans optimizasyonu - her frame'de değil belirli frame'lerde güncelle
+    frameCounter.current++;
+    if (frameCounter.current % 2 !== 0) return;
+    frameCounter.current = 0;
+    
+    // Lerp faktörü hesaplaması - delta bazlı, daha tutarlı ve verimli
+    const lerpFactor = Math.min(0.15 * delta * 60, 1);
+    const relaxFactor = Math.min(0.1 * delta * 60, 1);
+    
     if (isHovered) {
-      // Hover durumunda iç ve dış geometri birlikte hareket eder
-      scale.current.lerp(new THREE.Vector3(1.1, 1.1, 1.1), 0.15);
-      hoverHeight.current += (0.15 - hoverHeight.current) * 0.15;
-      glowIntensity.current += (1.0 - glowIntensity.current) * 0.2;
+      // Hover durumunda - manuel hızlı hesaplama
+      scale.current.x += (1.1 - scale.current.x) * lerpFactor;
+      scale.current.y += (1.1 - scale.current.y) * lerpFactor;
+      scale.current.z += (1.1 - scale.current.z) * lerpFactor;
+      
+      hoverHeight.current += (0.15 - hoverHeight.current) * lerpFactor;
+      glowIntensity.current += (1.0 - glowIntensity.current) * lerpFactor;
     } else {
-      // Normal durumda aynı şekilde birlikte hareket
-      scale.current.lerp(new THREE.Vector3(1, 1, 1), 0.1);
-      hoverHeight.current += (0 - hoverHeight.current) * 0.15;
-      glowIntensity.current += (0.3 - glowIntensity.current) * 0.15;
+      // Normal durumda - manuel hızlı hesaplama
+      scale.current.x += (1 - scale.current.x) * relaxFactor;
+      scale.current.y += (1 - scale.current.y) * relaxFactor;
+      scale.current.z += (1 - scale.current.z) * relaxFactor;
+      
+      hoverHeight.current += (0 - hoverHeight.current) * relaxFactor;
+      glowIntensity.current += (0.3 - glowIntensity.current) * relaxFactor;
     }
   });
 
@@ -101,25 +123,25 @@ const HexTile: React.FC<HexTileProps> = ({
       onClick={onHover}
     >
       <group position={[0, hoverHeight.current, 0]} scale={scale.current}>
-        {/* Dış çizgi - hep beyaz (çizgi grafiğindeki gibi) - 180 derece döndürülmüş */}
+        {/* Geometri ve materyal optimizasyonu - azaltılmış hesaplamalar */}
+        {/* Dış çizgi - önceden oluşturulmuş geometriyi kullan */}
         <mesh rotation={[-Math.PI / 2, Math.PI, 0]} position={[0, 0.025, 0]}>
-          <ringGeometry args={[size * 0.94, size * 1.05, 6]} />
+          <primitive attach="geometry" object={outerRingGeometry} />
           <meshBasicMaterial 
             color={isHovered ? "#ffffff" : edgeColor}
             side={THREE.DoubleSide}
             transparent={false}
+            toneMapped={false} // Daha az post-processing
           />
         </mesh>
         
-        {/* İç kısım - renk değişimi burada olur - 180 derece döndürülmüş (advanced mode) */}
+        {/* İç kısım - önceden oluşturulmuş geometriyi kullan */}
         <mesh rotation={[-Math.PI / 2, Math.PI, 0]} position={[0, 0.02, 0]}>
-          <ringGeometry args={[0, size * 0.92, 6]} />
-          <meshStandardMaterial 
+          <primitive attach="geometry" object={innerRingGeometry} />
+          <meshLambertMaterial // StandardMaterial yerine daha hafif Lambert kullanımı 
             color={isHovered ? hoverColor : baseColor}
             emissive={isHovered ? hoverColor : baseColor}
             emissiveIntensity={0.5}
-            roughness={0.1}
-            metalness={0.9}
           />
         </mesh>
       </group>
