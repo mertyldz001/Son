@@ -127,7 +127,7 @@ const HexTile: React.FC<HexTileProps> = ({
       <group position={[0, hoverHeight.current, 0]} scale={scale.current}>
         {/* Geometri ve materyal optimizasyonu - azaltılmış hesaplamalar */}
         {/* Dış çizgi - sadece ince kenarlı altıgen */}
-        <mesh rotation={[-Math.PI / 2, Math.PI / 2, 0]} position={[0, 0.025, 0]}>
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.025, 0]}>
           <primitive attach="geometry" object={outerRingGeometry} />
           <meshBasicMaterial 
             color="#ffffff"
