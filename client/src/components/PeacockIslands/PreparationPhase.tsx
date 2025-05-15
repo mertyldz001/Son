@@ -839,21 +839,8 @@ const PreparationPhase = () => {
                   </p>
                 </div>
                 
-                {/* Düğme */}
+                {/* Sadece Savaşa Başla butonu */}
                 <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => {
-                      // 3 altın kazandır
-                      playClick();
-                      trainSoldiers(player.id, -1.5); // Negatif değer verince altın artıyor
-                      setActionLog(prev => [...prev, "3 altın kazandınız!"]);
-                    }}
-                    className="px-3 py-2 bg-gradient-to-b from-amber-600 to-amber-800 border border-amber-500/50 rounded-md text-sm text-amber-200 font-medium flex items-center transition hover:bg-gradient-to-b hover:from-amber-500 hover:to-amber-700"
-                  >
-                    <span className="material-icons text-sm mr-1">payments</span>
-                    Altın Kazan
-                  </button>
-                  
                   <button
                     onClick={() => {
                       playClick();

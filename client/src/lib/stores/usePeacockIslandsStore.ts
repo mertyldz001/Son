@@ -22,9 +22,9 @@ import { createEnemyWave } from "../game/peacockIslands/enemies";
 import { simulateBattle, getEggBonusValue } from "../game/peacockIslands/battle";
 
 // Başlangıç durumları için sabitler
-const INITIAL_GOLD = 10;
+const INITIAL_GOLD = 16; // 16 altın ile başlasın
 const INITIAL_EGGS = 0;
-const INITIAL_SOLDIERS = 5;
+const INITIAL_SOLDIERS = 0; // Artık başlangıçta asker yok, marketten alınacak
 const INITIAL_SOLDIER_HEALTH = 30;
 const INITIAL_SOLDIER_ATTACK = 10;
 const PREPARATION_TIME = 60; // saniye
@@ -245,29 +245,19 @@ export const usePeacockIslandsStore = create<PeacockIslandsStore>((set, get) => 
   endBattlePhase: (playerWon: boolean) => {
     const { currentTurn, player, npc } = get();
     
-    // Eğer oyuncu kazandıysa, ödül olarak altın ekle
+    // Eğer oyuncu kazandıysa, 4 altın ödül ekle
     if (playerWon) {
       const updatedPlayer = { 
         ...player,
         island: {
           ...player.island,
-          resources: {
-            ...player.island.resources,
-            gold: player.island.resources.gold + currentTurn * 20
-          }
+          gold: player.island.gold + 4 // Kazanırsa 4 altın
         }
       };
       
-      // NPC sürekli kaybederse altını artsın
+      // NPC'nin durumu değişmez
       const updatedNpc = {
-        ...npc,
-        island: {
-          ...npc.island,
-          resources: {
-            ...npc.island.resources,
-            gold: npc.island.resources.gold + currentTurn * 15
-          }
-        }
+        ...npc
       };
       
       set({ 
@@ -279,27 +269,17 @@ export const usePeacockIslandsStore = create<PeacockIslandsStore>((set, get) => 
         npc: updatedNpc
       });
     } else {
-      // Oyuncu kaybettiyse sonraki tura geç (oyun bitmiyor, yeni bir tura başlıyor)
+      // Oyuncu kaybettiyse 2 altın ekle
       const updatedPlayer = { 
         ...player,
         island: {
           ...player.island,
-          resources: {
-            ...player.island.resources,
-            gold: player.island.resources.gold + 20 // Kaybedene ekstra altın
-          }
+          gold: player.island.gold + 2 // Kaybederse 2 altın
         }
       };
       
       const updatedNpc = {
-        ...npc,
-        island: {
-          ...npc.island,
-          resources: {
-            ...npc.island.resources,
-            gold: npc.island.resources.gold + 5
-          }
-        }
+        ...npc
       };
       
       set({ 
