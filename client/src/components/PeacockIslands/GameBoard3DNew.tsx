@@ -543,22 +543,18 @@ const GameBoard3D = () => {
   const { currentPhase } = usePeacockIslandsStore();
   const isBattlePhase = currentPhase === "battle";
   
-  // Kamera için geniş açılı sabit değerler - butonları geçici olarak devre dışı bıraktık
-  const cameraY = 30; // Daha yüksek değer
-  const cameraZ = 30; // Daha uzak değer
+  // Kamera için çok daha geniş açılı sabit değerler
+  const cameraY = 50; // Çok daha yüksek değer
+  const cameraZ = 45; // Çok daha uzak değer
   const backgroundColor = isBattlePhase ? "#2e5a7a" : "#3d6c95"; // Çok daha canlı ve modern arkaplan
   
-  // Basit buton fonksiyonları
+  // Zoom butonlarını kaldırdık sadece sabit değerlerle çalışıyoruz
   const handleZoomInClick = () => {
-    console.log("Yakınlaştırma butonu tıklandı");
-    setCameraY(y => Math.max(y - 3, 10));
-    setCameraZ(z => Math.max(z - 3, 10));
+    console.log("Bu fonksiyon geçici olarak devre dışı");
   };
   
   const handleZoomOutClick = () => {
-    console.log("Uzaklaştırma butonu tıklandı");
-    setCameraY(y => Math.min(y + 3, 30));
-    setCameraZ(z => Math.min(z + 3, 30));
+    console.log("Bu fonksiyon geçici olarak devre dışı");
   };
   
   return (
@@ -590,7 +586,7 @@ const GameBoard3D = () => {
         className="w-full max-w-4xl h-full max-h-[85vh] mx-auto my-auto touch-action-none"
         camera={{
           position: [0, cameraY, cameraZ],
-          fov: 50, // Daha geniş görüş açısı
+          fov: 75, // Çok daha geniş görüş açısı
           near: 0.1,
           far: 1000
         }}
