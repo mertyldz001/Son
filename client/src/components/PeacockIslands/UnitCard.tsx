@@ -21,8 +21,8 @@ const UnitCard: React.FC<UnitCardProps> = ({
   // Birim tipine göre görsel ve stil ayarları
   const getUnitColor = () => {
     return unit.type === 'warrior' 
-      ? 'border-blue-500 bg-gradient-to-br from-blue-900/70 to-blue-950/90' 
-      : 'border-amber-500 bg-gradient-to-br from-amber-900/70 to-amber-950/90';
+      ? 'border-blue-500 bg-gradient-to-br from-blue-900/70 to-blue-950/90 glow-blue-900' 
+      : 'border-amber-500 bg-gradient-to-br from-amber-900/70 to-amber-950/90 glow-amber-900';
   };
 
   const getUnitName = () => {
@@ -69,11 +69,11 @@ const UnitCard: React.FC<UnitCardProps> = ({
           </div>
           <div className="flex flex-col items-center bg-black/30 rounded p-1">
             <span className="text-xs text-gray-300">GÜÇ</span>
-            <span className="text-md font-bold">{unit.attackPower}</span>
+            <span className="text-md font-bold">{unit.attack}</span>
           </div>
           <div className="flex flex-col items-center bg-black/30 rounded p-1">
             <span className="text-xs text-gray-300">HIZ</span>
-            <span className="text-md font-bold">{Math.floor(unit.attackSpeed * 10)}</span>
+            <span className="text-md font-bold">{Math.floor(unit.speed * 10)}</span>
           </div>
         </div>
       </div>

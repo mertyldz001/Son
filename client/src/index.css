@@ -28,6 +28,20 @@ body {
 }
 
 .glowing {
+  animation: glow 1.5s infinite;
+}
+
+/* Kart parıltı efektleri */
+.glow-blue-900 {
+  box-shadow: 0 0 15px rgba(30, 64, 175, 0.4);
+}
+
+.glow-amber-900 {
+  box-shadow: 0 0 15px rgba(180, 83, 9, 0.4);
+}
+
+/* Birim kartları için hoverda parıltı efekti */
+.unit-card:hover {
   animation: glow 2s infinite;
 }
 
