@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
-import * as THREE from 'three';
+import React, { useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Unit, HatcherySlot } from '../../lib/game/peacockIslands/types';
-import { PeacockWarriorModel, HumanSoldierModel } from './3DModels';
+import * as THREE from 'three';
 import { usePeacockIslandsStore } from '../../lib/stores/usePeacockIslandsStore';
+import { PeacockWarriorModel, HumanSoldierModel } from './3DModels';
+import { Unit } from '../../lib/types';
 
 interface HexCoordinates {
   q: number;
@@ -75,8 +75,8 @@ function HexTile({
   // TFT stili hover animasyonu - yumuşak geçişli
   const hoverScale = useRef(new THREE.Vector3(1, 1, 1));
   const hoverHeight = useRef(0);
-  const glowIntensity = useRef(0);
-  
+  const glowIntensity = useRef(0.3);
+
   // Hover animasyonu - TFT stili yumuşak geçiş - İÇ VE DIŞ HER ZAMAN UYUMLU
   useFrame(() => {
     if (isHovered) {
@@ -103,26 +103,11 @@ function HexTile({
       <group
         position={[0, hoverHeight.current, 0]}
         scale={hoverScale.current}
-        onPointerOver={onHover}
-        onPointerOut={onUnhover}
-        onClick={(e) => {
-          e.stopPropagation();
-          window.dispatchEvent(
-            new CustomEvent('hex-click', { 
-              detail: { 
-                hexCoords,
-                isPlayerSide,
-                isOccupied 
-              } 
-            })
-          );
-        }}
-        userData={{ 
+        onClick={onHover}
+        onPointerEnter={onHover}
+        onPointerLeave={onUnhover}
+        userData={{
           hexCoords,
-          type: "hex-tile",
-          q: hexCoords.q,
-          r: hexCoords.r,
-          s: hexCoords.s,
           isPlayerSide,
           isOccupied
         }}
@@ -151,18 +136,16 @@ function HexTile({
       </group>
       
       {/* Koordinat bilgisi (debug için) */}
-      {/*
-      <Text
-        position={[0, 0.05, 0]}
+      {/* <Text
+        position={[0, 0.3, 0]}
         rotation={[-Math.PI / 2, 0, 0]}
         fontSize={0.2}
-        color="#ffffff"
+        color="white"
         anchorX="center"
         anchorY="middle"
       >
-        {`${hexCoords.q},${hexCoords.r}`}
-      </Text>
-      */}
+        {hexCoords.q},{hexCoords.r},{hexCoords.s}
+      </Text> */}
     </group>
   );
 }
@@ -182,69 +165,112 @@ const HexGrid: React.FC<HexGridProps> = ({
   unitPositions,
   onTileHover
 }) => {
-  const [hoveredTile, setHoveredTile] = useState<string | null>(null);
+  const [hoveredTile, setHoveredTile] = useState<HexCoordinates | null>(null);
 
   // Hexagon grid oluşturma
   const hexagons = [];
   
-  // Ekran görüntüsündeki düzene uygun grid oluşturma (3. ve 4. İstek)
-  // 3x7 ve 3x7 olarak toplam 42 hücre (21 oyuncu, 21 düşman) (4. İstek)
-  // İlk altıgen sol taraftan bir çıkıntı yapacak şekilde yerleşim (3. İstek)
-  const totalRows = 6; // 3 oyuncu, 3 düşman sırası
+  // Ekran görüntüsündeki düzene uygun grid oluşturma
+  // Tam balık pulu şeklinde nizami dizilim
+  const totalRows = 3; // Oyuncu ve düşman tarafı için ayrı ayrı 3'er sıra (toplam 6)
   const columnsPerRow = 7; // Her sırada 7 sütun
   
   // Başlangıçta gridWidth ve gridHeight değerleri yerine sabit değerler kullanalım
   gridWidth = columnsPerRow;
-  gridHeight = totalRows;
+  gridHeight = totalRows * 2; // Toplam 6 sıra (3 oyuncu + 3 düşman)
   
-  // Toplam grid oluşumu (3+3=6 sıra)
+  // Daha düzenli ve nizami görünüm için sıklaştırma faktörleri
+  const horizontalSpacing = size * 1.05; // Yatay hücreler arası mesafe
+  const verticalSpacing = size * 0.85;   // Dikey hücreler arası mesafe
+  const gridWidthTotal = horizontalSpacing * columnsPerRow; // Grid toplam genişliği
+  
+  // Grid merkezi
+  const centerX = 0;
+  const centerZ = 0;
+  
+  // Önce oyuncu tarafı (ilk 3 sıra)
   for (let row = 0; row < totalRows; row++) {
-    // Oyuncu tarafı için ilk 3 sıra, düşman tarafı için son 3 sıra
-    const isPlayerRow = row < totalRows / 2;
-    
     for (let col = 0; col < columnsPerRow; col++) {
-      // Altıgen koordinatlarını hesapla
       const r = row;
       const q = col;
       const s = -q - r;
       const key = `${q},${r},${s}`;
       
-      // 3. İstek: Resimde gösterilen düzene uygun yerleşim (nizami sıralama)
-      // Sol taraftan çıkıntı ile başlayan düzen
-      // Her satır için alternatif offset - tam ekran görüntüsündeki gibi
-      const offsetX = (row % 2 === 0) ? 0.5 : 0; // Çift numaralı sıralar offset'li
-      const x = size * 1.1 * (col - columnsPerRow/2 + offsetX);  // Yatay mesafe - daha yakın
+      // Altıgenlerin balıksırtı/petek düzeni için offset hesaplama
+      // Tek numaralı sıralar yarım birim sağa kaydırılır
+      const rowOffset = row % 2 === 1 ? horizontalSpacing / 2 : 0;
       
-      // 5. İstek: Z pozisyonu: Tam yeşil alanın ortasında olacak şekilde ayarla
-      const z = size * 1.2 * (row - totalRows/2 + 0.5);  // Dikey mesafe - yeşil alanın ortasına
+      // X pozisyonu: Grid'in merkezini referans alarak ve petek düzeni için offset uygulayarak
+      const x = centerX + (col * horizontalSpacing) - (gridWidthTotal / 2) + (horizontalSpacing / 2) + rowOffset;
       
-      // TFT tarzı: Oyuncu ve rakip tarafı - net ayrım
-      const isPlayerSide = row < totalRows / 2;
+      // Z pozisyonu: Oyuncu tarafı (pozitif z) - aşağıdan yukarı sıralanır
+      const z = centerZ + (verticalSpacing * (totalRows - 1 - row));
       
-      // Koordinat stringi (işgal durumunu kontrol etmek için)
-      const coordString = `${q},${r},${s}`;
+      // Bu tam olarak oyuncu tarafı (ilk 3 sıra)
+      const isPlayerSide = true;
       
-      // Bu hexagon'da birim var mı?
-      const isOccupied = unitPositions.has(coordString);
+      // Pozisyon oluşturma ve hex grid'e ekleme
+      const position: [number, number, number] = [x, 0, z];
       
+      // Altıgen hücreyi oluştur ve ekle
       hexagons.push(
         <HexTile 
-          key={key} 
-          position={[x, 0, z]} 
-          size={size} 
+          key={key}
+          position={position}
+          size={size}
           hexCoords={{ q, r, s }}
           isPlayerSide={isPlayerSide}
-          isHovered={hoveredTile === key}
-          isOccupied={isOccupied}
+          isHovered={hoveredTile ? hoveredTile.q === q && hoveredTile.r === r && hoveredTile.s === s : false}
+          isOccupied={Boolean(unitPositions.get(key))}
           onHover={() => {
-            setHoveredTile(key);
+            setHoveredTile({ q, r, s });
             onTileHover({ q, r, s });
           }}
-          onUnhover={() => {
-            if (hoveredTile === key) {
-              setHoveredTile(null);
-            }
+          onUnhover={() => {}}
+        />
+      );
+    }
+  }
+  
+  // Sonra düşman tarafı (son 3 sıra) - negatif z yönünde
+  for (let row = 0; row < totalRows; row++) {
+    for (let col = 0; col < columnsPerRow; col++) {
+      const r = row + totalRows; // Düşman koordinatları için offset
+      const q = col;
+      const s = -q - r;
+      const key = `${q},${r},${s}`;
+      
+      // Altıgenlerin balıksırtı/petek düzeni için offset hesaplama
+      // Tek numaralı sıralar yarım birim sağa kaydırılır
+      const rowOffset = row % 2 === 1 ? horizontalSpacing / 2 : 0;
+      
+      // X pozisyonu: Grid'in merkezini referans alarak ve petek düzeni için offset uygulayarak
+      const x = centerX + (col * horizontalSpacing) - (gridWidthTotal / 2) + (horizontalSpacing / 2) + rowOffset;
+      
+      // Z pozisyonu: Düşman tarafı (negatif z) - yukarıdan aşağı sıralanır
+      const z = centerZ - (verticalSpacing * row) - verticalSpacing; // Boşluk ekleyerek
+      
+      // Bu düşman tarafı (son 3 sıra)
+      const isPlayerSide = false;
+      
+      // Pozisyon oluşturma ve hex grid'e ekleme 
+      const position: [number, number, number] = [x, 0, z];
+      
+      // Altıgen hücreyi oluştur ve ekle
+      hexagons.push(
+        <HexTile 
+          key={key}
+          position={position}
+          size={size}
+          hexCoords={{ q, r, s }}
+          isPlayerSide={isPlayerSide}
+          isHovered={hoveredTile ? hoveredTile.q === q && hoveredTile.r === r && hoveredTile.s === s : false}
+          isOccupied={Boolean(unitPositions.get(key))}
+          onHover={() => {
+            setHoveredTile({ q, r, s });
+            onTileHover({ q, r, s });
           }}
+          onUnhover={() => {}}
         />
       );
     }
@@ -259,9 +285,21 @@ const HexGrid: React.FC<HexGridProps> = ({
   for (const [coordString, unit] of unitPositionsArray) {
     const [q, r, s] = coordString.split(',').map(Number);
     
-    // Hesaplanan pozisyonlar
-    const x = size * (3/2) * q;
-    const z = size * Math.sqrt(3) * (r + q/2);
+    // Koordinat pozisyonu bulmak için (oyuncuya/düşmana göre)
+    // Aynı yerleşim mantığını kullanarak birimlerin konumlarını hesapla
+    
+    let isPlayerSide = r < totalRows;
+    let realRow = isPlayerSide ? r : r - totalRows;
+    
+    const rowOffset = realRow % 2 === 1 ? horizontalSpacing / 2 : 0;
+    const x = centerX + (q * horizontalSpacing) - (gridWidthTotal / 2) + (horizontalSpacing / 2) + rowOffset;
+    let z = 0;
+    
+    if (isPlayerSide) {
+      z = centerZ + (verticalSpacing * (totalRows - 1 - realRow));
+    } else {
+      z = centerZ - (verticalSpacing * realRow) - verticalSpacing;
+    }
     
     unitElements.push(
       <group key={`unit-${unit.id}`} position={[x, 0.25, z]}>
