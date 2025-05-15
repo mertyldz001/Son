@@ -25,8 +25,8 @@ const PreparationPhase = () => {
     combineFeathers,
     hatchEgg,
     activateEgg,
-    deployUnit,
-    undeployUnit
+    // deployUnit, // Artık store.getState() ile çağrılıyor
+    // undeployUnit // Artık store.getState() ile çağrılıyor
   } = usePeacockIslandsStore();
   
   // Birim ve UI durum değişkenleri
