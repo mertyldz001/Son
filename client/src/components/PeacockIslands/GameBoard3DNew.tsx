@@ -543,20 +543,66 @@ const GameBoard3D = () => {
   const { currentPhase } = usePeacockIslandsStore();
   const isBattlePhase = currentPhase === "battle";
   
-  // Sabit kamera pozisyonu - Modern TFT tarzı bakış açısı
-  const cameraPosition: [number, number, number] = [0, 16, 16]; // Yüksekten bakış
+  // Daha geniş TFT tarzı bakış açısı için kamera pozisyonu - Vector3 kullanarak hataları çözdük
+  const [cameraPosition, setCameraPosition] = useState<THREE.Vector3>(new THREE.Vector3(0, 21, 21)); // Daha yüksekten ve uzaktan bakış
   const backgroundColor = isBattlePhase ? "#2e5a7a" : "#3d6c95"; // Çok daha canlı ve modern arkaplan
+  
+  // Yakınlaştırma ve uzaklaştırma fonksiyonları - Vector3 ile düzeltildi
+  const handleZoomIn = () => {
+    setCameraPosition(prev => {
+      // Vector3 kopya oluştur
+      const newPos = prev.clone();
+      
+      // Y ve Z değerlerini azalt (yakınlaştır) 
+      newPos.y = Math.max(newPos.y - 2, 10); // Minimum y yüksekliği 10
+      newPos.z = Math.max(newPos.z - 2, 10); // Minimum z uzaklığı 10
+      
+      return newPos;
+    });
+  };
+  
+  const handleZoomOut = () => {
+    setCameraPosition(prev => {
+      // Vector3 kopya oluştur
+      const newPos = prev.clone();
+      
+      // Y ve Z değerlerini artır (uzaklaştır)
+      newPos.y = Math.min(newPos.y + 2, 30); // Maksimum y yüksekliği 30
+      newPos.z = Math.min(newPos.z + 2, 30); // Maksimum z uzaklığı 30
+      
+      return newPos;
+    });
+  };
   
   return (
     <div className="absolute inset-0 z-0 flex items-center justify-center">
       {/* TFT tarzı yeşil zemin eklendi */}
       {/* TFT tarzı gradyan zemin - daha parlak */}
       <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-green-700 to-green-500 opacity-40 z-0"></div>
+      
+      {/* Yakınlaştırma/Uzaklaştırma butonları - sağ kenar */}
+      <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex flex-col gap-2 z-20">
+        <button 
+          onClick={handleZoomIn}
+          className="w-10 h-10 rounded-full bg-gray-800 bg-opacity-80 text-white text-2xl flex items-center justify-center hover:bg-opacity-100 transition-all shadow-lg"
+          aria-label="Yakınlaştır"
+        >
+          +
+        </button>
+        <button 
+          onClick={handleZoomOut}
+          className="w-10 h-10 rounded-full bg-gray-800 bg-opacity-80 text-white text-2xl flex items-center justify-center hover:bg-opacity-100 transition-all shadow-lg"
+          aria-label="Uzaklaştır"
+        >
+          -
+        </button>
+      </div>
+      
       <Canvas
         shadows
         className="w-full max-w-4xl h-full max-h-[85vh] mx-auto my-auto touch-action-none"
         camera={{
-          position: [cameraPosition[0], cameraPosition[1], cameraPosition[2]],
+          position: [cameraPosition.x, cameraPosition.y, cameraPosition.z],
           fov: 40,
           near: 0.1,
           far: 1000
