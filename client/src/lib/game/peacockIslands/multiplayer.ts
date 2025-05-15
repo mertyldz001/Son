@@ -15,9 +15,13 @@ export const simulatePlayerBattle = (
   if (player1Units.length === 0) {
     return {
       playerVictory: false,
-      enemyUnitsDefeated: 0,
+      enemiesDefeated: 0,
       playerUnitsLost: 0,
-      feathersCollected: null,
+      feathersCollected: {
+        green: 0,
+        blue: 0,
+        orange: 0
+      },
       battleLog: [{
         message: "Savaş hazırlığında asker yerleştirmediniz.",
         timestamp: new Date().toISOString()
@@ -28,9 +32,13 @@ export const simulatePlayerBattle = (
   if (player2Units.length === 0) {
     return {
       playerVictory: true,
-      enemyUnitsDefeated: 0,
+      enemiesDefeated: 0,
       playerUnitsLost: 0,
-      feathersCollected: null,
+      feathersCollected: {
+        green: 0,
+        blue: 0,
+        orange: 0
+      },
       battleLog: [{
         message: "Rakibiniz savaş hazırlığında asker yerleştirmedi.",
         timestamp: new Date().toISOString()
@@ -86,7 +94,11 @@ export const simulatePlayerBattle = (
     playerVictory: player1Victory,
     enemyUnitsDefeated: player1Victory ? weakerLosses : strongerLosses,
     playerUnitsLost: player1Victory ? strongerLosses : weakerLosses,
-    feathersCollected: null, // İki oyuncu arasında savaşta tüy kazanımı yok
+    feathersCollected: {
+      green: 0,
+      blue: 0, 
+      orange: 0
+    }, // İki oyuncu arasında savaşta tüy kazanımı yok
     battleLog: battleLog
   };
 };
