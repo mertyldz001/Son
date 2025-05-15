@@ -42,13 +42,15 @@ function HexTile({
   const hoverHeight = useRef(0);
   const glowIntensity = useRef(0);
   
-  // Hover animasyonu - TFT stili yumuşak geçiş
+  // Hover animasyonu - TFT stili yumuşak geçiş - İÇ VE DIŞ HER ZAMAN UYUMLU
   useFrame(() => {
     if (isHovered) {
+      // Hover durumunda iç ve dış geometri birlikte hareket eder
       hoverScale.current.lerp(new THREE.Vector3(1.1, 1.1, 1.1), 0.15);
       hoverHeight.current += (0.15 - hoverHeight.current) * 0.15;
       glowIntensity.current += (1.0 - glowIntensity.current) * 0.2;
     } else {
+      // Normal durumda aynı şekilde birlikte hareket
       hoverScale.current.lerp(new THREE.Vector3(1, 1, 1), 0.1);
       hoverHeight.current += (0 - hoverHeight.current) * 0.15;
       glowIntensity.current += (0.3 - glowIntensity.current) * 0.15;
@@ -85,7 +87,7 @@ function HexTile({
           isOccupied
         }}
       >
-        {/* YALNIZCA TEK BİR ALTIGEN ÇIZGI - ÇOK KALIN VE NET */}
+        {/* DIŞARIDA ALTIGEN ÇIZGI - KALIN VE NET */}
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.025, 0]}>
           <ringGeometry args={[size * 0.94, size * 1.05, 6]} />
           <meshBasicMaterial 
@@ -95,7 +97,7 @@ function HexTile({
           />
         </mesh>
         
-        {/* İÇERDEKI RENK ALANI - TAM ALTIGEN */}
+        {/* İÇERDEKI RENK ALANI - ALTIGEN */}
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, 0]}>
           <ringGeometry args={[0, size * 0.92, 6]} />
           <meshStandardMaterial 
