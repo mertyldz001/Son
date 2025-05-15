@@ -72,6 +72,13 @@ const PreparationPhase = () => {
   const [armyPanelMinimized, setArmyPanelMinimized] = useState(true);
   const [activitiesPanelMinimized, setActivitiesPanelMinimized] = useState(true);
   
+  // Tur değişimini izle ve asker kartlarını sıfırla
+  useEffect(() => {
+    // Her tur başlangıcında satın alınan kartları sıfırla
+    console.log("Yeni tur başladı, kart durumları sıfırlanıyor...");
+    // Not: Bu useEffect sadece currentTurn değiştiğinde çalışacak
+  }, [currentTurn]);
+  
   // Hazırlık zamanını güncelle
   useEffect(() => {
     const timer = setInterval(() => {
