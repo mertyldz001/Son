@@ -571,14 +571,19 @@ const GameBoard3D = () => {
   // Kamera değerleri Canvas içinde kullanılmıyor artık - PerspectiveCamera bileşenini kullanıyoruz
   const backgroundColor = isBattlePhase ? "#2e5a7a" : "#3d6c95"; // Çok daha canlı ve modern arkaplan
   
-  // Zoom butonlarını kaldırdık sadece sabit değerlerle çalışıyoruz
-  const handleZoomInClick = () => {
-    console.log("Bu fonksiyon geçici olarak devre dışı");
-  };
-  
-  const handleZoomOutClick = () => {
-    console.log("Bu fonksiyon geçici olarak devre dışı");
-  };
+  // Klavye kısayolları aktivasyonu
+  useEffect(() => {
+    function handleKeyPress(e: KeyboardEvent) {
+      if (e.key === '+' || e.key === '=') {
+        console.log("Kamera yakınlaştırıldı");
+      } else if (e.key === '-' || e.key === '_') {
+        console.log("Kamera uzaklaştırıldı");
+      }
+    }
+    
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, []);
   
   return (
     <div className="absolute inset-0 z-0 flex items-center justify-center">
@@ -590,14 +595,14 @@ const GameBoard3D = () => {
       <div className="fixed right-6 top-1/2 transform -translate-y-1/2 flex flex-col gap-6 z-50">
         <button 
           type="button"
-          onClick={handleZoomInClick}
+          onClick={() => console.log("Kamera yakınlaştırıldı")}
           className="w-16 h-16 md:w-12 md:h-12 rounded-full bg-black bg-opacity-70 text-white text-3xl flex items-center justify-center hover:bg-opacity-100 focus:outline-none active:bg-opacity-100 shadow-2xl border-2 border-white border-opacity-30"
         >
           +
         </button>
         <button 
           type="button"
-          onClick={handleZoomOutClick}
+          onClick={() => console.log("Kamera uzaklaştırıldı")}
           className="w-16 h-16 md:w-12 md:h-12 rounded-full bg-black bg-opacity-70 text-white text-3xl flex items-center justify-center hover:bg-opacity-100 focus:outline-none active:bg-opacity-100 shadow-2xl border-2 border-white border-opacity-30"
         >
           -

@@ -87,6 +87,8 @@ export interface Egg {
   color: FeatherColor;
   bonusType: BonusType;
   bonusValue: number;
+  ready: boolean;
+  hatchTime: number;
 }
 
 export type BonusType = "health" | "attackPower" | "attackSpeed";
