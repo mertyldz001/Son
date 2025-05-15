@@ -51,67 +51,82 @@ export const useAudio = create<AudioState>((set, get) => ({
       if (newMutedState) {
         backgroundMusic.pause();
       } else {
-        backgroundMusic.play().catch(error => {
-          console.log("Müzik başlatılamadı:", error);
-        });
+        try {
+          const context = new (window.AudioContext || (window as any).webkitAudioContext)();
+          context.resume().then(() => {
+            backgroundMusic.play().catch(error => {
+              // Hata mesajını konsola yazdırmayalım, hata oluşursa sessizce devam et
+              console.log("Müzik başlatılıyor: Kullanıcı etkileşimi bekliyor");
+            });
+          });
+        } catch (e) {
+          // Eğer AudioContext desteklenmiyorsa sessizce devam et
+        }
       }
     }
     
     // Just update the muted state
     set({ isMuted: newMutedState });
-    
-    // Log the change
-    console.log(`Sound ${newMutedState ? 'muted' : 'unmuted'}`);
   },
   
   playHit: () => {
     const { hitSound, isMuted } = get();
-    if (hitSound) {
-      // If sound is muted, don't play anything
-      if (isMuted) {
-        console.log("Hit sound skipped (muted)");
-        return;
+    if (hitSound && !isMuted) {
+      try {
+        // Clone the sound to allow overlapping playback
+        const soundClone = hitSound.cloneNode() as HTMLAudioElement;
+        soundClone.volume = 0.3;
+        
+        // Kullanıcı etkileşimi varsa ses çal
+        const playPromise = soundClone.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(() => {
+            // Hata durumunda sessizce devam et
+          });
+        }
+      } catch (e) {
+        // Hata durumunda sessizce devam et
       }
-      
-      // Clone the sound to allow overlapping playback
-      const soundClone = hitSound.cloneNode() as HTMLAudioElement;
-      soundClone.volume = 0.3;
-      soundClone.play().catch(error => {
-        console.log("Hit sound play prevented:", error);
-      });
     }
   },
   
   playSuccess: () => {
     const { successSound, isMuted } = get();
-    if (successSound) {
-      // If sound is muted, don't play anything
-      if (isMuted) {
-        console.log("Success sound skipped (muted)");
-        return;
+    if (successSound && !isMuted) {
+      try {
+        successSound.currentTime = 0;
+        
+        // Kullanıcı etkileşimi varsa ses çal
+        const playPromise = successSound.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(() => {
+            // Hata durumunda sessizce devam et
+          });
+        }
+      } catch (e) {
+        // Hata durumunda sessizce devam et
       }
-      
-      successSound.currentTime = 0;
-      successSound.play().catch(error => {
-        console.log("Success sound play prevented:", error);
-      });
     }
   },
   
   playClick: () => {
     const { clickSound, isMuted } = get();
-    if (clickSound) {
-      if (isMuted) {
-        console.log("Click sound skipped (muted)");
-        return;
+    if (clickSound && !isMuted) {
+      try {
+        const soundClone = clickSound.cloneNode() as HTMLAudioElement;
+        soundClone.volume = 0.2;
+        
+        // Kullanıcı etkileşimi varsa ses çal
+        const playPromise = soundClone.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(() => {
+            // Hata durumunda sessizce devam et
+          });
+        }
+      } catch (e) {
+        // Hata durumunda sessizce devam et
       }
-      
-      const soundClone = clickSound.cloneNode() as HTMLAudioElement;
-      soundClone.volume = 0.2;
-      soundClone.play().catch(error => {
-        console.log("Click sound play prevented:", error);
-      });
-    } else {
+    } else if (!isMuted) {
       // Geçici bir tıklama sesi
       get().playHit();
     }
@@ -119,18 +134,22 @@ export const useAudio = create<AudioState>((set, get) => ({
   
   playCollect: () => {
     const { collectSound, isMuted } = get();
-    if (collectSound) {
-      if (isMuted) {
-        console.log("Collect sound skipped (muted)");
-        return;
+    if (collectSound && !isMuted) {
+      try {
+        const soundClone = collectSound.cloneNode() as HTMLAudioElement;
+        soundClone.volume = 0.2;
+        
+        // Kullanıcı etkileşimi varsa ses çal
+        const playPromise = soundClone.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(() => {
+            // Hata durumunda sessizce devam et
+          });
+        }
+      } catch (e) {
+        // Hata durumunda sessizce devam et
       }
-      
-      const soundClone = collectSound.cloneNode() as HTMLAudioElement;
-      soundClone.volume = 0.2;
-      soundClone.play().catch(error => {
-        console.log("Collect sound play prevented:", error);
-      });
-    } else {
+    } else if (!isMuted) {
       // Geçici bir ses
       get().playSuccess();
     }
@@ -138,18 +157,22 @@ export const useAudio = create<AudioState>((set, get) => ({
   
   playBuild: () => {
     const { buildSound, isMuted } = get();
-    if (buildSound) {
-      if (isMuted) {
-        console.log("Build sound skipped (muted)");
-        return;
+    if (buildSound && !isMuted) {
+      try {
+        const soundClone = buildSound.cloneNode() as HTMLAudioElement;
+        soundClone.volume = 0.2;
+        
+        // Kullanıcı etkileşimi varsa ses çal
+        const playPromise = soundClone.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(() => {
+            // Hata durumunda sessizce devam et
+          });
+        }
+      } catch (e) {
+        // Hata durumunda sessizce devam et
       }
-      
-      const soundClone = buildSound.cloneNode() as HTMLAudioElement;
-      soundClone.volume = 0.2;
-      soundClone.play().catch(error => {
-        console.log("Build sound play prevented:", error);
-      });
-    } else {
+    } else if (!isMuted) {
       // Geçici bir ses
       get().playSuccess();
     }
