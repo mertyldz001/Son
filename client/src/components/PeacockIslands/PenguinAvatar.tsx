@@ -116,15 +116,33 @@ export function PenguinAvatar() {
     };
   }, [handleTouch]);
   
-  // Performans iyileştirmesi - Hareket için memo değerler
+  // Performans iyileştirmesi - Hareket için optimize edilmiş değerler
+  const lastFrameTime = useRef(0);
+  const frameSkipCount = useRef(0);
+  
+  // Animasyon frame'lerini atla (her X frame'de bir güncelle) - performans optimizasyonu
+  const FRAME_SKIP = 1; // Her 2 frame'de bir hesaplama yap
+  
   useFrame(({ clock }, delta) => {
     if (!isMoving || !targetPosition) return;
+    
+    // Frame atlama mekanizması - performans iyileştirmesi
+    frameSkipCount.current++;
+    if (frameSkipCount.current <= FRAME_SKIP) return;
+    frameSkipCount.current = 0;
+    
+    // Performans optimizasyonu - eğer çok kısa süre geçtiyse hesaplama yapma
+    const now = clock.getElapsedTime();
+    if (now - lastFrameTime.current < 0.016 && lastFrameTime.current > 0) return; // 60 FPS'den hızlı güncellemelerden kaçın
+    lastFrameTime.current = now;
     
     // Mevcut pozisyon
     const currentPos = new THREE.Vector3(position[0], position[1], position[2]);
     
-    // Hedef mesafesi
-    const distance = currentPos.distanceTo(targetPosition);
+    // Hedef mesafesi - Math.hypot daha performanslı
+    const dx = targetPosition.x - currentPos.x;
+    const dz = targetPosition.z - currentPos.z;
+    const distance = Math.hypot(dx, dz);
     
     // Hedefe ulaşıldı mı?
     if (distance < 0.1) {
@@ -133,17 +151,18 @@ export function PenguinAvatar() {
       return;
     }
     
-    // Hareket yönü
-    const direction = new THREE.Vector3().subVectors(targetPosition, currentPos).normalize();
+    // Yön hesaplama - normalize kullanmadan daha hızlı
+    const normalizedDx = dx / distance;
+    const normalizedDz = dz / distance;
     
-    // Hareket hızı - sabit hızda
-    const moveDistance = speed * delta * 60;
+    // Hareket hızı - sabit hızda, precalculate
+    const moveDistance = Math.min(speed * delta * 60, distance);
     
-    // Yeni pozisyon hesapla
-    const newX = currentPos.x + direction.x * Math.min(moveDistance, distance);
-    const newZ = currentPos.z + direction.z * Math.min(moveDistance, distance);
+    // Yeni pozisyon hesapla - cache friendly ve optimize
+    const newX = currentPos.x + normalizedDx * moveDistance;
+    const newZ = currentPos.z + normalizedDz * moveDistance;
     
-    // Pozisyonu güncelle
+    // Pozisyonu güncelle - tek seferde yap
     setPosition([newX, position[1], newZ]);
     
     // Sabit yükseklik - idle animasyonu yok

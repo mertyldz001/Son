@@ -77,18 +77,38 @@ function HexTile({
   const hoverHeight = useRef(0);
   const glowIntensity = useRef(0.3);
 
+  // Optimizasyon: Update sayacı - her 2 frame'de bir hesaplama yapar
+  const frameCounter = useRef(0);
+  
   // Hover animasyonu - TFT stili yumuşak geçiş - İÇ VE DIŞ HER ZAMAN UYUMLU
-  useFrame(() => {
+  useFrame((_, delta) => {
+    // Performans optimizasyonu - her frame'de değil belirli frame'lerde güncelle
+    frameCounter.current++;
+    if (frameCounter.current % 2 !== 0) return;
+    frameCounter.current = 0;
+    
+    // Lerp faktörü hesaplaması - daha etkili
+    const lerpFactor = Math.min(0.15 * delta * 60, 1);
+    const relaxFactor = Math.min(0.1 * delta * 60, 1);
+    
     if (isHovered) {
       // Hover durumunda iç ve dış geometri birlikte hareket eder
-      hoverScale.current.lerp(new THREE.Vector3(1.1, 1.1, 1.1), 0.15);
-      hoverHeight.current += (0.15 - hoverHeight.current) * 0.15;
-      glowIntensity.current += (1.0 - glowIntensity.current) * 0.2;
+      // Vector3.lerp yerine manuel hesaplama - daha hızlı
+      hoverScale.current.x += (1.1 - hoverScale.current.x) * lerpFactor;
+      hoverScale.current.y += (1.1 - hoverScale.current.y) * lerpFactor;
+      hoverScale.current.z += (1.1 - hoverScale.current.z) * lerpFactor;
+      
+      // Yükseklik hesabını optimize et
+      hoverHeight.current += (0.15 - hoverHeight.current) * lerpFactor;
+      glowIntensity.current += (1.0 - glowIntensity.current) * lerpFactor;
     } else {
       // Normal durumda aynı şekilde birlikte hareket
-      hoverScale.current.lerp(new THREE.Vector3(1, 1, 1), 0.1);
-      hoverHeight.current += (0 - hoverHeight.current) * 0.15;
-      glowIntensity.current += (0.3 - glowIntensity.current) * 0.15;
+      hoverScale.current.x += (1 - hoverScale.current.x) * relaxFactor;
+      hoverScale.current.y += (1 - hoverScale.current.y) * relaxFactor;
+      hoverScale.current.z += (1 - hoverScale.current.z) * relaxFactor;
+      
+      hoverHeight.current += (0 - hoverHeight.current) * relaxFactor;
+      glowIntensity.current += (0.3 - glowIntensity.current) * relaxFactor;
     }
   });
   
@@ -277,51 +297,51 @@ const HexGrid: React.FC<HexGridProps> = ({
     }
   }
   
-  // Birimleri göster
-  const unitElements = [];
-  
-  // Map'i diziyi çevirerek üzerinde işlem yapalım
-  const unitPositionsArray = Array.from(unitPositions);
-  
-  for (const [coordString, unit] of unitPositionsArray) {
-    const [q, r, s] = coordString.split(',').map(Number);
+  // Birimleri göster - performans optimizasyonu için useMemo
+  const unitElements = React.useMemo(() => {
+    const elements = [];
     
-    // Koordinat pozisyonu bulmak için (oyuncuya/düşmana göre)
-    // Aynı yerleşim mantığını kullanarak birimlerin konumlarını hesapla
-    // Yeni grid tasarımına uygun olarak düzenlendi
+    // Map'i diziyi çevirerek üzerinde işlem yapalım
+    const unitPositionsArray = Array.from(unitPositions);
     
-    let isPlayerSide = r < totalRows;
-    let realRow = isPlayerSide ? r : r - totalRows;
-    
-    // Yeni düzene göre rowOffset kullanmıyoruz - tüm sıralar düz hizalı
-    const x = centerX + (q * horizontalSpacing) - (gridWidthTotal / 2) + (horizontalSpacing / 2);
-    let z = 0;
-    
-    if (isPlayerSide) {
-      z = centerZ + (verticalSpacing * (totalRows - 1 - realRow));
-    } else {
-      z = centerZ - (verticalSpacing * realRow) - verticalSpacing;
+    for (const [coordString, unit] of unitPositionsArray) {
+      const [q, r, s] = coordString.split(',').map(Number);
+      
+      // Pozisyon hesaplama optimizasyonu - gereksiz değişkenleri kaldır
+      const isPlayerSide = r < totalRows;
+      const realRow = isPlayerSide ? r : r - totalRows;
+      
+      // Pozisyon hesaplamalarını optimize et - daha az matematiksel işlem
+      const halfGridWidth = gridWidthTotal / 2;
+      const x = centerX + (q * horizontalSpacing) - halfGridWidth + (horizontalSpacing / 2);
+      
+      // Z hesaplaması için tek bir formül kullan - daha hızlı
+      const z = isPlayerSide 
+        ? centerZ + (verticalSpacing * (totalRows - 1 - realRow))
+        : centerZ - (verticalSpacing * (realRow + 1));
+      
+      elements.push(
+        <group key={`unit-${unit.id}`} position={[x, 0.25, z]}>
+          {unit.type === 'warrior' ? (
+            <PeacockWarriorModel 
+              position={[0, 0, 0]} 
+              rotation={[0, Math.PI, 0]} 
+              scale={0.3} 
+              type="adult" 
+            />
+          ) : (
+            <HumanSoldierModel 
+              position={[0, 0, 0]} 
+              rotation={[0, Math.PI, 0]} 
+              scale={0.3} 
+            />
+          )}
+        </group>
+      );
     }
     
-    unitElements.push(
-      <group key={`unit-${unit.id}`} position={[x, 0.25, z]}>
-        {unit.type === 'warrior' ? (
-          <PeacockWarriorModel 
-            position={[0, 0, 0]} 
-            rotation={[0, Math.PI, 0]} 
-            scale={0.3} 
-            type="adult" 
-          />
-        ) : (
-          <HumanSoldierModel 
-            position={[0, 0, 0]} 
-            rotation={[0, Math.PI, 0]} 
-            scale={0.3} 
-          />
-        )}
-      </group>
-    );
-  }
+    return elements;
+  }, [unitPositions, centerX, centerZ, horizontalSpacing, verticalSpacing, gridWidthTotal, totalRows]);
   
   return (
     <group>
