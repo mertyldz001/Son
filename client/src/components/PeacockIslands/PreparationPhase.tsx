@@ -202,11 +202,11 @@ const PreparationPhase = () => {
       {/* 3D Game Board as background */}
       <GameBoard3D />
       
-      {/* UI Overlays */}
+      {/* UI Overlays - Bulanıklık kaldırıldı */}
       <div className="absolute inset-0 z-10 p-4 pointer-events-none">
-        {/* Üst panel - Tur bilgileri (Daha modern ve küçük) */}
+        {/* Üst panel - Tur bilgileri */}
         <div className="flex justify-between w-full items-center pointer-events-auto">
-          <div className="bg-gradient-to-r from-amber-900/80 to-amber-800/70 px-4 py-2 rounded-lg border border-amber-500/30 shadow-lg backdrop-blur-sm flex items-center space-x-2 transform -translate-y-1">
+          <div className="bg-gradient-to-r from-amber-900 to-amber-800 px-4 py-2 rounded-lg border border-amber-500/30 shadow-lg flex items-center space-x-2 transform -translate-y-1">
             <div className="p-1.5 bg-amber-700/50 rounded-md">
               <span className="material-icons text-amber-300" style={{ fontSize: '18px' }}>diamond</span>
             </div>
@@ -219,7 +219,7 @@ const PreparationPhase = () => {
           </div>
           
           <div className="flex items-center gap-3">
-            <div className="px-3 py-2 rounded-lg text-white flex items-center bg-gradient-to-r from-blue-900/90 to-blue-800/70 border border-blue-500/30 shadow-lg backdrop-blur-sm">
+            <div className="px-3 py-2 rounded-lg text-white flex items-center bg-gradient-to-r from-blue-900 to-blue-800 border border-blue-500/30 shadow-lg">
               <span className="material-icons mr-1.5 text-blue-300" style={{ fontSize: '16px' }}>timer</span>
               <span className="font-medium">
                 {Math.floor(preparationTimeLeft)}
@@ -227,13 +227,13 @@ const PreparationPhase = () => {
               </span>
             </div>
             
-            <div className="px-3 py-2 rounded-lg text-white flex items-center bg-gradient-to-r from-indigo-900/90 to-indigo-800/70 border border-indigo-500/30 shadow-lg backdrop-blur-sm">
+            <div className="px-3 py-2 rounded-lg text-white flex items-center bg-gradient-to-r from-indigo-900 to-indigo-800 border border-indigo-500/30 shadow-lg">
               <span className="material-icons mr-1.5 text-indigo-300" style={{ fontSize: '16px' }}>flag</span>
               <span className="font-medium">Tur {currentTurn}/5</span>
             </div>
             
             {/* NPC Aktivitesi - Sağ tarafta modern tasarım */}
-            <div className="px-3 py-2 rounded-lg text-white flex items-center bg-gradient-to-r from-purple-900/90 to-purple-800/70 border border-purple-500/30 shadow-lg backdrop-blur-sm" 
+            <div className="px-3 py-2 rounded-lg text-white flex items-center bg-gradient-to-r from-purple-900 to-purple-800 border border-purple-500/30 shadow-lg" 
                  title="NPC Aktiviteleri (Bilgisayar rakip)">
               <span className="material-icons mr-1.5 text-purple-300" style={{ fontSize: '16px' }}>bolt</span>
               <span className="font-medium">NPC</span>
@@ -244,8 +244,8 @@ const PreparationPhase = () => {
         
         {/* Ana içerik - Yeni düzen */}
         <div className="flex gap-6 h-3/4 pointer-events-auto">
-          {/* Sol panel - Oyuncu bilgileri */}
-          <div className="w-1/4 glass-panel rounded-lg p-4 flex flex-col text-white relative z-10">
+          {/* Sol panel - Oyuncu bilgileri - bulanıklık kaldırıldı */}
+          <div className="w-1/4 bg-blue-900/90 rounded-lg p-4 flex flex-col text-white relative z-10 border border-blue-700">
             <div className="flex items-center mb-4">
               <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center mr-3 border-2 border-blue-400">
                 <span className="material-icons">person</span>
