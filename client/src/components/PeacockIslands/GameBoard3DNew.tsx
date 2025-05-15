@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, Suspense, useMemo } from 'react';
+import { useRef, useState, useEffect, Suspense, useMemo, useCallback } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { 
   OrbitControls, 
@@ -22,37 +22,57 @@ import { PenguinAvatar } from './PenguinAvatar';
 import HexGrid from './HexGrid';
 import { getDeployedUnitPositionsMap } from '../../lib/game/peacockIslands/unitSystem';
 
-// Animasyonlu su yüzeyi bileşeni
+// Animasyonlu su yüzeyi bileşeni - performans için optimize edildi
 const AnimatedWater = ({ position = [0, 0, 0], size = 20 }) => {
   const meshRef = useRef<THREE.Mesh>(null);
-  const [time, setTime] = useState(0);
+  const timeRef = useRef(0); // useState yerine useRef kullan - daha yüksek performans
+  const frameSkipRef = useRef(0); // Her frame'i işleme - performans optimize
+  
+  // Su materyal ayarları - memo ile hesaplamaları önle
+  const waterMaterial = useMemo(() => {
+    return new THREE.MeshStandardMaterial({
+      color: "#4466aa",
+      metalness: 0.2,
+      roughness: 0.1,
+      transparent: true,
+      opacity: 0.8
+    });
+  }, []);
+  
+  // Su geometrisi - memo ile yeniden oluşturma
+  const waterGeometry = useMemo(() => {
+    return new THREE.PlaneGeometry(size, size, 20, 20); // daha az segment
+  }, [size]);
   
   useFrame((_, delta) => {
-    setTime(prev => prev + delta * 0.3);
+    // Her 2 karede bir güncelle - performans artışı
+    frameSkipRef.current++;
+    if (frameSkipRef.current < 2) return;
+    frameSkipRef.current = 0;
+    
+    // Daha hafif animasyon hesaplaması
+    timeRef.current += delta * 0.2; // daha düşük değer
     
     if (meshRef.current) {
-      // Dalga efekti için yavaş dönüş
-      meshRef.current.rotation.z = Math.sin(time * 0.05) * 0.05;
+      // Basit bir sin dalgası - minimum hesaplama
+      meshRef.current.rotation.z = Math.sin(timeRef.current * 0.04) * 0.04;
     }
   });
+  
+  // TypeScript güvenliği için - pozisyon doğrulama
+  const safePosition = Array.isArray(position) ? 
+    [position[0] || 0, position[1] || 0, position[2] || 0] as [number, number, number] : 
+    [0, 0, 0] as [number, number, number];
   
   return (
     <mesh 
       ref={meshRef} 
-      position={[position[0], position[1], position[2]]} 
+      position={safePosition} 
       rotation={[-Math.PI / 2, 0, 0]} 
       receiveShadow
     >
-      <planeGeometry args={[size, size, 32, 32]} />
-      <meshStandardMaterial 
-        color="#4466aa" 
-        metalness={0.2}
-        roughness={0.1}
-        transparent
-        opacity={0.8}
-      >
-        <Float speed={2} floatIntensity={2} />
-      </meshStandardMaterial>
+      <primitive attach="geometry" object={waterGeometry} />
+      <primitive attach="material" object={waterMaterial} />
     </mesh>
   );
 };
@@ -353,52 +373,51 @@ const GameScene = () => {
     };
   }, [zoom]);
   
-  // Unit sürükleme takibi için
-  useEffect(() => {
-    // Birim sürükleme başlangıcı
-    const handleDragStart = (e: CustomEvent) => {
-      if (e?.detail?.unit) {
-        const unit = e.detail.unit;
-        setDragCursor({
-          visible: true,
-          type: unit.type,
-          unitId: unit.id
-        });
-        console.log('Birim sürükleme başladı:', unit.type, unit.id);
-      }
-    };
-    
-    // Birim sürükleme bitişi
-    const handleDragEnd = () => {
+  // Unit sürükleme takibi için - memoize event handlers
+  const handleDragStart = useCallback((e: CustomEvent) => {
+    if (e?.detail?.unit) {
+      const unit = e.detail.unit;
       setDragCursor({
-        visible: false,
-        type: null,
-        unitId: null
+        visible: true,
+        type: unit.type,
+        unitId: unit.id
       });
-      console.log('Birim sürükleme bitti');
-    };
+    }
+  }, []);
     
-    // Hex tıklama olayını dinle
-    const handleHexClick = (e: CustomEvent) => {
-      // Sürükleme aktifse ve tıklanan hex konumu geçerliyse
-      if (dragCursor.visible && dragCursor.unitId && e?.detail?.hexCoords) {
-        const hexCoords = e.detail.hexCoords;
-        const { isPlayerSide, isOccupied } = e.detail;
-        
-        // Sadece oyuncu tarafına ve boş hücrelere yerleştir
-        if (isPlayerSide && !isOccupied) {
-          console.log(`Birim ${dragCursor.unitId} yerleştirildi: q:${hexCoords.q}, r:${hexCoords.r}, s:${hexCoords.s}`);
-          
-          // Sürüklemeyi temizle
-          setDragCursor({
-            visible: false,
-            type: null,
-            unitId: null
-          });
-        }
+  // Birim sürükleme bitişi - memoize
+  const handleDragEnd = useCallback(() => {
+    setDragCursor({
+      visible: false,
+      type: null,
+      unitId: null
+    });
+  }, []);
+    
+  // Hex tıklama olayını dinle - memoize ile performans artışı
+  const handleHexClick = useCallback((e: CustomEvent) => {
+    // Sürükleme aktifse ve tıklanan hex konumu geçerliyse
+    if (!e?.detail?.hexCoords) return;
+    
+    // Performans için erken return pattern
+    const hexCoords = e.detail.hexCoords;
+    const { isPlayerSide, isOccupied } = e.detail;
+    
+    if (dragCursor.visible && dragCursor.unitId) {  
+      // Sadece oyuncu tarafına ve boş hücrelere yerleştir
+      if (isPlayerSide && !isOccupied) {
+        // Sürüklemeyi temizle
+        setDragCursor({
+          visible: false,
+          type: null,
+          unitId: null
+        });
       }
-    };
-    
+    }
+  }, [dragCursor]);
+  
+  // Event listener'ları sadece bir kere ekle
+  useEffect(() => {
     // Event dinleyicilerini ekle
     window.addEventListener('unit-drag-start', handleDragStart as EventListener);
     window.addEventListener('unit-drag-end', handleDragEnd as EventListener);
@@ -409,12 +428,12 @@ const GameScene = () => {
       window.removeEventListener('unit-drag-end', handleDragEnd as EventListener);
       window.removeEventListener('hex-click', handleHexClick as EventListener);
     };
-  }, [dragCursor]);
+  }, [handleDragStart, handleDragEnd, handleHexClick]);
   
-  // Hex üzerine gelme eventi
-  const handleHexHover = (coords: {q: number, r: number, s: number}) => {
+  // Hex üzerine gelme eventi - memoize ile performans artırma
+  const handleHexHover = useCallback((coords: {q: number, r: number, s: number}) => {
     setHoveredHex(coords);
-  };
+  }, []);
   
   return (
     <>
