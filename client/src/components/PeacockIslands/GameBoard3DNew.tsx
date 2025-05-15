@@ -446,6 +446,8 @@ const GameScene = () => {
         near={0.1} 
         far={1000}
         makeDefault
+        // Frustum kısıtlaması - görünmez nesneler için render engellemesi
+        frustumCulled={true}
       />
       
       {/* Işıklandırma - optimize edilmiş - daha az ışık kaynağı */}
