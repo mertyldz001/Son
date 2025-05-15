@@ -9,6 +9,7 @@ import UnitCard from "./UnitCard";
 import DragDrop from "./DragDrop";
 import { getDeployedUnitPositionsMap } from "../../lib/game/peacockIslands/unitSystem";
 import WindowPanel from "../UI/WindowPanel";
+import { User, ShieldCheck, Leaf, Egg as EggIcon } from 'lucide-react';
 
 // Hazırlık Fazı Bileşeni
 const PreparationPhase = () => {
