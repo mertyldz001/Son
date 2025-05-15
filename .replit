@@ -12,8 +12,11 @@ run = ["sh", "-c", "npm run dev"]
 [[ports]]
 localPort = 5000
 
+[[ports]]
+localPort = 5001
+externalPort = 80
+
 [workflows]
-runButton = "Project"
 
 [[workflows.workflow]]
 name = "Project"
