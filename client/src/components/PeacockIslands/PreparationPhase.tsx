@@ -259,6 +259,7 @@ const PreparationPhase = () => {
             {/* Kaynaklar WindowPanel */}
             <WindowPanel 
               title="Kaynaklar" 
+              iconType="island"
               width="100%" 
               initiallyMinimized={resourcesPanelMinimized}
               height="auto"
@@ -274,7 +275,7 @@ const PreparationPhase = () => {
                 <div className="bg-gradient-to-br from-green-900/60 to-emerald-800/40 p-3 rounded-lg text-center card-hover border border-green-600/30">
                   <div className="text-green-300 font-bold text-xl">{player.island.resources.eggs}</div>
                   <div className="text-xs flex items-center justify-center mt-1">
-                    <span className="material-icons text-xs mr-1">egg</span>
+                    <EggIcon size={12} className="mr-1 text-green-300" />
                     <span>Yumurta</span>
                   </div>
                 </div>
@@ -284,6 +285,7 @@ const PreparationPhase = () => {
             {/* Tüy Envanteri WindowPanel */}
             <WindowPanel 
               title="Tüy Envanteri" 
+              iconType="feather"
               width="100%" 
               initiallyMinimized={featherPanelMinimized}
               height="auto"
@@ -328,7 +330,8 @@ const PreparationPhase = () => {
             
             {/* Ordu WindowPanel */}
             <WindowPanel 
-              title="Ordu" 
+              title="Ordu"
+              iconType="army" 
               width="100%" 
               initiallyMinimized={armyPanelMinimized}
               height="auto"
