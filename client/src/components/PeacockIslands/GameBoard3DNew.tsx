@@ -39,23 +39,23 @@ const AnimatedWater = ({ position = [0, 0, 0], size = 20 }) => {
     });
   }, []);
   
-  // Su geometrisi - memo ile yeniden oluşturma
+  // Su geometrisi - daha az poligon ile daha hızlı render
   const waterGeometry = useMemo(() => {
-    return new THREE.PlaneGeometry(size, size, 20, 20); // daha az segment
+    return new THREE.PlaneGeometry(size, size, 10, 10); // çok daha az segment
   }, [size]);
   
   useFrame((_, delta) => {
-    // Her 2 karede bir güncelle - performans artışı
+    // Her 4 karede bir güncelle - maksimum performans artışı
     frameSkipRef.current++;
-    if (frameSkipRef.current < 2) return;
+    if (frameSkipRef.current < 4) return;
     frameSkipRef.current = 0;
     
-    // Daha hafif animasyon hesaplaması
-    timeRef.current += delta * 0.2; // daha düşük değer
+    // Ultra hafif animasyon hesaplaması
+    timeRef.current += delta * 0.1; // daha da düşük değer
     
     if (meshRef.current) {
-      // Basit bir sin dalgası - minimum hesaplama
-      meshRef.current.rotation.z = Math.sin(timeRef.current * 0.04) * 0.04;
+      // Daha da basitleştirilmiş dalga animasyonu
+      meshRef.current.rotation.z = Math.sin(timeRef.current * 0.02) * 0.03;
     }
   });
   
@@ -437,14 +437,14 @@ const GameScene = () => {
   
   return (
     <>
-      {/* TFT tarzı düz görünüm için kamera ayarı */}
-      {/* Daha uzaktan bakan ama açılı kamera */}
+      {/* TFT tarzı optimum görünüm için kamera ayarı */}
+      {/* Daha uzaktan bakan ama açılı kamera - oyun alanı tam ortalanıyor */}
       <PerspectiveCamera 
-        position={[0, 25, 30]} 
+        position={[0, 26, 28]} 
         rotation={[-Math.PI/4, 0, 0]} 
-        fov={45}
+        fov={42}
         near={0.1} 
-        far={1000}
+        far={500} // Daha kısa far değeri - performans için
         makeDefault
         // Frustum kısıtlaması - görünmez nesneler için render engellemesi
         frustumCulled={true}

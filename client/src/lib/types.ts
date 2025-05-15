@@ -30,4 +30,5 @@ export interface HatcherySlot {
   id: string;
   isActive: boolean;
   egg: Egg | null;
+  status?: 'idle' | 'hatching' | 'ready';
 }

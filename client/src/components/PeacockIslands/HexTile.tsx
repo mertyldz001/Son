@@ -72,11 +72,17 @@ const HexTile: React.FC<HexTileProps> = ({
   // İnce çizgili hexagon için geometri değişiklikleri
   const hexLineWidth = 0.02; // Orta kalınlıkta kenar çizgisi
   
-  // Geometrileri memorize et - performans için aynı geometriler tekrar tekrar oluşturulmasın
-  const outerRingGeometry = useMemo(() => new THREE.RingGeometry(size - hexLineWidth, size, 6), [size, hexLineWidth]);
+  // Tüm hex'ler için ortak geometriler - performans için statik olarak tanımlandı 
+  // Bu statik geometriler tüm hex'ler için paylaşılacak
+  const outerRingGeometry = useMemo(() => {
+    // Daha az segment sayısı ile optimize edildi
+    return new THREE.RingGeometry(size - hexLineWidth, size, 6, 1);
+  }, []);
   
-  // Işıklı halka efekti için ek geometri
-  const glowRingGeometry = useMemo(() => new THREE.RingGeometry(size + 0.01, size + 0.02, 6), [size]);
+  // Işıklı halka efekti için ek geometri - daha optimize edildi
+  const glowRingGeometry = useMemo(() => {
+    return new THREE.RingGeometry(size + 0.01, size + 0.02, 6, 1);
+  }, []);
 
   // Hover animasyonu için
   const scale = useRef(new THREE.Vector3(1, 1, 1));
@@ -86,30 +92,37 @@ const HexTile: React.FC<HexTileProps> = ({
   // Performans optimizasyonu: Update sayacı - her 2 frame'de bir hesaplama yapar
   const frameCounter = useRef(0);
   
-  // Hover durumunda yumuşak animasyon için frame bazlı güncelleme - optimize edildi
+  // Hover durumunda yumuşak animasyon için optimize edilmiş ve hafifletilmiş güncelleme
   useFrame((_, delta) => {
-    // Performans optimizasyonu - her frame'de değil belirli frame'lerde güncelle
+    // Performans optimizasyonu - her 3 frame'de bir güncelle
     frameCounter.current++;
-    if (frameCounter.current % 2 !== 0) return;
+    if (frameCounter.current % 3 !== 0) return;
     frameCounter.current = 0;
     
-    // Lerp faktörü hesaplaması - delta bazlı, daha tutarlı ve verimli
-    const lerpFactor = Math.min(0.15 * delta * 60, 1);
-    const relaxFactor = Math.min(0.1 * delta * 60, 1);
+    // Daha basit ve daha hızlı hesaplama
+    // Sabit değerler kullanarak CPU hesaplamalarını azalt
+    const lerpFactor = 0.1;
+    const relaxFactor = 0.07;
     
     if (isHovered) {
-      // Hover durumunda - manuel hızlı hesaplama
-      scale.current.x += (1.1 - scale.current.x) * lerpFactor;
-      scale.current.y += (1.1 - scale.current.y) * lerpFactor;
-      scale.current.z += (1.1 - scale.current.z) * lerpFactor;
+      // Hover durumunda - tüm eksen değerleri tek seferde hesaplanır
+      const targetScale = 1.1;
+      scale.current.set(
+        scale.current.x + (targetScale - scale.current.x) * lerpFactor,
+        scale.current.y + (targetScale - scale.current.y) * lerpFactor,
+        scale.current.z + (targetScale - scale.current.z) * lerpFactor
+      );
       
       hoverHeight.current += (0.15 - hoverHeight.current) * lerpFactor;
       glowIntensity.current += (1.0 - glowIntensity.current) * lerpFactor;
     } else {
-      // Normal durumda - manuel hızlı hesaplama
-      scale.current.x += (1 - scale.current.x) * relaxFactor;
-      scale.current.y += (1 - scale.current.y) * relaxFactor;
-      scale.current.z += (1 - scale.current.z) * relaxFactor;
+      // Normal durumda - tüm eksen değerleri tek seferde hesaplanır
+      const targetScale = 1.0;
+      scale.current.set(
+        scale.current.x + (targetScale - scale.current.x) * relaxFactor,
+        scale.current.y + (targetScale - scale.current.y) * relaxFactor,
+        scale.current.z + (targetScale - scale.current.z) * relaxFactor
+      );
       
       hoverHeight.current += (0 - hoverHeight.current) * relaxFactor;
       glowIntensity.current += (0.3 - glowIntensity.current) * relaxFactor;
