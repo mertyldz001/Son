@@ -61,12 +61,12 @@ const PreparationPhase = () => {
   const [selectedHatcherySlot, setSelectedHatcherySlot] = useState<HatcherySlot | null>(null);
   const [actionLog, setActionLog] = useState<string[]>([]);
 
-  // Pencere küçültme durumları
-  const [featherPanelMinimized, setFeatherPanelMinimized] = useState(false);
-  const [eggPanelMinimized, setEggPanelMinimized] = useState(false);
-  const [resourcesPanelMinimized, setResourcesPanelMinimized] = useState(false);
-  const [armyPanelMinimized, setArmyPanelMinimized] = useState(false);
-  const [activitiesPanelMinimized, setActivitiesPanelMinimized] = useState(false);
+  // Pencere küçültme durumları - hepsi başlangıçta küçültülmüş
+  const [featherPanelMinimized, setFeatherPanelMinimized] = useState(true);
+  const [eggPanelMinimized, setEggPanelMinimized] = useState(true);
+  const [resourcesPanelMinimized, setResourcesPanelMinimized] = useState(true);
+  const [armyPanelMinimized, setArmyPanelMinimized] = useState(true);
+  const [activitiesPanelMinimized, setActivitiesPanelMinimized] = useState(true);
   
   // Hazırlık zamanını güncelle
   useEffect(() => {
