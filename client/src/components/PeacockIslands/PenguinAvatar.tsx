@@ -21,14 +21,14 @@ export function PenguinAvatar() {
   const { scene: penguinScene } = useGLTF('/models/penguin_-_tft.glb');
   const penguinModel = useMemo(() => penguinScene?.clone(), [penguinScene]);
   
-  // TFT oyun alanının sınırları - Hex Grid için genişletildi
-  // Tüm hexlerin erişilebilir olması için
+  // TFT oyun alanının sınırları - Çok daha geniş erişim için
+  // Tüm alanın erişilebilir olması için maksimum genişletildi
   const gameBounds = useMemo(() => {
     return {
-      minX: -6, 
-      maxX: 6,
-      minZ: -15, // Aşağıdaki hex sütunlarına erişim için uzatıldı
-      maxZ: 5    // Yukarı yönde erişim için artırıldı
+      minX: -10, // Daha geniş yatay erişim
+      maxX: 10,  // Daha geniş yatay erişim
+      minZ: -25, // Çok daha aşağı erişim sağlandı
+      maxZ: 10   // Çok daha yukarı erişim sağlandı
     };
   }, []);
   
