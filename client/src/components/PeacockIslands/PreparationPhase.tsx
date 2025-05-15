@@ -963,7 +963,7 @@ const PreparationPhase = () => {
                                     };
                                     
                                     // Askeri oyuncuya ekle
-                                    addUnitToPlayer(player.id, [newUnit]);
+                                    usePeacockIslandsStore.getState().addUnitToPlayer(player.id, [newUnit]);
                                     
                                     // Askeri sürüklenecek obje olarak ayarla
                                     setDraggedUnit(newUnit);

@@ -15,7 +15,8 @@ import {
   Egg,
   BattleResult,
   FeatherInventory,
-  BonusType
+  BonusType,
+  Unit
 } from "../game/peacockIslands/types";
 import { createEnemyWave } from "../game/peacockIslands/enemies";
 import { simulateBattle, getEggBonusValue } from "../game/peacockIslands/battle";
@@ -48,6 +49,9 @@ interface PeacockIslandsStore extends GameState {
   combineFeathers: (playerId: string, color: FeatherColor, amount: number) => void;
   hatchEgg: (playerId: string, color: FeatherColor) => void;
   activateEgg: (playerId: string, slotId: string) => void;
+  
+  // Birim eylemleri
+  addUnitToPlayer: (playerId: string, units: Unit[]) => void;
   
   // Birim yerleştirme eylemleri
   deployUnit: (playerId: string, unitId: string, position: {q: number, r: number, s: number}) => void;
@@ -739,6 +743,86 @@ export const usePeacockIslandsStore = create<PeacockIslandsStore>((set, get) => 
   },
   
   // NPC eylemleri
+  // Birim ekleme fonksiyonu
+  addUnitToPlayer: (playerId: string, units: Unit[]) => {
+    set((state) => {
+      const players = [...state.players];
+      const playerIndex = players.findIndex((p) => p.id === playerId);
+      
+      if (playerIndex < 0) return state;
+      
+      const player = { ...players[playerIndex] };
+      player.island.units = [...player.island.units, ...units];
+      
+      players[playerIndex] = player;
+      
+      return {
+        ...state,
+        players,
+      };
+    });
+  },
+  
+  // Birim yerleştirme fonksiyonu
+  deployUnit: (playerId: string, unitId: string, position: {q: number, r: number, s: number}) => {
+    set((state) => {
+      const players = [...state.players];
+      const playerIndex = players.findIndex((p) => p.id === playerId);
+      
+      if (playerIndex < 0) return state;
+      
+      const player = { ...players[playerIndex] };
+      const unitIndex = player.island.units.findIndex(u => u.id === unitId);
+      
+      if (unitIndex < 0) return state;
+      
+      const updatedUnits = [...player.island.units];
+      updatedUnits[unitIndex] = {
+        ...updatedUnits[unitIndex],
+        isDeployed: true,
+        position
+      };
+      
+      player.island.units = updatedUnits;
+      players[playerIndex] = player;
+      
+      return {
+        ...state,
+        players,
+      };
+    });
+  },
+  
+  // Birim yerini değiştirme fonksiyonu
+  undeployUnit: (playerId: string, unitId: string) => {
+    set((state) => {
+      const players = [...state.players];
+      const playerIndex = players.findIndex((p) => p.id === playerId);
+      
+      if (playerIndex < 0) return state;
+      
+      const player = { ...players[playerIndex] };
+      const unitIndex = player.island.units.findIndex(u => u.id === unitId);
+      
+      if (unitIndex < 0) return state;
+      
+      const updatedUnits = [...player.island.units];
+      updatedUnits[unitIndex] = {
+        ...updatedUnits[unitIndex],
+        isDeployed: false,
+        position: undefined
+      };
+      
+      player.island.units = updatedUnits;
+      players[playerIndex] = player;
+      
+      return {
+        ...state,
+        players,
+      };
+    });
+  },
+
   performNpcActions: () => {
     const { npc } = get();
     const actions: ActionType[] = [];

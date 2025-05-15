@@ -148,6 +148,7 @@ export type ActionType =
   | "trainSoldiers" 
   | "upgradeBuilding"
   | "hatchEgg"
+  | "combineFeathers"
   | "activateEgg"
   | "gameStart"
   | "preparation"
