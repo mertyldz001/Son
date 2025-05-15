@@ -543,24 +543,27 @@ const GameBoard3D = () => {
   const { currentPhase } = usePeacockIslandsStore();
   const isBattlePhase = currentPhase === "battle";
   
-  // Daha geniş TFT tarzı bakış açısı için kamera pozisyonu
-  const [cameraX, setCameraX] = useState(0);
-  const [cameraY, setCameraY] = useState(21);
-  const [cameraZ, setCameraZ] = useState(21);
+  // Sabit kamera pozisyonu ve renkler
+  const [cameraPos, setCameraPos] = useState({ x: 0, y: 21, z: 21 });
   const backgroundColor = isBattlePhase ? "#2e5a7a" : "#3d6c95"; // Çok daha canlı ve modern arkaplan
   
-  // Yakınlaştırma ve uzaklaştırma fonksiyonları
-  const handleZoomIn = () => {
-    // Y ve Z değerlerini azalt (yakınlaştır)
-    setCameraY(prev => Math.max(prev - 2, 10)); // Minimum y yüksekliği 10
-    setCameraZ(prev => Math.max(prev - 2, 10)); // Minimum z uzaklığı 10
-  };
+  // Yakınlaştırma fonksiyonu - Çok basitleştirildi
+  function zoomIn() {
+    setCameraPos(prev => ({
+      ...prev,
+      y: Math.max(prev.y - 3, 10),
+      z: Math.max(prev.z - 3, 10)
+    }));
+  }
   
-  const handleZoomOut = () => {
-    // Y ve Z değerlerini artır (uzaklaştır)
-    setCameraY(prev => Math.min(prev + 2, 30)); // Maksimum y yüksekliği 30
-    setCameraZ(prev => Math.min(prev + 2, 30)); // Maksimum z uzaklığı 30
-  };
+  // Uzaklaştırma fonksiyonu - Çok basitleştirildi
+  function zoomOut() {
+    setCameraPos(prev => ({
+      ...prev,
+      y: Math.min(prev.y + 3, 30),
+      z: Math.min(prev.z + 3, 30)
+    }));
+  }
   
   return (
     <div className="absolute inset-0 z-0 flex items-center justify-center">
@@ -571,18 +574,18 @@ const GameBoard3D = () => {
       {/* Yakınlaştırma/Uzaklaştırma butonları - sağ kenar, mobil için daha büyük ve dokunma kolay */}
       <div className="absolute right-4 top-1/2 transform -translate-y-1/2 flex flex-col gap-4 z-50 pointer-events-auto">
         <button 
-          onClick={handleZoomIn}
-          onTouchStart={handleZoomIn} 
-          className="w-14 h-14 md:w-12 md:h-12 rounded-full bg-gray-800 bg-opacity-90 text-white text-3xl flex items-center justify-center hover:bg-opacity-100 transition-all shadow-xl border-2 border-white border-opacity-20"
+          onClick={zoomIn}
+          onTouchStart={zoomIn} 
+          className="w-16 h-16 md:w-14 md:h-14 rounded-full bg-gray-800 bg-opacity-90 text-white text-3xl flex items-center justify-center hover:bg-opacity-100 transition-all shadow-xl border-2 border-white border-opacity-20"
           aria-label="Yakınlaştır"
           style={{ touchAction: 'manipulation' }}
         >
           +
         </button>
         <button 
-          onClick={handleZoomOut}
-          onTouchStart={handleZoomOut}
-          className="w-14 h-14 md:w-12 md:h-12 rounded-full bg-gray-800 bg-opacity-90 text-white text-3xl flex items-center justify-center hover:bg-opacity-100 transition-all shadow-xl border-2 border-white border-opacity-20"
+          onClick={zoomOut}
+          onTouchStart={zoomOut}
+          className="w-16 h-16 md:w-14 md:h-14 rounded-full bg-gray-800 bg-opacity-90 text-white text-3xl flex items-center justify-center hover:bg-opacity-100 transition-all shadow-xl border-2 border-white border-opacity-20"
           aria-label="Uzaklaştır"
           style={{ touchAction: 'manipulation' }}
         >
@@ -594,7 +597,7 @@ const GameBoard3D = () => {
         shadows
         className="w-full max-w-4xl h-full max-h-[85vh] mx-auto my-auto touch-action-none"
         camera={{
-          position: [cameraX, cameraY, cameraZ],
+          position: [cameraPos.x, cameraPos.y, cameraPos.z],
           fov: 40,
           near: 0.1,
           far: 1000
