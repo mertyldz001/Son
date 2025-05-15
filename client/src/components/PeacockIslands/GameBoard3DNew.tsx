@@ -520,7 +520,7 @@ const GameScene = () => {
       </group>
       
       {/* Hexagonal Savaş Alanı - TFT stili - merkeze tam konumlandırılmış */}
-      <group position={[0, 0.05, 0]} scale={1.5}>
+      <group position={[0, 0.05, 3]} scale={1.5}>
         {/* Performans için memoized veri ile yeniden render azaltma */}
         <HexGrid 
           size={0.7} 
