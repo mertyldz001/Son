@@ -858,81 +858,85 @@ const PreparationPhase = () => {
           </div>
         </div>
         
-        {/* Asker Kartları Paneli - Sabit alt bölüm olarak gösteriliyor */}
-        <div className="fixed bottom-24 left-0 right-0 pointer-events-auto">
-          <div className="bg-slate-900/90 backdrop-blur-sm border-t border-slate-700/50 p-4 shadow-lg">
-            <div className="max-w-7xl mx-auto">
-              <h3 className="text-white font-bold text-lg mb-3 flex items-center">
-                <span className="material-icons text-amber-400 mr-2">military_tech</span>
-                Askerleriniz
-              </h3>
-              
-              {player.island.units.length === 0 ? (
-                <p className="text-slate-400 text-sm mb-2">Henüz askeriniz yok. "Asker Eğit" butonuna tıklayarak asker alabilirsiniz.</p>
-              ) : (
-                <div className="flex gap-4">
-                  {/* Tavuskuşu Askerleri */}
-                  {peacockWarriors.length > 0 && (
-                    <div className="flex-1">
-                      <h4 className="text-blue-300 text-sm font-medium mb-2">Tavuskuşu Askerleri</h4>
-                      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-2">
-                        {peacockWarriors.filter((unit: Unit) => !unit.isDeployed).map((unit: Unit) => (
-                          <div key={unit.id} className="transition-transform transform hover:scale-[1.02]">
-                            <div 
-                              className="cursor-grab"
-                              onMouseDown={() => {
-                                if (!unit.isDeployed) {
-                                  setDraggedUnit(unit);
-                                  playClick();
-                                }
-                              }}
-                            >
-                              <UnitCard 
-                                unit={unit} 
-                                isDragging={draggedUnit?.id === unit.id} 
-                                onDragStart={() => {}} 
-                                onDragEnd={() => {}} 
-                                isDeployed={unit.isDeployed}
-                              />
-                            </div>
+        {/* Asker Kartları Paneli - Sol kısımda sabit panel olarak gösteriliyor */}
+        <div className="fixed left-0 top-1/4 bottom-24 w-72 pointer-events-auto z-10">
+          <div className="bg-slate-900/90 backdrop-blur-sm border-r border-slate-700/50 p-4 shadow-lg h-full overflow-y-auto">
+            <h3 className="text-white font-bold text-lg mb-3 flex items-center">
+              <span className="material-icons text-amber-400 mr-2">military_tech</span>
+              Askerleriniz
+            </h3>
+            
+            {player.island.units.length === 0 ? (
+              <p className="text-slate-400 text-sm mb-2">Henüz askeriniz yok. "Asker Eğit" butonuna tıklayarak asker alabilirsiniz.</p>
+            ) : (
+              <div className="space-y-4">
+                {/* Tavuskuşu Askerleri */}
+                {peacockWarriors.length > 0 && (
+                  <div>
+                    <h4 className="text-blue-300 text-sm font-bold mb-2 flex items-center">
+                      <span className="material-icons text-blue-400 mr-1 text-sm">verified</span>
+                      Tavuskuşu Askerleri
+                    </h4>
+                    <div className="grid grid-cols-2 gap-2">
+                      {peacockWarriors.filter((unit: Unit) => !unit.isDeployed).map((unit: Unit) => (
+                        <div key={unit.id} className="transition-transform transform hover:scale-[1.05]">
+                          <div 
+                            className="cursor-grab"
+                            onMouseDown={() => {
+                              if (!unit.isDeployed) {
+                                setDraggedUnit(unit);
+                                playClick();
+                              }
+                            }}
+                          >
+                            <UnitCard 
+                              unit={unit} 
+                              isDragging={draggedUnit?.id === unit.id} 
+                              onDragStart={() => {}} 
+                              onDragEnd={() => {}} 
+                              isDeployed={unit.isDeployed}
+                            />
                           </div>
-                        ))}
-                      </div>
+                        </div>
+                      ))}
                     </div>
-                  )}
-                  
-                  {/* İnsan Askerleri */}
-                  {humanSoldiers.length > 0 && (
-                    <div className="flex-1">
-                      <h4 className="text-amber-300 text-sm font-medium mb-2">İnsan Askerleri</h4>
-                      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-2">
-                        {humanSoldiers.filter((unit: Unit) => !unit.isDeployed).map((unit: Unit) => (
-                          <div key={unit.id} className="transition-transform transform hover:scale-[1.02]">
-                            <div 
-                              className="cursor-grab"
-                              onMouseDown={() => {
-                                if (!unit.isDeployed) {
-                                  setDraggedUnit(unit);
-                                  playClick();
-                                }
-                              }}
-                            >
-                              <UnitCard 
-                                unit={unit} 
-                                isDragging={draggedUnit?.id === unit.id} 
-                                onDragStart={() => {}} 
-                                onDragEnd={() => {}} 
-                                isDeployed={unit.isDeployed}
-                              />
-                            </div>
+                  </div>
+                )}
+                
+                {/* İnsan Askerleri */}
+                {humanSoldiers.length > 0 && (
+                  <div>
+                    <h4 className="text-amber-300 text-sm font-bold mb-2 flex items-center">
+                      <span className="material-icons text-amber-400 mr-1 text-sm">verified</span>
+                      İnsan Askerleri
+                    </h4>
+                    <div className="grid grid-cols-2 gap-2">
+                      {humanSoldiers.filter((unit: Unit) => !unit.isDeployed).map((unit: Unit) => (
+                        <div key={unit.id} className="transition-transform transform hover:scale-[1.05]">
+                          <div 
+                            className="cursor-grab"
+                            onMouseDown={() => {
+                              if (!unit.isDeployed) {
+                                setDraggedUnit(unit);
+                                playClick();
+                              }
+                            }}
+                          >
+                            <UnitCard 
+                              unit={unit} 
+                              isDragging={draggedUnit?.id === unit.id} 
+                              onDragStart={() => {}} 
+                              onDragEnd={() => {}} 
+                              isDeployed={unit.isDeployed}
+                            />
                           </div>
-                        ))}
-                      </div>
+                        </div>
+                      ))}
                     </div>
-                  )}
-                </div>
-              )}
-            </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
         

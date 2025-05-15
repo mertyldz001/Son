@@ -197,7 +197,7 @@ const HexGrid: React.FC<HexGridProps> = ({
   
   // Grid merkezi - yeşil dikdörtgenin tam ortasına yerleştirme
   const centerX = 0; // X koordinatı ortalı
-  const centerZ = 0; // Z koordinatını dikdörtgenin orta noktasına ayarla
+  const centerZ = 6; // Z koordinatını yeşil dikdörtgenin orta noktasına ayarla (GameBoard3DNew'deki group position'a göre)
   
   // Hexagon oluşturma işlemini memoize ediyoruz - performans için
   const hexTiles = React.useMemo(() => {
