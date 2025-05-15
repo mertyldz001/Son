@@ -947,6 +947,9 @@ const PreparationPhase = () => {
                               // Askeri sürüklenecek obje olarak ayarla
                               setDraggedUnit(newUnit);
                               
+                              // Bu kartı satın alınmış olarak işaretle (böylece kart yuvası gizlenecek)
+                              setIsPurchased(true);
+                              
                               // Aksiyon loguna ekle - optimize edilmiş
                               const newLog = `${unitType.type} satın alındı!`;
                               setActionLog(prev => [...prev, newLog]);
