@@ -64,6 +64,10 @@ const PreparationPhase = () => {
   const [featherColorSelected, setFeatherColorSelected] = useState<FeatherColor | null>(null);
   const [selectedHatcherySlot, setSelectedHatcherySlot] = useState<HatcherySlot | null>(null);
   const [actionLog, setActionLog] = useState<string[]>([]);
+  
+  // Kartların yeniden oluşturulması için force update
+  const [updateCounter, setUpdateCounter] = useState(0);
+  const forceUpdate = () => setUpdateCounter(prev => prev + 1);
 
   // Pencere küçültme durumları - hepsi başlangıçta küçültülmüş
   const [featherPanelMinimized, setFeatherPanelMinimized] = useState(true);
@@ -81,6 +85,9 @@ const PreparationPhase = () => {
     console.log("Yeni tur başladı, kart durumları sıfırlanıyor...");
     // Tüm kartları satın alınmamış duruma getir
     purchasedCardRefs.current = [false, false, false, false, false];
+    
+    // Karları yeniden oluşturmak için force update çağır
+    forceUpdate();
     
     // Bir sonraki render'da tüm kartların görünür olması için state'i güncelle
     setActionLog(prev => [...prev, "Yeni bir hazırlık fazı başladı. Market yenilendi."]);
@@ -892,7 +899,7 @@ const PreparationPhase = () => {
                         { type: "Asker", iconType: "speed", attack: 10, defense: 8, health: 35, speed: 10 },
                         { type: "Asker", iconType: "security", attack: 15, defense: 10, health: 35, speed: 6 },
                         { type: "Asker", iconType: "military_tech", attack: 10, defense: 10, health: 30, speed: 7 }
-                      ], []).map((unitType, index) => {
+                      ], [updateCounter]).map((unitType, index) => {
                         // Hazırlık fazında satın alınan asker sayısı
                         const purchasedSoldiersCount = player.island.units
                           .filter((u: Unit) => u.type === 'soldier' && !u.isDeployed).length;
