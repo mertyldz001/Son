@@ -31,11 +31,11 @@ function HexTile({
   onHover, 
   onUnhover 
 }: HexTileProps) {
-  // TFT tarzı renkler - ekran görüntüsündeki gibi
-  const baseColor = isPlayerSide ? "#4f9bff" : "#e04040"; // Ekran görüntüsündeki gibi ana renkler
-  const hoverColor = isPlayerSide ? "#64bdff" : "#ff6060"; // Vurgu renkleri
-  // Kenar çizgisi renkleri - exact match ekran görüntüsüne göre
-  const edgeColor = isPlayerSide ? "#4692e8" : "#eb6060";
+  // Yeni resme göre siyah/koyu renkli altıgenler
+  const baseColor = isPlayerSide ? "#222222" : "#222222"; // Siyah altıgenler 
+  const hoverColor = isPlayerSide ? "#444444" : "#444444"; // Hover durumunda biraz açık renkli
+  // Kenar çizgisi renkleri - siyah zemin için açık kenarlar
+  const edgeColor = isPlayerSide ? "#444444" : "#444444";
   
   // TFT stili hover animasyonu - yumuşak geçişli
   const hoverScale = useRef(new THREE.Vector3(1, 1, 1));
@@ -148,19 +148,31 @@ const HexGrid: React.FC<HexGridProps> = ({
   const hexagons = [];
   
   // TFT tarzı düzgün grid oluşturma - Sütunları tam düz hizala
-  // Her sütun kendi kolonunda olacak şekilde düzenle
-  for (let r = 0; r < gridHeight; r++) {
-    // TFT tarzı düzen için ofseti kaldır - sütunlar düz olsun
-    for (let q = 0; q < gridWidth; q++) {
+  // Altıgenleri resimde görünen düzende yerleştir (tam ekran görüntüsündeki gibi)
+  // Üç satır halinde, düz sütunlar şeklinde - tam resme uygun
+  const rows = 3;
+  const columnsPerRow = 7;
+  
+  // Başlangıçta gridWidth ve gridHeight değerleri yerine sabit değerler kullanalım
+  gridWidth = columnsPerRow;
+  gridHeight = rows;
+  
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < columnsPerRow; col++) {
+      // Altıgen koordinatlarını hesapla
+      const r = row;
+      const q = col;
       const s = -q - r;
       const key = `${q},${r},${s}`;
       
-      // Pozisyonlar - TFT tarzı daha yakın sütunlar
-      const x = size * 2.2 * (q - gridWidth/2 + 0.5);  // Yatay olarak optimal aralık
-      const z = size * 2.0 * r;  // Dikey olarak optimal aralık
+      // Resimde gösterilen tam düz sütunlar için düzen
+      // X pozisyonu: düz sütunlar için offset yok - sık aralıklı olsun
+      const x = size * 1.5 * (col - columnsPerRow/2 + 0.5);  // Yatay mesafe daha da azaltıldı
+      // Z pozisyonu: düz satırlar için offset
+      const z = size * 1.7 * row;  // Dikey mesafe de azaltıldı - daha sık aralıklı
       
       // TFT tarzı: Oyuncu ve rakip tarafı - net ayrım
-      const isPlayerSide = r < gridHeight / 2;
+      const isPlayerSide = row < rows / 2;
       
       // Koordinat stringi (işgal durumunu kontrol etmek için)
       const coordString = `${q},${r},${s}`;
