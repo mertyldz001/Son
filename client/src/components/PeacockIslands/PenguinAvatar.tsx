@@ -19,30 +19,29 @@ export function PenguinAvatar() {
   
   // Sadece sütunlar ve yeşil bahçe alanında hareket edebilme kontrolü
   const isValidPosition = (point: THREE.Vector3): boolean => {
-    // Hexagonal sütunlar ve yeşil bahçe bölgesi için sınırlar
-    // Merkezden başlayarak hex grid ve çevresindeki yeşil alan tanımı
-    const centerX = 0;
-    const centerZ = 0;
+    // TFT oyun alanı sınırları - sütunlar ve yeşil bahçe bölgesi dahil
     
-    // Hexagonal grid alanı (sütunlar)
-    const gridWidth = 7;  // x-ekseninde 7 sütun
-    const gridHeight = 6; // z-ekseninde 6 sütun
-    const cellSize = 1.2; // Her hücrenin boyutu
+    // Merkezde değil, kaydırılmış oyun alanı merkezi (TFT tarzı grid için)
+    // Kamera görüntüsüne göre ayarlanmış koordinatlar
+    const gridCenterX = 0;
+    const gridCenterZ = -2; // Oyun alanı biraz ön tarafa kayık
     
-    // Grid alanını hesapla
-    const gridBoundsX = (gridWidth * cellSize) / 2;
-    const gridBoundsZ = (gridHeight * cellSize) / 2;
+    // Oyun alanı dikdörtgen sınırları
+    // Hexler ve çimenliklerle birlikte tüm alanı kapsayan daha dar alanlar
+    const maxX = 4.2;  // Sağ sınır 
+    const minX = -4.2; // Sol sınır
+    const maxZ = 2.0;  // Üst sınır (oyuncuya daha yakın)
+    const minZ = -6.0; // Alt sınır (oyuncudan daha uzak)
     
-    // Yeşil bahçe alanı için ilave sınır
-    const gardenMargin = 2.0; // Gridden yeşil alana doğru uzanan mesafe
+    // Merkeze göre pozisyon kontrolü yerine doğrudan sınırlar içinde mi kontrolü
+    const isWithinBounds = 
+      point.x >= minX && 
+      point.x <= maxX && 
+      point.z >= minZ && 
+      point.z <= maxZ;
     
-    // X ve Z koordinatları merkeze göre normalize et
-    const relativeX = Math.abs(point.x - centerX);
-    const relativeZ = Math.abs(point.z - centerZ);
-    
-    // Sütunlar ve yeşil bahçe alanında mı kontrol et
-    return relativeX <= (gridBoundsX + gardenMargin) && 
-           relativeZ <= (gridBoundsZ + gardenMargin);
+    // Direkt dikdörtgen içinde mi kontrolü
+    return isWithinBounds;
   };
   
   // Mobil dokunma ve tıklama için DOM tabanlı çözüm
@@ -95,11 +94,15 @@ export function PenguinAvatar() {
       
       // Raycaster ile düzlemin kesişimini bul
       if (raycaster.ray.intersectPlane(groundPlane, targetPoint)) {
+        console.log("Tıklanan nokta:", targetPoint.x, targetPoint.z);
+        
         // Geçerli pozisyon kontrolü
         if (!isValidPosition(targetPoint)) {
           console.log("Geçersiz hedef: Sütunlar ve bahçe dışında");
           return; // Geçersiz pozisyon
         }
+        
+        console.log("Geçerli hedef: Hareket başlıyor");
         
         // Hedef pozisyonu ayarla
         setTargetPosition(targetPoint);
