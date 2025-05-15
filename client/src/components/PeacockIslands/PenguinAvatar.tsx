@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useMemo } from "react";
 import { useGLTF } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
@@ -11,189 +11,162 @@ export function PenguinAvatar() {
   const [isMoving, setIsMoving] = useState(false);
   const [targetPosition, setTargetPosition] = useState<THREE.Vector3 | null>(null);
   
-  // Hareket hızı - daha akıcı hareket için hızı artır
-  const speed = 0.08;
+  // Daha hızlı hareket - performans iyileştirmesi
+  const speed = 0.12;
   
   // ThreeJS dünyası için erişim
-  const { raycaster, camera, scene } = useThree();
+  const { raycaster, camera } = useThree();
   
-  // Sadece sütunlar ve yeşil bahçe alanında hareket edebilme kontrolü
-  const isValidPosition = (point: THREE.Vector3): boolean => {
-    // TFT oyun alanı sınırları - sütunlar ve yeşil bahçe bölgesi dahil
-    
-    // Merkezde değil, kaydırılmış oyun alanı merkezi (TFT tarzı grid için)
-    // Kamera görüntüsüne göre ayarlanmış koordinatlar
-    const gridCenterX = 0;
-    const gridCenterZ = -2; // Oyun alanı biraz ön tarafa kayık
-    
-    // Oyun alanı dikdörtgen sınırları
-    // Hexler ve çimenliklerle birlikte tüm alanı kapsayan daha dar alanlar
-    const maxX = 4.2;  // Sağ sınır 
-    const minX = -4.2; // Sol sınır
-    const maxZ = 2.0;  // Üst sınır (oyuncuya daha yakın)
-    const minZ = -6.0; // Alt sınır (oyuncudan daha uzak)
-    
-    // Merkeze göre pozisyon kontrolü yerine doğrudan sınırlar içinde mi kontrolü
-    const isWithinBounds = 
-      point.x >= minX && 
-      point.x <= maxX && 
-      point.z >= minZ && 
-      point.z <= maxZ;
-    
-    // Direkt dikdörtgen içinde mi kontrolü
-    return isWithinBounds;
-  };
+  // Penguen modeli - Performans için memo
+  const { scene: penguinScene } = useGLTF('/models/penguin_-_tft.glb');
+  const penguinModel = useMemo(() => penguinScene?.clone(), [penguinScene]);
   
-  // Mobil dokunma ve tıklama için DOM tabanlı çözüm
-  useEffect(() => {
-    // Mobil cihazlar için dokunma olayını yakalamak için
-    const handleTouch = (event: TouchEvent | MouseEvent) => {
-      // Canvas elemanını bul
+  // TFT oyun alanının sınırları - HexGrid'e göre ölçeklenmiş
+  // HexGrid içindeki koordinat yapısına göre ayarlandı
+  const gameBounds = useMemo(() => {
+    return {
+      minX: -6, 
+      maxX: 6,
+      minZ: -8, 
+      maxZ: 2
+    };
+  }, []);
+  
+  // Tıklama işlemcisi - Performans için iyileştirildi
+  const handleTouch = useMemo(() => {
+    return (event: TouchEvent | MouseEvent) => {
+      // Canvas elemanını bul ve sınır kontrolü
       const canvas = document.querySelector('canvas');
       if (!canvas) return;
       
-      // Dokunma veya tıklama koordinatlarını al
-      let x, y;
+      // Tıklama veya dokunma koordinatları
+      let clientX: number, clientY: number;
       
       if ('touches' in event) {
-        // Dokunma olayı için
+        // Dokunma olayı
         if (event.touches.length === 0) return;
-        const touch = event.touches[0];
-        x = touch.clientX;
-        y = touch.clientY;
+        clientX = event.touches[0].clientX;
+        clientY = event.touches[0].clientY;
       } else {
-        // Mouse tıklaması için
-        x = event.clientX;
-        y = event.clientY;
+        // Mouse tıklaması
+        clientX = event.clientX;
+        clientY = event.clientY;
       }
       
-      // Canvas sınırları içinde mi kontrol et
+      // Canvas dışı tıklamaları yoksay
       const rect = canvas.getBoundingClientRect();
       if (
-        x < rect.left ||
-        x > rect.right ||
-        y < rect.top ||
-        y > rect.bottom
+        clientX < rect.left ||
+        clientX > rect.right ||
+        clientY < rect.top ||
+        clientY > rect.bottom
       ) {
-        return; // Canvas dışında
+        return;
       }
       
-      // Normalize edilmiş koordinatlar (-1 ile 1 arasında)
-      const normalizedX = ((x - rect.left) / rect.width) * 2 - 1;
-      const normalizedY = -((y - rect.top) / rect.height) * 2 + 1;
+      // Canvas koordinatlarını normalize et (-1 ile 1 arasında)
+      const normalizedX = ((clientX - rect.left) / rect.width) * 2 - 1;
+      const normalizedY = -((clientY - rect.top) / rect.height) * 2 + 1;
       
-      // Raycaster kullanarak 3D dünyada kesişim noktası bul
-      raycaster.setFromCamera(
-        new THREE.Vector2(normalizedX, normalizedY),
-        camera
-      );
+      // Raycaster'ı hazırla
+      raycaster.setFromCamera(new THREE.Vector2(normalizedX, normalizedY), camera);
       
-      // Zemini bulmak için bir yardımcı düzlem oluştur
+      // Zemin düzlemi - Y=0 düzleminde
       const groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
       const targetPoint = new THREE.Vector3();
       
-      // Raycaster ile düzlemin kesişimini bul
+      // Işın-düzlem kesişimi hesapla
       if (raycaster.ray.intersectPlane(groundPlane, targetPoint)) {
-        console.log("Tıklanan nokta:", targetPoint.x, targetPoint.z);
-        
-        // Geçerli pozisyon kontrolü
-        if (!isValidPosition(targetPoint)) {
-          console.log("Geçersiz hedef: Sütunlar ve bahçe dışında");
-          return; // Geçersiz pozisyon
+        // Tıklanan nokta oyun alanı içinde mi?
+        if (
+          targetPoint.x < gameBounds.minX || 
+          targetPoint.x > gameBounds.maxX || 
+          targetPoint.z < gameBounds.minZ || 
+          targetPoint.z > gameBounds.maxZ
+        ) {
+          // Sınırlar dışında - hareket etme
+          console.log("Sınırlar dışında tıklama:", targetPoint.x, targetPoint.z);
+          return;
         }
         
-        console.log("Geçerli hedef: Hareket başlıyor");
+        // Hareket et
+        console.log("Hareket hedefi:", targetPoint.x, targetPoint.z);
         
-        // Hedef pozisyonu ayarla
+        // Hedefi ayarla ve hareketi başlat
         setTargetPosition(targetPoint);
         setIsMoving(true);
         
-        // Hedef yöne dönüş - daha yumuşak rotasyon
+        // Hedefe dön
         const deltaX = targetPoint.x - position[0];
         const deltaZ = targetPoint.z - position[2];
         const angle = Math.atan2(deltaX, deltaZ);
         setRotation([0, angle, 0]);
       }
     };
-    
-    // Olayları ekle - hem tıklama hem dokunma için
+  }, [camera, raycaster, gameBounds, position]);
+  
+  // Event listener'ları ekle/kaldır
+  useEffect(() => {
     document.addEventListener('click', handleTouch);
     document.addEventListener('touchstart', handleTouch);
     
-    // Temizleme
     return () => {
       document.removeEventListener('click', handleTouch);
       document.removeEventListener('touchstart', handleTouch);
     };
-  }, [camera, raycaster, scene, position]);
+  }, [handleTouch]);
   
-  // Animasyon ve hareket - daha akıcı ve gçzel
-  useFrame((_, delta) => {
-    if (targetPosition && isMoving) {
-      // Mevcut pozisyon
-      const currentPos = new THREE.Vector3(position[0], position[1], position[2]);
-      
-      // Hedefe kalan mesafe
-      const distance = currentPos.distanceTo(targetPosition);
-      
-      // Hedefe vardıysak dur
-      if (distance < 0.1) {
-        setIsMoving(false);
-        setTargetPosition(null);
-        // Karakterin sabit kalmasını sağla - idle animasyonu olmadan
-        return;
-      }
-      
-      // Hareket yönü - daha akıcı hareket için
-      const direction = new THREE.Vector3().subVectors(targetPosition, currentPos).normalize();
-      
-      // Hız eğrisi - hareket başlangıcında ve bitişinde yavaşlama
-      let moveSpeed = speed;
-      if (distance < 1.0) {
-        // Hedefe yaklaşırken yavaşla
-        moveSpeed = speed * (distance / 1.0);
-      }
-      
-      // Minimum hız garantisi
-      moveSpeed = Math.max(speed * 0.5, moveSpeed);
-      
-      // Hareket mesafesini hesapla
-      const moveDistance = moveSpeed * delta * 60;
-      
-      // Yeni pozisyon
-      const newX = currentPos.x + direction.x * Math.min(moveDistance, distance);
-      const newZ = currentPos.z + direction.z * Math.min(moveDistance, distance);
-      
-      // Pozisyonu güncelle
-      setPosition([newX, position[1], newZ]);
-      
-      // Hareket sırasında karakterin yüksekliği sabit kalır
-      if (model.current) {
-        // Idle animasyonu olmadan, sabit yükseklik
-        model.current.position.y = 0.05;
-      }
+  // Performans iyileştirmesi - Hareket için memo değerler
+  useFrame(({ clock }, delta) => {
+    if (!isMoving || !targetPosition) return;
+    
+    // Mevcut pozisyon
+    const currentPos = new THREE.Vector3(position[0], position[1], position[2]);
+    
+    // Hedef mesafesi
+    const distance = currentPos.distanceTo(targetPosition);
+    
+    // Hedefe ulaşıldı mı?
+    if (distance < 0.1) {
+      setIsMoving(false);
+      setTargetPosition(null);
+      return;
+    }
+    
+    // Hareket yönü
+    const direction = new THREE.Vector3().subVectors(targetPosition, currentPos).normalize();
+    
+    // Hareket hızı - sabit hızda
+    const moveDistance = speed * delta * 60;
+    
+    // Yeni pozisyon hesapla
+    const newX = currentPos.x + direction.x * Math.min(moveDistance, distance);
+    const newZ = currentPos.z + direction.z * Math.min(moveDistance, distance);
+    
+    // Pozisyonu güncelle
+    setPosition([newX, position[1], newZ]);
+    
+    // Sabit yükseklik - idle animasyonu yok
+    if (model.current) {
+      model.current.position.y = 0;
     }
   });
   
-  // Penguen modeli
-  const { scene: penguinScene } = useGLTF('/models/penguin_-_tft.glb');
-  if (!penguinScene) return null;
+  // Penguen modeli yüklü değilse render etme
+  if (!penguinModel) return null;
   
   return (
-    <group
-      position={[position[0], position[1], position[2]]}
-    >
-      {/* Penguen modeli */}
+    <group position={[position[0], position[1], position[2]]}>
       <group 
         ref={model} 
         rotation={[rotation[0], rotation[1], rotation[2]]} 
         scale={[0.3, 0.3, 0.3]}
       >
-        <primitive object={penguinScene.clone()} />
+        <primitive object={penguinModel} />
       </group>
     </group>
   );
 }
 
-// Modelimizi önceden yükle
+// Modelimizi önceden yükle - performans için
 useGLTF.preload('/models/penguin_-_tft.glb');
