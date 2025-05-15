@@ -409,17 +409,15 @@ const GameScene = () => {
   return (
     <>
       {/* TFT tarzı düz görünüm için kamera ayarı */}
-      {/* Tam kuş bakışı kamera perspektifi */}
+      {/* Daha uzaktan bakan ama açılı kamera */}
       <PerspectiveCamera 
-        position={[0, 60, 0]} 
-        rotation={[-Math.PI/2, 0, 0]} 
-        fov={60}
+        position={[0, 25, 30]} 
+        rotation={[-Math.PI/4, 0, 0]} 
+        fov={45}
         near={0.1} 
         far={1000}
         makeDefault
       />
-      {/* Kamera değişikliği log */}
-      {console.log("KUŞ BAKIŞI KAMERA AKTİF EDİLDİ")}
       
       {/* Işıklandırma - modern ve parlak tarz */}
       <ambientLight intensity={0.7} /> {/* Ortam ışığını daha da arttır */}
@@ -546,9 +544,7 @@ const GameBoard3D = () => {
   const { currentPhase } = usePeacockIslandsStore();
   const isBattlePhase = currentPhase === "battle";
   
-  // Kamera için çok daha geniş açılı sabit değerler
-  const cameraY = 50; // Çok daha yüksek değer
-  const cameraZ = 45; // Çok daha uzak değer
+  // Kamera değerleri Canvas içinde kullanılmıyor artık - PerspectiveCamera bileşenini kullanıyoruz
   const backgroundColor = isBattlePhase ? "#2e5a7a" : "#3d6c95"; // Çok daha canlı ve modern arkaplan
   
   // Zoom butonlarını kaldırdık sadece sabit değerlerle çalışıyoruz
