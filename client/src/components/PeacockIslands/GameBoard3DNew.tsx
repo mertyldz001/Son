@@ -543,9 +543,9 @@ const GameBoard3D = () => {
   const { currentPhase } = usePeacockIslandsStore();
   const isBattlePhase = currentPhase === "battle";
   
-  // Kamera için ilk değerler
-  const [cameraY, setCameraY] = useState(21);
-  const [cameraZ, setCameraZ] = useState(21);
+  // Kamera için geniş açılı sabit değerler - butonları geçici olarak devre dışı bıraktık
+  const cameraY = 30; // Daha yüksek değer
+  const cameraZ = 30; // Daha uzak değer
   const backgroundColor = isBattlePhase ? "#2e5a7a" : "#3d6c95"; // Çok daha canlı ve modern arkaplan
   
   // Basit buton fonksiyonları
@@ -590,7 +590,7 @@ const GameBoard3D = () => {
         className="w-full max-w-4xl h-full max-h-[85vh] mx-auto my-auto touch-action-none"
         camera={{
           position: [0, cameraY, cameraZ],
-          fov: 40,
+          fov: 50, // Daha geniş görüş açısı
           near: 0.1,
           far: 1000
         }}
