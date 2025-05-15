@@ -746,80 +746,142 @@ export const usePeacockIslandsStore = create<PeacockIslandsStore>((set, get) => 
   // Birim ekleme fonksiyonu
   addUnitToPlayer: (playerId: string, units: Unit[]) => {
     set((state) => {
-      const players = [...state.players];
-      const playerIndex = players.findIndex((p) => p.id === playerId);
+      // Mevcut durumda sadece bir oyuncu var (çoklu oyuncu desteği için gelecekte genişletilebilir)
+      if (playerId === state.player.id) {
+        const updatedPlayer = { 
+          ...state.player,
+          island: {
+            ...state.player.island,
+            units: [...state.player.island.units, ...units]
+          }
+        };
+        
+        return {
+          ...state,
+          player: updatedPlayer
+        };
+      } else if (playerId === state.npc.id) {
+        const updatedNpc = { 
+          ...state.npc,
+          island: {
+            ...state.npc.island,
+            units: [...state.npc.island.units, ...units]
+          }
+        };
+        
+        return {
+          ...state,
+          npc: updatedNpc
+        };
+      }
       
-      if (playerIndex < 0) return state;
-      
-      const player = { ...players[playerIndex] };
-      player.island.units = [...player.island.units, ...units];
-      
-      players[playerIndex] = player;
-      
-      return {
-        ...state,
-        players,
-      };
+      return state;
     });
   },
   
   // Birim yerleştirme fonksiyonu
   deployUnit: (playerId: string, unitId: string, position: {q: number, r: number, s: number}) => {
     set((state) => {
-      const players = [...state.players];
-      const playerIndex = players.findIndex((p) => p.id === playerId);
+      if (playerId === state.player.id) {
+        const unitIndex = state.player.island.units.findIndex((u: Unit) => u.id === unitId);
+        
+        if (unitIndex < 0) return state;
+        
+        const updatedUnits = [...state.player.island.units];
+        updatedUnits[unitIndex] = {
+          ...updatedUnits[unitIndex],
+          isDeployed: true,
+          position
+        };
+        
+        return {
+          ...state,
+          player: {
+            ...state.player,
+            island: {
+              ...state.player.island,
+              units: updatedUnits
+            }
+          }
+        };
+      } else if (playerId === state.npc.id) {
+        const unitIndex = state.npc.island.units.findIndex((u: Unit) => u.id === unitId);
+        
+        if (unitIndex < 0) return state;
+        
+        const updatedUnits = [...state.npc.island.units];
+        updatedUnits[unitIndex] = {
+          ...updatedUnits[unitIndex],
+          isDeployed: true,
+          position
+        };
+        
+        return {
+          ...state,
+          npc: {
+            ...state.npc,
+            island: {
+              ...state.npc.island,
+              units: updatedUnits
+            }
+          }
+        };
+      }
       
-      if (playerIndex < 0) return state;
-      
-      const player = { ...players[playerIndex] };
-      const unitIndex = player.island.units.findIndex(u => u.id === unitId);
-      
-      if (unitIndex < 0) return state;
-      
-      const updatedUnits = [...player.island.units];
-      updatedUnits[unitIndex] = {
-        ...updatedUnits[unitIndex],
-        isDeployed: true,
-        position
-      };
-      
-      player.island.units = updatedUnits;
-      players[playerIndex] = player;
-      
-      return {
-        ...state,
-        players,
-      };
+      return state;
     });
   },
   
   // Birim yerini değiştirme fonksiyonu
   undeployUnit: (playerId: string, unitId: string) => {
     set((state) => {
-      const players = [...state.players];
-      const playerIndex = players.findIndex((p) => p.id === playerId);
+      if (playerId === state.player.id) {
+        const unitIndex = state.player.island.units.findIndex((u: Unit) => u.id === unitId);
+        
+        if (unitIndex < 0) return state;
+        
+        const updatedUnits = [...state.player.island.units];
+        updatedUnits[unitIndex] = {
+          ...updatedUnits[unitIndex],
+          isDeployed: false,
+          position: undefined
+        };
+        
+        return {
+          ...state,
+          player: {
+            ...state.player,
+            island: {
+              ...state.player.island,
+              units: updatedUnits
+            }
+          }
+        };
+      } else if (playerId === state.npc.id) {
+        const unitIndex = state.npc.island.units.findIndex((u: Unit) => u.id === unitId);
+        
+        if (unitIndex < 0) return state;
+        
+        const updatedUnits = [...state.npc.island.units];
+        updatedUnits[unitIndex] = {
+          ...updatedUnits[unitIndex],
+          isDeployed: false,
+          position: undefined
+        };
+        
+        return {
+          ...state,
+          npc: {
+            ...state.npc,
+            island: {
+              ...state.npc.island,
+              units: updatedUnits
+            }
+          }
+        };
+      }
       
-      if (playerIndex < 0) return state;
-      
-      const player = { ...players[playerIndex] };
-      const unitIndex = player.island.units.findIndex(u => u.id === unitId);
-      
-      if (unitIndex < 0) return state;
-      
-      const updatedUnits = [...player.island.units];
-      updatedUnits[unitIndex] = {
-        ...updatedUnits[unitIndex],
-        isDeployed: false,
-        position: undefined
-      };
-      
-      player.island.units = updatedUnits;
-      players[playerIndex] = player;
-      
-      return {
-        ...state,
-        players,
-      };
+      return state;
     });
   },
 

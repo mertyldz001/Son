@@ -44,9 +44,14 @@ const PreparationPhase = () => {
     if (draggedUnit) {
       // Eğer bir birim seçiliyse ve oyuncu tarafına sürükleniyorsa
       if (coords.r >= 3) { // Oyuncu tarafı (alt 3 sıra)
-        deployUnit(player.id, draggedUnit.id, coords);
+        // Store üzerindeki deployUnit fonksiyonunu çağır
+        usePeacockIslandsStore.getState().deployUnit(player.id, draggedUnit.id, coords);
         playClick();
         setDraggedUnit(null);
+        
+        // Aksiyon loguna ekle
+        setActionLog(prev => [...prev, `Birim ${coords.q},${coords.r} konumuna yerleştirildi!`]);
+        
         return true;
       }
     }
@@ -179,8 +184,13 @@ const PreparationPhase = () => {
         // Sadece oyuncu tarafına ve boş hücrelere koy
         if (detail.isPlayerSide && !detail.isOccupied) {
           console.log('Hex tıklandı:', detail.hexCoords);
-          deployUnit(player.id, draggedUnit.id, detail.hexCoords);
+          // Store üzerindeki deployUnit fonksiyonunu çağır
+          usePeacockIslandsStore.getState().deployUnit(player.id, draggedUnit.id, detail.hexCoords);
           playClick();
+          
+          // Aksiyon loguna ekle
+          setActionLog(prev => [...prev, `Birim ${detail.hexCoords.q},${detail.hexCoords.r} konumuna yerleştirildi!`]);
+          
           setDraggedUnit(null);
         }
       }
