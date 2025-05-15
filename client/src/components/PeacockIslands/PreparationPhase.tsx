@@ -932,11 +932,17 @@ const PreparationPhase = () => {
                                 attack: unitType.attack,
                                 defense: unitType.defense,
                                 speed: unitType.speed,
-                                isDeployed: false
+                                isDeployed: true, // Direkt sütuna yerleştirilmiş olarak işaretle
+                                position: { // Sütun pozisyonunu belirle - oyuncu tarafında (yani üstteki 3 sırada)
+                                  q: index,   // Sütun numarası (0, 1, 2, 3, 4)
+                                  r: 0,       // En üst sıra
+                                  s: -index   // Hex koordinat sistemi için gerekli
+                                }
                               };
                               
                               // Askeri oyuncuya ekle
-                              store.addUnitToPlayer(player.id, [newUnit]);
+                              const gameStore = usePeacockIslandsStore.getState();
+                              gameStore.addUnitToPlayer(player.id, [newUnit]);
                               
                               // Askeri sürüklenecek obje olarak ayarla
                               setDraggedUnit(newUnit);
