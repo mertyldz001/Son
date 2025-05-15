@@ -160,7 +160,9 @@ const createEgg = (color: FeatherColor): Egg => {
     id: nanoid(),
     color,
     bonusType: bonusType as BonusType,
-    bonusValue
+    bonusValue,
+    ready: false,
+    hatchTime: 20 // 20 saniye içinde hazır olacak
   };
 };
 

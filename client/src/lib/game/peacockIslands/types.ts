@@ -80,6 +80,7 @@ export interface HatcherySlot {
   id: string;
   isActive: boolean;
   egg: Egg | null;
+  status?: 'idle' | 'hatching' | 'ready' | 'empty' | 'incubating';
 }
 
 export interface Egg {
@@ -115,9 +116,11 @@ export interface EnemyWave {
 
 export interface BattleResult {
   playerWon: boolean;
+  playerVictory: boolean;
   playerDamage: number;
   enemiesDefeated: number;
   turnsElapsed: number;
+  feathersCollected?: FeatherInventory;
 }
 
 export interface BattleLog {
