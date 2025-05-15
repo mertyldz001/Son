@@ -67,10 +67,10 @@ const HexTile: React.FC<HexTileProps> = ({
   const edgeColor = tileEdgeColor;
 
   // Hexagon'un ölçüleri - daha büyük aralıklı 
-  const size = 0.6; // Daha da büyük hex ölçüsü - daha geniş aralıklar için
+  const size = 0.7; // En büyük hex ölçüsü - referans görüntüdeki gibi geniş aralıklar için
 
   // İnce çizgili hexagon için geometri değişiklikleri
-  const hexLineWidth = 0.01; // Çok daha ince kenar çizgisi
+  const hexLineWidth = 0.005; // Son derece ince kenar çizgisi
   
   // Geometrileri memorize et - performans için aynı geometriler tekrar tekrar oluşturulmasın
   const outerRingGeometry = useMemo(() => new THREE.RingGeometry(size - hexLineWidth, size, 6), [size, hexLineWidth]);
@@ -130,9 +130,10 @@ const HexTile: React.FC<HexTileProps> = ({
         <mesh rotation={[-Math.PI / 2, Math.PI, 0]} position={[0, 0.025, 0]}>
           <primitive attach="geometry" object={outerRingGeometry} />
           <meshBasicMaterial 
-            color={isHovered ? "#ffffff" : "#ffffff"}
+            color="#ffffff"
             side={THREE.DoubleSide}
-            transparent={false}
+            transparent={true}
+            opacity={isHovered ? 0.9 : 0.7}
             toneMapped={false} // Daha az post-processing
           />
         </mesh>

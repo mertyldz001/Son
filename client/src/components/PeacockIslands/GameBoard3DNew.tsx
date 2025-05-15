@@ -520,10 +520,10 @@ const GameScene = () => {
         </mesh>
       </group>
       
-      {/* Hexagonal Savaş Alanı - TFT stili - yeni tasarım */}
-      <group position={[0, 0.05, 0]} scale={1.3}>
+      {/* Hexagonal Savaş Alanı - TFT stili - yeni minimal tasarım */}
+      <group position={[0, 0.05, 0]} scale={1.5}>
         <HexGrid 
-          size={0.6} 
+          size={0.7} 
           gridWidth={7} 
           gridHeight={6} 
           unitPositions={deployedUnitPositions}
@@ -533,9 +533,9 @@ const GameScene = () => {
         {/* Sürüklenen birimin görsel önizlemesi - eğer varsa ve cursor hex üzerindeyse */}
         {dragCursor.visible && hoveredHex && (
           <group position={[
-            0.6 * 2 * (hoveredHex.q - 3.5 + 0.5), // Merkezi hizalama için düzeltme - yeni boyuta göre
+            0.7 * 2 * (hoveredHex.q - 3.5 + 0.5), // Merkezi hizalama için düzeltme - yeni boyuta göre
             0.5, // y pozisyonu (yerden yükseklik)
-            hoveredHex.r * 0.6 * 2 // hex boyutuna göre z pozisyonu - yeni boyuta göre ayarlandı
+            hoveredHex.r * 0.7 * 2 // hex boyutuna göre z pozisyonu - yeni boyuta göre ayarlandı
           ]}>
             {dragCursor.type === 'warrior' ? (
               <PeacockWarriorModel 
