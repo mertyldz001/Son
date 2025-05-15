@@ -58,7 +58,7 @@ const AnimatedWater = ({ position = [0, 0, 0], size = 20 }) => {
 };
 
 // Oyuncu adası
-const PlayerIsland = ({ position = [0, 0, 0] }) => {
+const PlayerIsland = ({ position = [0, 0, 0] as [number, number, number] }) => {
   // Ada renkleri
   const islandColors = { 
     base: "#aa8899", 
@@ -543,35 +543,23 @@ const GameBoard3D = () => {
   const { currentPhase } = usePeacockIslandsStore();
   const isBattlePhase = currentPhase === "battle";
   
-  // Daha geniş TFT tarzı bakış açısı için kamera pozisyonu - Vector3 kullanarak hataları çözdük
-  const [cameraPosition, setCameraPosition] = useState<THREE.Vector3>(new THREE.Vector3(0, 21, 21)); // Daha yüksekten ve uzaktan bakış
+  // Daha geniş TFT tarzı bakış açısı için kamera pozisyonu
+  const [cameraX, setCameraX] = useState(0);
+  const [cameraY, setCameraY] = useState(21);
+  const [cameraZ, setCameraZ] = useState(21);
   const backgroundColor = isBattlePhase ? "#2e5a7a" : "#3d6c95"; // Çok daha canlı ve modern arkaplan
   
-  // Yakınlaştırma ve uzaklaştırma fonksiyonları - Vector3 ile düzeltildi
+  // Yakınlaştırma ve uzaklaştırma fonksiyonları
   const handleZoomIn = () => {
-    setCameraPosition(prev => {
-      // Vector3 kopya oluştur
-      const newPos = prev.clone();
-      
-      // Y ve Z değerlerini azalt (yakınlaştır) 
-      newPos.y = Math.max(newPos.y - 2, 10); // Minimum y yüksekliği 10
-      newPos.z = Math.max(newPos.z - 2, 10); // Minimum z uzaklığı 10
-      
-      return newPos;
-    });
+    // Y ve Z değerlerini azalt (yakınlaştır)
+    setCameraY(prev => Math.max(prev - 2, 10)); // Minimum y yüksekliği 10
+    setCameraZ(prev => Math.max(prev - 2, 10)); // Minimum z uzaklığı 10
   };
   
   const handleZoomOut = () => {
-    setCameraPosition(prev => {
-      // Vector3 kopya oluştur
-      const newPos = prev.clone();
-      
-      // Y ve Z değerlerini artır (uzaklaştır)
-      newPos.y = Math.min(newPos.y + 2, 30); // Maksimum y yüksekliği 30
-      newPos.z = Math.min(newPos.z + 2, 30); // Maksimum z uzaklığı 30
-      
-      return newPos;
-    });
+    // Y ve Z değerlerini artır (uzaklaştır)
+    setCameraY(prev => Math.min(prev + 2, 30)); // Maksimum y yüksekliği 30
+    setCameraZ(prev => Math.min(prev + 2, 30)); // Maksimum z uzaklığı 30
   };
   
   return (
@@ -602,7 +590,7 @@ const GameBoard3D = () => {
         shadows
         className="w-full max-w-4xl h-full max-h-[85vh] mx-auto my-auto touch-action-none"
         camera={{
-          position: [cameraPosition.x, cameraPosition.y, cameraPosition.z],
+          position: [cameraX, cameraY, cameraZ],
           fov: 40,
           near: 0.1,
           far: 1000
