@@ -409,14 +409,17 @@ const GameScene = () => {
   return (
     <>
       {/* TFT tarzı düz görünüm için kamera ayarı */}
+      {/* Tam kuş bakışı kamera perspektifi */}
       <PerspectiveCamera 
-        position={[0, 14, 18]} 
-        rotation={[-Math.PI/4, 0, 0]} 
-        fov={35}
+        position={[0, 60, 0]} 
+        rotation={[-Math.PI/2, 0, 0]} 
+        fov={60}
         near={0.1} 
-        far={100}
+        far={1000}
         makeDefault
       />
+      {/* Kamera değişikliği log */}
+      {console.log("KUŞ BAKIŞI KAMERA AKTİF EDİLDİ")}
       
       {/* Işıklandırma - modern ve parlak tarz */}
       <ambientLight intensity={0.7} /> {/* Ortam ışığını daha da arttır */}
@@ -584,12 +587,7 @@ const GameBoard3D = () => {
       <Canvas
         shadows
         className="w-full max-w-4xl h-full max-h-[85vh] mx-auto my-auto touch-action-none"
-        camera={{
-          position: [0, cameraY, cameraZ],
-          fov: 75, // Çok daha geniş görüş açısı
-          near: 0.1,
-          far: 1000
-        }}
+        // Kamera ayarları artık PerspectiveCamera bileşeni içinde yönetiliyor
         gl={{
           antialias: true,
           powerPreference: "default"
