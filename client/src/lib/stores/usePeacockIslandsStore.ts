@@ -18,6 +18,12 @@ import {
   BonusType,
   Unit
 } from "../game/peacockIslands/types";
+
+// Çoklu oyuncu savaş mekanikleri
+import { 
+  simulatePlayerBattle,
+  simulateDetailedBattle
+} from "../game/peacockIslands/multiplayer";
 import { createEnemyWave } from "../game/peacockIslands/enemies";
 import { simulateBattle, getEggBonusValue } from "../game/peacockIslands/battle";
 
