@@ -242,20 +242,10 @@ const PreparationPhase = () => {
           </div>
         </div>
         
-        {/* Ana içerik - Yeni düzen */}
-        <div className="flex gap-6 h-3/4 pointer-events-auto">
-          {/* Sol panel - Oyuncu bilgileri - bulanıklık kaldırıldı */}
-          <div className="w-1/4 bg-blue-900/90 rounded-lg p-4 flex flex-col text-white relative z-10 border border-blue-700">
-            <div className="flex items-center mb-4">
-              <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center mr-3 border-2 border-blue-400">
-                <span className="material-icons">person</span>
-              </div>
-              <div>
-                <h3 className="text-lg font-bold">{player.island.name}</h3>
-                <p className="text-xs text-blue-300">Ada Komutanı</p>
-              </div>
-            </div>
-            
+        {/* Ana içerik - Sağ panel içeriği */}
+        <div className="flex gap-6 h-3/4 pointer-events-auto justify-end">
+          {/* Sağ panel - oyun bilgileri */}
+          <div className="w-1/4 min-w-80 max-w-96">
             {/* Kaynaklar WindowPanel */}
             <WindowPanel 
               title="Kaynaklar" 
