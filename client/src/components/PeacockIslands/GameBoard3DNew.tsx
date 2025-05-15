@@ -453,22 +453,19 @@ const GameScene = () => {
       {/* Işıklandırma - optimize edilmiş - daha az ışık kaynağı */}
       <ambientLight intensity={0.9} /> {/* Ortam ışığını artırıyoruz böylece diğer ışıkları azaltabiliriz */}
       
-      {/* Ana ışık kaynağı - optimize edilmiş shadow map */}
+      {/* Ana ışık kaynağı - maksimum optimize edilmiş shadow map */}
       <directionalLight 
         position={[5, 15, 8]} 
         intensity={1.5} 
         castShadow 
-        shadow-mapSize={[1024, 1024]} // Daha düşük çözünürlük - daha hızlı render
-        shadow-camera-left={-15}
-        shadow-camera-right={15}
-        shadow-camera-top={15}
-        shadow-camera-bottom={-15}
+        shadow-mapSize={[512, 512]} // Çok daha düşük çözünürlük - çok daha hızlı render
+        shadow-bias={-0.0005} // Gölge artifactları önlemek için
+        shadow-camera-left={-10}
+        shadow-camera-right={10}
+        shadow-camera-top={10}
+        shadow-camera-bottom={-10}
+        shadow-camera-far={50} // Daha kısa far değeri - performans için
       />
-      
-      {/* Sadece bir yardımcı ışık - performans optimizasyonu */}
-      <pointLight position={[-5, 10, -5]} intensity={0.5} color="#88ccff" />
-      
-      {/* Glow efektleri kaldırıldı - performans için */}
       
       {/* Arka plan rengi - daha açık ve modern */}
       <color attach="background" args={['#364c6b']} />
@@ -522,8 +519,9 @@ const GameScene = () => {
         </mesh>
       </group>
       
-      {/* Hexagonal Savaş Alanı - TFT stili - yeni minimal tasarım */}
+      {/* Hexagonal Savaş Alanı - TFT stili - merkeze tam konumlandırılmış */}
       <group position={[0, 0.05, 0]} scale={1.5}>
+        {/* Performans için memoized veri ile yeniden render azaltma */}
         <HexGrid 
           size={0.7} 
           gridWidth={7} 
