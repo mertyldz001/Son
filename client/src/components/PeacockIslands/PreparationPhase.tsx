@@ -873,18 +873,18 @@ const PreparationPhase = () => {
                     {/* Kart yuvaları - sadece 5 asker satın alınabilir */}
                     <div className="grid grid-cols-5 gap-4">
                       {useMemo(() => [
-                        { type: "Okçu", attack: 12, defense: 6, health: 30, speed: 8 },
-                        { type: "Piyade", attack: 8, defense: 12, health: 40, speed: 5 },
-                        { type: "Süvari", attack: 10, defense: 8, health: 35, speed: 10 },
-                        { type: "Şövalye", attack: 15, defense: 10, health: 35, speed: 6 },
-                        { type: "Mızrakçı", attack: 10, defense: 10, health: 30, speed: 7 }
+                        { type: "Asker", iconType: "gps_fixed", attack: 12, defense: 6, health: 30, speed: 8 },
+                        { type: "Asker", iconType: "shield", attack: 8, defense: 12, health: 40, speed: 5 },
+                        { type: "Asker", iconType: "speed", attack: 10, defense: 8, health: 35, speed: 10 },
+                        { type: "Asker", iconType: "security", attack: 15, defense: 10, health: 35, speed: 6 },
+                        { type: "Asker", iconType: "military_tech", attack: 10, defense: 10, health: 30, speed: 7 }
                       ], []).map((unitType, index) => {
                         // Hazırlık fazında satın alınan asker sayısı
                         const purchasedSoldiersCount = player.island.units
                           .filter((u: Unit) => u.type === 'soldier' && !u.isDeployed).length;
                           
-                        // Bu kart satın alındı mı?
-                        const isPurchased = purchasedSoldiersCount > index;
+                        // Bu kart satın alındı mı? Durumu React state'de tutalım
+                        const [isPurchased, setIsPurchased] = useState(false);
                         
                         // Her fazda en fazla 5 asker satın alınabilir
                         const maxSoldiersReached = purchasedSoldiersCount >= 5;
@@ -970,11 +970,7 @@ const PreparationPhase = () => {
                                   <div className="flex justify-center mb-2 h-16">
                                     <div className="w-12 h-12 bg-slate-700 rounded-full flex items-center justify-center">
                                       <span className="material-icons text-amber-400 text-2xl">
-                                        {unitType.type === "Okçu" ? "gps_fixed" :
-                                        unitType.type === "Piyade" ? "shield" :
-                                        unitType.type === "Süvari" ? "speed" :
-                                        unitType.type === "Şövalye" ? "security" :
-                                        "military_tech"}
+                                        {unitType.iconType}
                                       </span>
                                     </div>
                                   </div>
